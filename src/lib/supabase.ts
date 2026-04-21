@@ -41,6 +41,7 @@ const createMockClient = () => {
                 // Return a temporary blob URL for the "uploaded" file so it shows in the UI
                 data: { publicUrl: path.startsWith('blob:') ? path : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=1000' } 
               }),
+              list: async () => ({ data: [], error: null }),
             }),
           };
         }

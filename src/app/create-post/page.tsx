@@ -72,13 +72,13 @@ function CreatePostPageContent() {
       if (imageFile) {
         setUploadProgress('Uploading cover image...');
         const path = `posts/${profile.id}/${Date.now()}-${imageFile.name}`;
-        imageUrl = await uploadFile('post-media', path, imageFile);
+        imageUrl = await uploadFile('avatars', path, imageFile);
       }
 
       if (videoFile) {
         setUploadProgress('Uploading motion clip...');
         const path = `posts/${profile.id}/${Date.now()}-${videoFile.name}`;
-        videoUrl = await uploadFile('post-media', path, videoFile);
+        videoUrl = await uploadFile('avatars', path, videoFile);
       }
 
       const { error: postError } = await supabase.from('posts').insert({

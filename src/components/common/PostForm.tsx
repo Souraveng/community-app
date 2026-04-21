@@ -79,13 +79,13 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(({
       if (imageFile) {
         setUploadProgress('Uploading image...');
         const path = `posts/${profile.id}/${Date.now()}-${imageFile.name}`;
-        imageUrl = await uploadFile('post-media', path, imageFile);
+        imageUrl = await uploadFile('avatars', path, imageFile);
       }
 
       if (videoFile) {
         setUploadProgress('Uploading video...');
         const path = `posts/${profile.id}/${Date.now()}-${videoFile.name}`;
-        videoUrl = await uploadFile('post-media', path, videoFile);
+        videoUrl = await uploadFile('avatars', path, videoFile);
       }
 
       const finalCommunity = mode === 'global' ? `c:${selectedCategory}` : communityName;
