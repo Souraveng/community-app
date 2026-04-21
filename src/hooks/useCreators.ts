@@ -37,7 +37,7 @@ export function useCreators() {
 
       // 2. Fetch counts for each profile in parallel
       const creatorsWithStats = await Promise.all(
-        profiles.map(async (profile) => {
+        profiles.map(async (profile: any) => {
           // Post count
           const { count: postCount } = await supabase
             .from('posts')

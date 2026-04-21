@@ -86,8 +86,8 @@ export function useNotifications() {
       }
 
       // 2. Fetch sender profiles for these notifications
-      const senderIds = Array.from(new Set(rawData.map(n => n.sender_id)));
-      const validUUIDs = senderIds.filter(isValidUUID);
+      const senderIds = Array.from(new Set(rawData.map((n: any) => n.sender_id)));
+      const validUUIDs = senderIds.filter((id: any) => isValidUUID(id));
       
       let profiles: any[] = [];
       if (validUUIDs.length > 0) {
@@ -104,13 +104,13 @@ export function useNotifications() {
       }
 
       // 3. Manually merge
-      const mergedData = rawData.map(n => ({
+      const mergedData = rawData.map((n: any) => ({
         ...n,
-        sender: profiles.find(p => p.id === n.sender_id) || null
+        sender: profiles.find((p: any) => p.id === n.sender_id) || null
       }));
 
       setNotifications(mergedData as Notification[]);
-      setUnreadCount(mergedData.filter(n => !n.is_read).length);
+      setUnreadCount(mergedData.filter((n: any) => !n.is_read).length);
     } catch (err) {
       console.error('Error in fetchNotifications:', err);
     } finally {
@@ -125,7 +125,7 @@ export function useNotifications() {
         .update({ is_read: true })
         .eq('id', notificationId);
       
-      setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n));
+      setNotifications(prev => prev.map((n: any) => n.id === notificationId ? { ...n, is_read: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (err) {
       console.error('Error marking notification as read:', err);
@@ -140,7 +140,7 @@ export function useNotifications() {
         .update({ is_read: true })
         .eq('receiver_id', user.uid);
       
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setNotifications(prev => prev.map((n: any) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (err) {
       console.error('Error marking all notifications as read:', err);

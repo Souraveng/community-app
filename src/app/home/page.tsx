@@ -67,7 +67,7 @@ export default function HomeFeed() {
 
         if (data && data.length > 0) {
           // Map database fields to UI props
-          const mappedPosts = data.map(post => ({
+          const mappedPosts = data.map((post: any) => ({
             id: post.id,
             user: post.username,
             avatar: post.user_avatar,

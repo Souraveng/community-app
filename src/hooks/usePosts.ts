@@ -30,7 +30,7 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
         schema: 'public', 
         table: 'posts',
         filter: communityName ? `community_name=eq.${communityName}` : undefined
-      }, (payload) => {
+      }, (payload: any) => {
         setPosts(prev => [payload.new as Post, ...prev]);
       })
       .subscribe();
@@ -71,7 +71,7 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
   const upvotePost = async (postId: string) => {
     try {
        // Optimistic update
-       setPosts(prev => prev.map(p => p.id === postId ? { ...p, upvotes: p.upvotes + 1 } : p));
+       setPosts(prev => prev.map((p: any) => p.id === postId ? { ...p, upvotes: p.upvotes + 1 } : p));
        
        const { error } = await supabase.rpc('increment_upvotes', { post_id: postId });
        if (error) throw error;

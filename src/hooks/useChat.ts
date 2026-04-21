@@ -45,7 +45,7 @@ export function useChat(conversationId?: string) {
           schema: 'public',
           table: 'messages',
           filter: `conversation_id=eq.${conversationId}`
-        }, async (payload) => {
+        }, async (payload: any) => {
           const msg = payload.new as Message;
           const decrypted = await decryptSingle(msg);
           setMessages(prev => [...prev, decrypted]);

@@ -46,7 +46,7 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
     channelRef.current = channel;
 
     channel
-      .on('broadcast', { event: 'call-offer' }, async ({ payload }) => {
+      .on('broadcast', { event: 'call-offer' }, async ({ payload }: any) => {
         if (payload.from === user.uid) return;
         setIncomingCall({ from: payload.from, type: payload.callType });
         setCallType(payload.callType);
@@ -55,12 +55,12 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
         pcRef.current = createPeerConnection();
         await pcRef.current.setRemoteDescription(new RTCSessionDescription(payload.offer));
       })
-      .on('broadcast', { event: 'call-answer' }, async ({ payload }) => {
+      .on('broadcast', { event: 'call-answer' }, async ({ payload }: any) => {
         if (payload.from === user.uid || !pcRef.current) return;
         await pcRef.current.setRemoteDescription(new RTCSessionDescription(payload.answer));
         setCallState('connected');
       })
-      .on('broadcast', { event: 'ice-candidate' }, async ({ payload }) => {
+      .on('broadcast', { event: 'ice-candidate' }, async ({ payload }: any) => {
         if (payload.from === user.uid || !pcRef.current) return;
         try {
           await pcRef.current.addIceCandidate(new RTCIceCandidate(payload.candidate));
@@ -68,7 +68,7 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
           console.error('Error adding ICE candidate:', err);
         }
       })
-      .on('broadcast', { event: 'call-end' }, ({ payload }) => {
+      .on('broadcast', { event: 'call-end' }, ({ payload }: any) => {
         if (payload.from === user.uid) return;
         endCall();
       })

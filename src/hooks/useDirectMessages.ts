@@ -75,7 +75,7 @@ export function useDirectMessages() {
       if (error) throw error;
 
       // Enhance conversations with "other user" profile data
-      const processed = await Promise.all((data || []).map(async (conv) => {
+      const processed = await Promise.all((data || []).map(async (conv: any) => {
         const otherId = conv.participants.find((id: string) => id !== user.uid);
         
         // Guard nested profile fetch

@@ -102,14 +102,14 @@ export default function UserProfilePage() {
             .select('follower_id, profiles!follows_follower_id_fkey(*)')
             .eq('following_id', profile.id);
           if (error) throw error;
-          data = follows.map(f => f.profiles);
+          data = (follows as any[]).map((f: any) => f.profiles);
         } else {
           const { data: follows, error } = await supabase
             .from('follows')
             .select('following_id, profiles!follows_following_id_fkey(*)')
             .eq('follower_id', profile.id);
           if (error) throw error;
-          data = follows.map(f => f.profiles);
+          data = (follows as any[]).map((f: any) => f.profiles);
         }
         setConnectionList(data || []);
       } catch (err) {
