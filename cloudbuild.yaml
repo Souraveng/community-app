@@ -45,4 +45,4 @@ substitutions:
   _NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_X5hicdUW-7IutBByArDJ-A_HZ5kK9AC
 
 options:
-  logging: CLOUD_LOGGING
+  logging: CLOUD_LOGGING_ONLY
