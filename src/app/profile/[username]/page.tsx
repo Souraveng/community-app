@@ -345,13 +345,13 @@ export default function UserProfilePage() {
                      </div>
                    ) : posts.length > 0 ? (
                      posts.map((post) => (
-                       <PostCard 
-                         key={post.id}
-                         id={post.id}
-                         user={post.username}
-                         userId={post.user_id}
-                         avatar={post.user_avatar}
-                         timestamp={formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                        <PostCard 
+                          key={post.id}
+                          id={post.id}
+                          user={post.username}
+                          userId={post.user_id}
+                          avatar={post.user_avatar}
+                          timestamp={post.created_at}
                          community={post.community_name}
                          title={post.title}
                          content={post.content}

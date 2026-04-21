@@ -15,23 +15,19 @@ if (typeof window !== 'undefined') {
 const hasKeys = supabaseUrl && supabaseAnonKey;
 
 
-// Robust, infinitely chainable mock client using Proxies
-// This prevents "TypeError: x is not a function" crashes when environment variables are missing
+// Robust, infinitely chainable mock client for "Demo Mode"
+// This allows the UI to function perfectly even without environment variables.
 const createMockClient = () => {
   const chainable = (target: any = {}): any => {
     return new Proxy(target, {
       get(target, prop) {
-        // 1. If it's a standard Promise method, return a resolved promise with mock data
-        if (prop === 'then') {
-          return (resolve: any) => resolve({ data: [], error: null });
-        }
-        
-        // 2. Handle specialized objects
+        // 1. Handle specialized objects
         if (prop === 'auth') {
           return {
-            getSession: async () => ({ data: { session: null }, error: null }),
+            getSession: async () => ({ data: { session: { user: { id: 'demo-user', email: 'curator@gallery.demo' } } }, error: null }),
+            getUser: async () => ({ data: { user: { id: 'demo-user', email: 'curator@gallery.demo' } }, error: null }),
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-            signInWithPassword: async () => ({ data: {}, error: new Error('Supabase not configured') }),
+            signInWithPassword: async () => ({ data: { user: { id: 'demo-user' }, session: {} }, error: null }),
             signOut: async () => ({ error: null }),
           };
         }
@@ -39,10 +35,19 @@ const createMockClient = () => {
         if (prop === 'storage') {
           return {
             from: () => ({
-              upload: async () => ({ data: null, error: new Error('Supabase not configured') }),
-              getPublicUrl: () => ({ data: { publicUrl: '' } }),
+              // Simulate successful upload and return the path
+              upload: async (path: string, file: File) => ({ data: { path }, error: null }),
+              getPublicUrl: (path: string) => ({ 
+                // Return a temporary blob URL for the "uploaded" file so it shows in the UI
+                data: { publicUrl: path.startsWith('blob:') ? path : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=1000' } 
+              }),
             }),
           };
+        }
+
+        // 2. Standard Promise method (e.g., .then(), .select(), .from())
+        if (prop === 'then') {
+          return (resolve: any) => resolve({ data: [], error: null });
         }
 
         // 3. For everything else (from, select, eq, order, etc.), return the chainable proxy again

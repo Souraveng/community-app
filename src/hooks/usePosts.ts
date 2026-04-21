@@ -8,7 +8,7 @@ export interface Post {
   community_name: string;
   image_url: string | null;
   video_url: string | null;
-  user_id: string; // Required for deletion check
+  user_id: string; 
   username: string;
   user_avatar: string | null;
   upvotes: number;
@@ -16,38 +16,21 @@ export interface Post {
   created_at: string;
 }
 
-export function usePosts(communityName?: string, sort: 'latest' | 'trending' = 'latest', userId?: string) {
+export function usePosts(communityName?: string, sort: 'latest' | 'trending' = 'trending', userId?: string) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPosts();
 
-    // Subscribe to new posts
     const subscription = supabase
       .channel('posts')
       .on('postgres_changes', { 
-        event: 'INSERT', 
+        event: '*', 
         schema: 'public', 
         table: 'posts'
-      }, (payload: any) => {
-        const newPost = payload.new as Post;
-        
-        // Client-side filtering to support OR conditions (name vs c:name)
-        const matchesCommunity = communityName && (
-          newPost.community_name === communityName || 
-          newPost.community_name === `c:${communityName}`
-        );
-        
-        const matchesUser = userId && newPost.user_id === userId;
-        
-        // If no filters provided, show everything (Home Feed)
-        // If filters provided, only show if matched
-        if (!communityName && !userId) {
-          setPosts(prev => [newPost, ...prev]);
-        } else if (matchesCommunity || matchesUser) {
-          setPosts(prev => [newPost, ...prev]);
-        }
+      }, () => {
+        fetchPosts(); // Refetch on any change to maintain relevance order
       })
       .subscribe();
 
@@ -63,14 +46,7 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
         .from('posts')
         .select('*');
 
-      if (sort === 'trending') {
-        query = query.order('upvotes', { ascending: false });
-      } else {
-        query = query.order('created_at', { ascending: false });
-      }
-
       if (communityName) {
-        // Match either the exact community name or the global category prefixed with c:
         query = query.or(`community_name.eq."${communityName}",community_name.eq."c:${communityName}"`);
       }
 
@@ -81,25 +57,25 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
       const { data, error } = await query;
 
       if (error) throw error;
-      setPosts(data || []);
+      
+      let processedPosts = data || [];
+
+      // Pure Relevance Algorithm: (Net Votes) + (Comments * 2)
+      if (sort === 'trending') {
+        processedPosts.sort((a: Post, b: Post) => {
+          const scoreA = (a.upvotes || 0) + ((a.comment_count || 0) * 2);
+          const scoreB = (b.upvotes || 0) + ((b.comment_count || 0) * 2);
+          return scoreB - scoreA;
+        });
+      } else {
+        processedPosts.sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }
+
+      setPosts(processedPosts);
     } catch (err) {
       console.error('Error fetching posts:', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const upvotePost = async (postId: string) => {
-    try {
-       // Optimistic update
-       setPosts(prev => prev.map((p: any) => p.id === postId ? { ...p, upvotes: p.upvotes + 1 } : p));
-       
-       const { error } = await supabase.rpc('increment_upvotes', { post_id: postId });
-       if (error) throw error;
-
-       // Note: In a real app, you'd trigger a notification here too.
-    } catch (err) {
-      console.error('Error upvoting post:', err);
     }
   };
 
@@ -114,5 +90,5 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
     }
   };
 
-  return { posts, loading, upvotePost, deletePost, refresh: fetchPosts };
+  return { posts, loading, deletePost, refresh: fetchPosts };
 }

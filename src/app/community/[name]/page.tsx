@@ -182,7 +182,7 @@ export default function CommunityPage() {
                      userId={post.user_id}
                      user={post.username}
                      avatar={post.user_avatar}
-                     timestamp={formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                     timestamp={post.created_at}
                      community={post.community_name}
                      title={post.title}
                      content={post.content}
