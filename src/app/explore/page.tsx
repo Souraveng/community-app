@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
@@ -25,6 +27,12 @@ export default function ExplorePage() {
       setSortOrder('latest');
       setSelectedCategory(category);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Recently';
+    return date.toLocaleDateString();
   };
 
   return (
@@ -69,7 +77,7 @@ export default function ExplorePage() {
                       <PostCard 
                         id={post.id}
                         user={post.username}
-                        timestamp={new Date(post.created_at).toLocaleDateString()}
+                        timestamp={formatDate(post.created_at)}
                         community={post.community_name}
                         title={post.title}
                         content={post.content}

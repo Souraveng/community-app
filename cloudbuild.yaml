@@ -36,11 +36,11 @@ images:
   - '$_AR_HOSTNAME/$_PROJECT_ID/$_REPOSITORY/${_SERVICE_NAME}:$COMMIT_SHA'
 
 substitutions:
-  _AR_HOSTNAME: us-central1-docker.pkg.dev
+  _AR_HOSTNAME: europe-west1-docker.pkg.dev
   _PROJECT_ID: genai-a-490712
-  _REPOSITORY: gallery-repo # You must create this repo in Artifact Registry first
+  _REPOSITORY: gallery-repo
   _SERVICE_NAME: gallery-app
-  _DEPLOY_REGION: us-central1
+  _DEPLOY_REGION: europe-west1
   _NEXT_PUBLIC_SUPABASE_URL: https://ddheyyvfbfsgttkdkrfo.supabase.co
   _NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_X5hicdUW-7IutBByArDJ-A_HZ5kK9AC
 

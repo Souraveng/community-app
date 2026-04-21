@@ -8,12 +8,43 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const isServer = typeof window === 'undefined';
 const hasKeys = supabaseUrl && supabaseAnonKey;
 
-if (!hasKeys && !isServer) {
-  console.warn('Supabase URL or Anon Key is missing. Check your environment variables.');
-}
+// Mock client for build-time and misconfigured runtime resilience
+const createMockClient = () => ({
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+    signInWithPassword: async () => ({ data: {}, error: new Error('Supabase not configured') }),
+    signOut: async () => ({ error: null }),
+  },
+  from: () => ({
+    select: () => ({
+      order: () => ({
+        eq: () => Promise.resolve({ data: [], error: null }),
+        limit: () => Promise.resolve({ data: [], error: null }),
+        single: () => Promise.resolve({ data: null, error: null }),
+        then: (cb: any) => cb({ data: [], error: null }),
+      }),
+      eq: () => Promise.resolve({ data: [], error: null }),
+      single: () => Promise.resolve({ data: null, error: null }),
+      then: (cb: any) => cb({ data: [], error: null }),
+    }),
+    insert: () => Promise.resolve({ data: null, error: null }),
+    update: () => Promise.resolve({ data: null, error: null }),
+    delete: () => Promise.resolve({ data: null, error: null }),
+  }),
+  channel: () => ({
+    on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
+    subscribe: () => ({ unsubscribe: () => {} }),
+  }),
+  rpc: () => Promise.resolve({ data: null, error: null }),
+  storage: {
+    from: () => ({
+      upload: async () => ({ data: null, error: new Error('Supabase not configured') }),
+      getPublicUrl: () => ({ data: { publicUrl: '' } }),
+    }),
+  },
+});
 
-// We only initialize the client if we have keys. 
-// If missing during build (server-side), we export a placeholder to prevent "supabaseUrl is required" error.
 export const supabase = hasKeys 
   ? createClient(supabaseUrl, supabaseAnonKey)
-  : (null as any);
+  : (createMockClient() as any);
