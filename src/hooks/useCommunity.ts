@@ -10,6 +10,7 @@ export interface Community {
   banner_url?: string;
   member_count: number;
   created_at: string;
+  creator_id: string; // Required for deletion check
 }
 
 export function useCommunity(name?: string) {
@@ -97,5 +98,15 @@ export function useCommunity(name?: string) {
     }
   };
 
-  return { community, isMember, loading, createCommunity, joinCommunity, leaveCommunity };
+  const deleteCommunity = async (communityName: string) => {
+    try {
+      const { error } = await supabase.from('communities').delete().eq('name', communityName);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error deleting community:', err);
+      throw err;
+    }
+  };
+
+  return { community, isMember, loading, createCommunity, joinCommunity, leaveCommunity, deleteCommunity };
 }

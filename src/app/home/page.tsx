@@ -69,6 +69,7 @@ export default function HomeFeed() {
           // Map database fields to UI props
           const mappedPosts = data.map((post: any) => ({
             id: post.id,
+            user_id: post.user_id, // Added this
             user: post.username,
             avatar: post.user_avatar,
             timestamp: new Date(post.created_at).toLocaleDateString(),
@@ -161,14 +162,17 @@ export default function HomeFeed() {
             </div>
           </div>
 
-          {/* Posts List */}
           <div className="space-y-8">
             {posts.map((post, index) => (
               <PostCard 
-                key={index} 
+                key={post.id || index} 
                 id={post.id} 
+                userId={post.user_id}
                 {...post} 
                 autoplay={profile?.autoplay_enabled ?? true}
+                onDelete={(deletedId) => {
+                  setPosts(prev => prev.filter(p => p.id !== deletedId));
+                }}
               />
             ))}
           </div>

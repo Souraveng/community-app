@@ -14,7 +14,7 @@ import Link from 'next/link';
 
 export default function CommunityPage() {
   const { name } = useParams();
-  const { community, isMember, joinCommunity, leaveCommunity, loading } = useCommunity(name as string);
+  const { community, isMember, joinCommunity, leaveCommunity, deleteCommunity, loading } = useCommunity(name as string);
   const { profile } = useProfile();
   const [posts, setPosts] = useState<any[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
@@ -41,6 +41,20 @@ export default function CommunityPage() {
     } finally {
       setPostsLoading(false);
     }
+  };
+
+  const handleDeleteCommunity = async () => {
+    if (!window.confirm('WARNING: Are you sure you want to PERMANENTLY delete this gallery? All exhibits and membership data will be lost.')) return;
+    try {
+      await deleteCommunity(name as string);
+      window.location.href = '/';
+    } catch (err) {
+      alert('Failed to delete gallery. Please try again.');
+    }
+  };
+
+  const handlePostDeleted = (postId: string) => {
+    setPosts(prev => prev.filter(p => p.id !== postId));
   };
 
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center font-headlines text-2xl"><Navbar />Analyzing Gallery...</div>;
@@ -114,6 +128,7 @@ export default function CommunityPage() {
                    <PostCard 
                      key={post.id}
                      id={post.id}
+                     userId={post.user_id}
                      user={post.username}
                      avatar={post.user_avatar}
                      timestamp={new Date(post.created_at).toLocaleDateString()}
@@ -124,6 +139,7 @@ export default function CommunityPage() {
                      upvotes={post.upvotes.toString()}
                      comments={post.comment_count.toString()}
                      autoplay={profile?.autoplay_enabled ?? true}
+                     onDelete={handlePostDeleted}
                    />
                  ))
                ) : (

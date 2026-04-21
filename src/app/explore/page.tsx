@@ -78,6 +78,7 @@ export default function ExplorePage() {
                     <div key={post.id} className="break-inside-avoid">
                       <PostCard 
                         id={post.id}
+                        userId={post.user_id}
                         user={post.username}
                         timestamp={formatDate(post.created_at)}
                         community={post.community_name}
@@ -87,6 +88,7 @@ export default function ExplorePage() {
                         upvotes={post.upvotes.toString()}
                         comments={post.comment_count.toString()}
                         autoplay={profile?.autoplay_enabled ?? true}
+                        onDelete={() => { /* Handled by hook state in usePosts but good for callback compatibility */ }}
                       />
                     </div>
                   ))}

@@ -8,6 +8,7 @@ export interface Post {
   community_name: string;
   image_url: string | null;
   video_url: string | null;
+  user_id: string; // Required for deletion check
   username: string;
   user_avatar: string | null;
   upvotes: number;
@@ -82,5 +83,16 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
     }
   };
 
-  return { posts, loading, upvotePost, refresh: fetchPosts };
+  const deletePost = async (postId: string) => {
+    try {
+      const { error } = await supabase.from('posts').delete().eq('id', postId);
+      if (error) throw error;
+      setPosts(prev => prev.filter(p => p.id !== postId));
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      throw err;
+    }
+  };
+
+  return { posts, loading, upvotePost, deletePost, refresh: fetchPosts };
 }

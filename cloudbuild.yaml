@@ -38,7 +38,7 @@ images:
 substitutions:
   _AR_HOSTNAME: europe-west1-docker.pkg.dev
   _PROJECT_ID: genai-a-490712
-  _REPOSITORY: gallery-repo
+  _REPOSITORY: cloud-run-source-deploy
   _SERVICE_NAME: gallery-app
   _DEPLOY_REGION: europe-west1
   _NEXT_PUBLIC_SUPABASE_URL: https://ddheyyvfbfsgttkdkrfo.supabase.co
