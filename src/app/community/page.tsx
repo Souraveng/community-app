@@ -9,6 +9,7 @@ const communityPosts = [
   {
     id: 'mock-1',
     user: 'alex_minimalist',
+    userId: 'mock-user-1',
     timestamp: '4h ago',
     community: 'Case Study',
     title: 'The evolution of minimalist interfaces in high-end automotive design',
@@ -20,6 +21,7 @@ const communityPosts = [
   {
     id: 'mock-2',
     user: 'grid_master',
+    userId: 'mock-user-2',
     timestamp: '8h ago',
     community: 'Discussion',
     title: 'Why we need to stop using 1px borders for everything',

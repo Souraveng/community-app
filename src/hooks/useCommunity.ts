@@ -55,7 +55,7 @@ export function useCommunity(name?: string) {
     }
   };
 
-  const createCommunity = async (communityData: Omit<Community, 'member_count' | 'created_at'>) => {
+  const createCommunity = async (communityData: Omit<Community, 'member_count' | 'created_at' | 'creator_id'>) => {
     if (!profile) return;
     
     try {
