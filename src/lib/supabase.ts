@@ -8,43 +8,44 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const isServer = typeof window === 'undefined';
 const hasKeys = supabaseUrl && supabaseAnonKey;
 
-// Mock client for build-time and misconfigured runtime resilience
-const createMockClient = () => ({
-  auth: {
-    getSession: async () => ({ data: { session: null }, error: null }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    signInWithPassword: async () => ({ data: {}, error: new Error('Supabase not configured') }),
-    signOut: async () => ({ error: null }),
-  },
-  from: () => ({
-    select: () => ({
-      order: () => ({
-        eq: () => Promise.resolve({ data: [], error: null }),
-        limit: () => Promise.resolve({ data: [], error: null }),
-        single: () => Promise.resolve({ data: null, error: null }),
-        then: (cb: any) => cb({ data: [], error: null }),
-      }),
-      eq: () => Promise.resolve({ data: [], error: null }),
-      single: () => Promise.resolve({ data: null, error: null }),
-      then: (cb: any) => cb({ data: [], error: null }),
-    }),
-    insert: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Insert failed.') }),
-    upsert: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Upsert failed.') }),
-    update: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Update failed.') }),
-    delete: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Delete failed.') }),
-  }),
-  channel: () => ({
-    on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
-    subscribe: () => ({ unsubscribe: () => {} }),
-  }),
-  rpc: () => Promise.resolve({ data: null, error: null }),
-  storage: {
-    from: () => ({
-      upload: async () => ({ data: null, error: new Error('Supabase not configured') }),
-      getPublicUrl: () => ({ data: { publicUrl: '' } }),
-    }),
-  },
-});
+// Robust, infinitely chainable mock client using Proxies
+// This prevents "TypeError: x is not a function" crashes when environment variables are missing
+const createMockClient = () => {
+  const chainable = (target: any = {}): any => {
+    return new Proxy(target, {
+      get(target, prop) {
+        // 1. If it's a standard Promise method, return a resolved promise with mock data
+        if (prop === 'then') {
+          return (resolve: any) => resolve({ data: [], error: null });
+        }
+        
+        // 2. Handle specialized objects
+        if (prop === 'auth') {
+          return {
+            getSession: async () => ({ data: { session: null }, error: null }),
+            onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+            signInWithPassword: async () => ({ data: {}, error: new Error('Supabase not configured') }),
+            signOut: async () => ({ error: null }),
+          };
+        }
+
+        if (prop === 'storage') {
+          return {
+            from: () => ({
+              upload: async () => ({ data: null, error: new Error('Supabase not configured') }),
+              getPublicUrl: () => ({ data: { publicUrl: '' } }),
+            }),
+          };
+        }
+
+        // 3. For everything else (from, select, eq, order, etc.), return the chainable proxy again
+        return (...args: any[]) => chainable();
+      }
+    });
+  };
+
+  return chainable();
+};
 
 export const supabase = hasKeys 
   ? createClient(supabaseUrl, supabaseAnonKey)

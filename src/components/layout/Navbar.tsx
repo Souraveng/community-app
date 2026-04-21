@@ -235,7 +235,7 @@ const Navbar: React.FC = () => {
                   <Link href="/profile" className="flex items-center gap-2 group">
                     <div className="w-8 h-8 rounded-full overflow-hidden relative border border-outline-variant/10 group-hover:border-primary transition-all">
                       {user.photoURL ? (
-                        <Image src={user.photoURL} alt={user.displayName || 'User'} fill className="object-cover" />
+                        <Image src={user.photoURL} alt={user.displayName || 'User'} fill className="object-cover" sizes="32px" />
                       ) : (
                         <span className="material-symbols-outlined text-zinc-400">account_circle</span>
                       )}

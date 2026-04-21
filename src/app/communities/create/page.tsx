@@ -33,7 +33,7 @@ export default function CreateCommunityPage() {
 
     setUploading(type);
     try {
-      const bucket = 'avatar';
+      const bucket = 'avatars';
       const path = `communities/${type}s/${user.uid}_${Date.now()}_${file.name}`;
       
       const publicUrl = await uploadFile(bucket, path, file, { 
@@ -135,7 +135,7 @@ export default function CreateCommunityPage() {
                       className="group cursor-pointer aspect-square rounded-3xl border-2 border-dashed border-outline-variant/20 hover:border-primary/40 transition-all flex flex-col items-center justify-center gap-3 bg-surface-container-lowest/30 relative overflow-hidden"
                     >
                       {avatarUrl ? (
-                        <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
+                        <Image src={avatarUrl} alt="Avatar" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                       ) : (
                         <>
                           <span className="material-symbols-outlined text-3xl opacity-20 group-hover:opacity-100 group-hover:text-primary transition-all">add_photo_alternate</span>
@@ -150,7 +150,7 @@ export default function CreateCommunityPage() {
                       className="group cursor-pointer aspect-square rounded-3xl border-2 border-dashed border-outline-variant/20 hover:border-primary/40 transition-all flex flex-col items-center justify-center gap-3 bg-surface-container-lowest/30 relative overflow-hidden"
                     >
                       {bannerUrl ? (
-                        <Image src={bannerUrl} alt="Banner" fill className="object-cover" />
+                        <Image src={bannerUrl} alt="Banner" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                       ) : (
                         <>
                           <span className="material-symbols-outlined text-3xl opacity-20 group-hover:opacity-100 group-hover:text-primary transition-all">landscape</span>

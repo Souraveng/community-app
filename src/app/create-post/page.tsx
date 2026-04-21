@@ -50,14 +50,14 @@ export default function CreatePostPage() {
       if (imageFile) {
         setUploadProgress('Uploading visual...');
         const path = `posts/${user.uid}/${Date.now()}_${imageFile.name}`;
-        imageUrl = await uploadFile('avatar', path, imageFile, { maxSizeMB: 5 });
+        imageUrl = await uploadFile('avatars', path, imageFile, { maxSizeMB: 5 });
       }
 
       // 2. Upload Video if selected
       if (videoFile) {
         setUploadProgress('Uploading motion...');
         const path = `posts/${user.uid}/${Date.now()}_${videoFile.name}`;
-        videoUrl = await uploadFile('media', path, videoFile, { maxSizeMB: 2 }); // 2MB Limit as requested
+        videoUrl = await uploadFile('avatars', path, videoFile, { maxSizeMB: 20 });
       }
 
       // 3. Create Post
