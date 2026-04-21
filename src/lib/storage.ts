@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 export async function uploadFile(
-  bucket: 'avatars' | 'media',
+  bucket: string,
   path: string,
   file: File,
   options: { maxSizeMB?: number; allowedTypes?: string[] } = {}

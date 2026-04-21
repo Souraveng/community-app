@@ -25,13 +25,7 @@ export function useNotifications() {
   useEffect(() => {
     if (!user?.uid) return;
 
-    // Smart Guard: Only subscribe if the receiver_id column (likely UUID) matches the user ID format
-    // If mismatch, skip subscription to prevent SDK errors
-    if (!isValidUUID(user.uid)) {
-      console.warn('Notifications: Realtime subscription skipped due to ID type mismatch (Firebase vs UUID).');
-      setLoading(false);
-      return;
-    }
+    // Removed restrictive UUID check to support Firebase UIDs
 
     fetchNotifications();
 
@@ -54,21 +48,10 @@ export function useNotifications() {
     };
   }, [user?.uid]);
 
-  const isValidUUID = (id: string) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
-  };
+  // Removed restrictive UUID validation
 
   const fetchNotifications = async () => {
     if (!user?.uid) return;
-
-    // Smart Guard: Pre-flight check to prevent database syntax error (22P02)
-    if (!isValidUUID(user.uid)) {
-      console.warn(`Notifications: Fetch skipped for player "${user.uid}" because the database expects a UUID.`);
-      setNotifications([]);
-      setUnreadCount(0);
-      setLoading(false);
-      return;
-    }
 
     try {
       // 1. Fetch raw notifications
@@ -87,14 +70,14 @@ export function useNotifications() {
 
       // 2. Fetch sender profiles for these notifications
       const senderIds = Array.from(new Set(rawData.map((n: any) => n.sender_id)));
-      const validUUIDs = senderIds.filter((id: any) => isValidUUID(id));
+      const validSenderIds = senderIds; // Firebase UIDs are valid
       
       let profiles: any[] = [];
-      if (validUUIDs.length > 0) {
+      if (validSenderIds.length > 0) {
         const { data: profData, error: profError } = await supabase
           .from('profiles')
           .select('id, username, full_name, avatar_url')
-          .in('id', validUUIDs);
+          .in('id', validSenderIds);
 
         if (profError) {
           console.warn('Profile fetch error:', profError);

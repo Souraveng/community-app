@@ -28,9 +28,10 @@ const createMockClient = () => ({
       single: () => Promise.resolve({ data: null, error: null }),
       then: (cb: any) => cb({ data: [], error: null }),
     }),
-    insert: () => Promise.resolve({ data: null, error: null }),
-    update: () => Promise.resolve({ data: null, error: null }),
-    delete: () => Promise.resolve({ data: null, error: null }),
+    insert: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Insert failed.') }),
+    upsert: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Upsert failed.') }),
+    update: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Update failed.') }),
+    delete: () => Promise.resolve({ data: null, error: new Error('Supabase not configured: Delete failed.') }),
   }),
   channel: () => ({
     on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),

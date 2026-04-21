@@ -9,6 +9,7 @@ import { useCommunity } from '../../../hooks/useCommunity';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabase';
+import { uploadFile } from '../../../lib/storage';
 import { useAuth } from '../../../hooks/useAuth';
 
 export default function CreateCommunityPage() {
@@ -32,19 +33,13 @@ export default function CreateCommunityPage() {
 
     setUploading(type);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `communities/${type}s/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('posts') // Reusing posts bucket or create 'communities' if available
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('posts')
-        .getPublicUrl(filePath);
+      const bucket = 'avatar';
+      const path = `communities/${type}s/${user.uid}_${Date.now()}_${file.name}`;
+      
+      const publicUrl = await uploadFile(bucket, path, file, { 
+        maxSizeMB: type === 'avatar' ? 1 : 5,
+        allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+      });
 
       if (type === 'avatar') setAvatarUrl(publicUrl);
       else setBannerUrl(publicUrl);

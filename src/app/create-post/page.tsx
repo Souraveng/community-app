@@ -50,7 +50,7 @@ export default function CreatePostPage() {
       if (imageFile) {
         setUploadProgress('Uploading visual...');
         const path = `posts/${user.uid}/${Date.now()}_${imageFile.name}`;
-        imageUrl = await uploadFile('media', path, imageFile, { maxSizeMB: 5 });
+        imageUrl = await uploadFile('avatar', path, imageFile, { maxSizeMB: 5 });
       }
 
       // 2. Upload Video if selected
@@ -68,6 +68,7 @@ export default function CreatePostPage() {
         community_name: community,
         image_url: imageUrl,
         video_url: videoUrl,
+        user_id: user.uid, // Required for database constraints and RLS
         username: profile.username,
         user_avatar: profile.avatar_url,
         upvotes: 0,

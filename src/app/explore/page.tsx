@@ -7,6 +7,7 @@ import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
 import PostCard from '@/components/common/PostCard';
 import { usePosts } from '@/hooks/usePosts';
+import { useProfile } from '@/hooks/useProfile';
 
 export default function ExplorePage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -16,6 +17,7 @@ export default function ExplorePage() {
     selectedCategory === 'All' ? undefined : selectedCategory,
     sortOrder
   );
+  const { profile } = useProfile();
 
   const categories = ['All', 'Trending', 'Architecture', 'UI/UX', 'Photography', 'Interior', 'Curated'];
 
@@ -84,6 +86,7 @@ export default function ExplorePage() {
                         image={post.image_url || 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=800'}
                         upvotes={post.upvotes.toString()}
                         comments={post.comment_count.toString()}
+                        autoplay={profile?.autoplay_enabled ?? true}
                       />
                     </div>
                   ))}

@@ -73,8 +73,7 @@ export default function LandingPage() {
                   alt="Modern art gallery interior"
                   fill
                   className="object-cover transform transition-transform duration-700 group-hover:scale-105"
-                  priority
-                  unoptimized
+                  preload={true}
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
@@ -98,7 +97,6 @@ export default function LandingPage() {
                   alt="Art Gallery Exhibit"
                   fill
                   className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
-                  unoptimized
                   sizes="(max-width: 768px) 100vw, 66vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -127,7 +125,6 @@ export default function LandingPage() {
                     alt="Wilderness Lens"
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    unoptimized
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
@@ -212,7 +209,6 @@ export default function LandingPage() {
                 alt="Abstract background"
                 fill
                 className="object-cover"
-                unoptimized
                 sizes="100vw"
               />
             </div>

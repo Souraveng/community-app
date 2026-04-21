@@ -9,11 +9,13 @@ import Button from '../../../components/common/Button';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabase';
 import { useCommunity } from '../../../hooks/useCommunity';
+import { useProfile } from '../../../hooks/useProfile';
 import Link from 'next/link';
 
 export default function CommunityPage() {
   const { name } = useParams();
   const { community, isMember, joinCommunity, leaveCommunity, loading } = useCommunity(name as string);
+  const { profile } = useProfile();
   const [posts, setPosts] = useState<any[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
 
@@ -121,6 +123,7 @@ export default function CommunityPage() {
                      image={post.image_url}
                      upvotes={post.upvotes.toString()}
                      comments={post.comment_count.toString()}
+                     autoplay={profile?.autoplay_enabled ?? true}
                    />
                  ))
                ) : (
