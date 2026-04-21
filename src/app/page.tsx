@@ -69,11 +69,12 @@ export default function LandingPage() {
               <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[2rem] blur-2xl group-hover:blur-3xl transition-all"></div>
               <div className="relative aspect-square rounded-[2rem] overflow-hidden shadow-2xl">
                 <Image 
-                  src="https://images.unsplash.com/photo-1574352067721-72d5913bd35c?auto=format&fit=crop&q=80&w=2000"
+                  src="https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&q=80&w=2000"
                   alt="Modern art gallery interior"
                   fill
                   className="object-cover transform transition-transform duration-700 group-hover:scale-105"
                   priority
+                  unoptimized
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
@@ -93,10 +94,11 @@ export default function LandingPage() {
               {/* Large Feature Card */}
               <div className="md:col-span-8 group relative overflow-hidden rounded-[2rem] bg-surface-container-lowest p-8 min-h-[400px] flex flex-col justify-end">
                 <Image 
-                  src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&q=80&w=2000"
+                  src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf86?auto=format&fit=crop&q=80&w=2000"
                   alt="Minimalist Living"
                   fill
                   className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
+                  unoptimized
                   sizes="(max-width: 768px) 100vw, 66vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -125,6 +127,7 @@ export default function LandingPage() {
                     alt="Wilderness Lens"
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    unoptimized
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
@@ -209,6 +212,7 @@ export default function LandingPage() {
                 alt="Abstract background"
                 fill
                 className="object-cover"
+                unoptimized
                 sizes="100vw"
               />
             </div>
