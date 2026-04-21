@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activity Center - The Gallery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffeef8",
+                    "on-surface-variant": "#595c5d",
+                    "outline": "#757778",
+                    "error-container": "#fb5151",
+                    "on-error-container": "#570008",
+                    "inverse-on-surface": "#9b9d9e",
+                    "tertiary-fixed-dim": "#e88ae1",
+                    "primary-fixed-dim": "#ff5d2e",
+                    "error-dim": "#9f0519",
+                    "on-error": "#ffefee",
+                    "inverse-surface": "#0c0f10",
+                    "surface-container-high": "#e0e3e4",
+                    "on-primary-fixed": "#000000",
+                    "surface-container-highest": "#dadddf",
+                    "tertiary-container": "#f797f0",
+                    "on-primary-fixed-variant": "#581200",
+                    "tertiary-fixed": "#f797f0",
+                    "tertiary-dim": "#7f2d7e",
+                    "surface-dim": "#d1d5d7",
+                    "on-surface": "#2c2f30",
+                    "primary-fixed": "#ff7852",
+                    "on-primary": "#ffefec",
+                    "tertiary": "#8d3a8b",
+                    "surface-bright": "#f5f6f7",
+                    "surface": "#f5f6f7",
+                    "secondary": "#005da4",
+                    "surface-container-low": "#eff1f2",
+                    "surface-variant": "#dadddf",
+                    "outline-variant": "#abadae",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#005292",
+                    "on-background": "#2c2f30",
+                    "inverse-primary": "#ff5624",
+                    "secondary-dim": "#005190",
+                    "on-tertiary-fixed-variant": "#6c1a6c",
+                    "on-tertiary-fixed": "#400042",
+                    "background": "#f5f6f7",
+                    "on-secondary-container": "#004982",
+                    "surface-container": "#e6e8ea",
+                    "secondary-fixed": "#b6d4ff",
+                    "surface-tint": "#ac2c00",
+                    "on-tertiary-container": "#610e63",
+                    "on-primary-container": "#480d00",
+                    "error": "#b31b25",
+                    "primary": "#ac2c00",
+                    "primary-container": "#ff7852",
+                    "on-secondary": "#eef3ff",
+                    "on-secondary-fixed": "#003562",
+                    "secondary-container": "#b6d4ff",
+                    "primary-dim": "#972500",
+                    "secondary-fixed-dim": "#9dc6ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl shadow-sm dark:shadow-none">
+<div class="flex items-center justify-between px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-zinc-900 dark:text-white font-headline">The Gallery</span>
+<nav class="hidden md:flex items-center gap-6 font-headline tracking-tight">
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors" href="#">Explore</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors" href="#">Communities</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors" href="#">Creators</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">search</span>
+<input class="bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary w-64" placeholder="Search Activity..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-blue-600 dark:text-blue-400 hover:text-blue-500 transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+<button class="hidden md:flex bg-primary text-on-primary font-semibold px-6 py-2 rounded-full hover:opacity-90 active:scale-95 duration-200 shadow-sm transition-all">
+                        New Post
+                    </button>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-12 px-6 max-w-4xl mx-auto">
+<header class="mb-12">
+<h1 class="text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">Activity Center</h1>
+<p class="text-on-surface-variant font-body">Manage your community interactions and stay updated on your curation journey.</p>
+</header>
+<!-- Filters Section -->
+<div class="flex flex-wrap gap-3 mb-8">
+<button class="px-5 py-2 rounded-full bg-primary text-on-primary text-sm font-semibold transition-all">All Activity</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface text-sm font-medium hover:bg-surface-container-high transition-all">Mentions</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface text-sm font-medium hover:bg-surface-container-high transition-all">Upvotes</button>
+<button class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface text-sm font-medium hover:bg-surface-container-high transition-all">Invitations</button>
+</div>
+<!-- Activity List Container -->
+<div class="space-y-4">
+<!-- Mentions Activity -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-5 flex gap-4 cursor-pointer">
+<div class="relative">
+<img alt="Elena Vance profile" class="w-12 h-12 rounded-full object-cover" data-alt="portrait of a young woman with curly hair and smiling eyes in warm golden hour sunlight studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADPdFxE2cGzLwsK05ZhmWRJVm2XheMHPZZNSiRCU734USZDib2MqeeRKAaQYjJukd3wYfForHq27UDpJBffjFUmSHZQFm1f9yisbYbG1OSzkVi1fSXZLggOuTjhAw_HPqLYZ4cLRBxLshL6OCsYFmVOHgV5s4W8irjetH0MVYCjx70e-8WvEghALPBCyyau2B1awR--bFThJEk_-Av90bvx0XQWDRLBTPHd46Hh0lzhnDZ8-USdmzJcu0pNNSho1OfR9h3VdHSiScU"/>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-on-secondary rounded-full p-1 border-2 border-surface-container-low">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">alternate_email</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="font-headline font-semibold text-on-surface">
+                            Elena Vance <span class="text-on-surface-variant font-normal">mentioned you in a comment on</span> "Modernist Architecture in Oslo"
+                        </p>
+<span class="text-xs font-label text-on-surface-variant whitespace-nowrap ml-4 uppercase tracking-wider">2m ago</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2 italic border-l-2 border-primary-container pl-3 py-1 bg-white/30 rounded-r-md">
+                        "@TheCurator I think this perfectly aligns with the principles we discussed yesterday! The concrete textures are stunning."
+                    </p>
+</div>
+</div>
+<!-- Upvote Activity -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-5 flex gap-4 cursor-pointer">
+<div class="relative">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">keyboard_double_arrow_up</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="font-headline font-semibold text-on-surface">
+                            12 people <span class="text-on-surface-variant font-normal">upvoted your collection</span> "Sunset Palettes"
+                        </p>
+<span class="text-xs font-label text-on-surface-variant whitespace-nowrap ml-4 uppercase tracking-wider">45m ago</span>
+</div>
+<div class="flex gap-2 mt-3 overflow-hidden">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high overflow-hidden">
+<img alt="Thumbnail" class="w-full h-full object-cover" data-alt="dramatic mountain landscape at sunset with deep orange and purple sky reflecting in a calm lake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNsBYftOXOd0EvTA22Z48oscH5-JB0t6lssfnMAfYrx62dBAEOXSLHRi19r3XryDearMw7bnLnVWoijseCqW78NoIxE1rWUP19l9xzKAsH3Xtj8Xl3PCPGIdfbd8J4IYV2-G89uB7sID8aHWDip8VzzSG47EQIEQ50dQUSCP-KIYiD4cG1CdJdrlLbIRQK3CIbA50NP-AthCGVsZdPU47Q45mpgpn3f2LeRzO-q2UQuaoF23pN3SKCTe1BnUEfCLnEJStOcvCtKtof"/>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container-high overflow-hidden">
+<img alt="Thumbnail" class="w-full h-full object-cover" data-alt="abstract swirl of deep blue and vibrant orange paint mixing in liquid texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW8FnrgECg7Ce1GTgLS2mnRGFkuqKnrxNMVOcrgvxwQCKuuYi5hOm2N9EHaY7koT0LcU6pm-gtj9pMUNuT8Un-eiYqHRTmFAUgLe7GYGB168YEfPH18V8-kQKFr2b87OT3iFjjjBl5-NCHm0mB8ChIsVQX0ij8iB8VYdpMlbDXzFkIB76TXe1n25JVEx2HaQu03Bo8a9GRsPQiVn6rQQGEisxymDFox3v6uCTvGWbbBDrsuKYm0HNuullawQvxhelmwCIHXUJ1y-dq"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Community Invitation -->
+<div class="group bg-surface-container hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center shadow-sm">
+<div class="flex-1 text-center md:text-left">
+<span class="inline-block px-3 py-1 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">Community Invitation</span>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-2">Join "The Brutalist Vanguard"</h3>
+<p class="text-on-surface-variant text-sm mb-4">A curated circle for enthusiasts of raw materials and geometric honesty in urban design.</p>
+<div class="flex justify-center md:justify-start gap-3">
+<button class="px-6 py-2 bg-primary text-on-primary rounded-full text-sm font-semibold hover:opacity-90 active:scale-95 transition-all">Accept</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface rounded-full text-sm font-semibold hover:bg-surface-variant transition-all">Decline</button>
+</div>
+</div>
+<div class="w-32 h-32 rounded-2xl overflow-hidden shadow-lg rotate-3 group-hover:rotate-0 transition-transform duration-500">
+<img alt="Community Cover" class="w-full h-full object-cover" data-alt="stark concrete skyscraper with repetitive geometric window patterns against a clear blue sky high contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAQpueRx6plJWC5n2QsgY8EblLklKirRt-N3mnBxM0JKjpZ0ZmH8fc89njjpyYSU8d7pA2pgt_K1aWqiiBhUn2MuAsxs1cuTwvxTpROKOAM7Rspt_s4h9MvNZ1u7mHSb3cfXBpvU00cIB_KO5DAQkJu4Rf7r2wpyZfvR1yZ4TvhNcoUXdpfdXSPEQlUbvEepgXO_mSsip9D0mFfkvxeoqw9Zg0uby5Zsv2u5EFKyQ2fEuNzz1f9xAo3cn4m6avJwmlUXRmIakaL97o"/>
+</div>
+</div>
+<!-- New Comment Activity -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-5 flex gap-4 cursor-pointer">
+<div class="relative">
+<img alt="Marcus Chen profile" class="w-12 h-12 rounded-full object-cover" data-alt="close up of a middle-aged man with sharp features and thoughtful expression wearing professional attire in soft office lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDopRmau3ieYmYRyBf5luz_kk11BKEoJkI3KYJqIRccWxQXK8YNGxLySLPCNG40qvYlKS2M2dQSwBqS8DLdfXnVwXelFxw2jnjjVmzU5WAPZgrWCAIRpWD7YK6G_Y7NjYyJsSU8YvXMB1-UWYWQ0dXsF9X-zmsbjhgalBTRagZSe6VGQFHcBumxNMkQp2KyfM_rSG3h2F7BLZNcp675QFLhqdG73BH3OCCOel78vPdF1Cy0HwBtF4H7eih8Ra2bnKtMLZBDxbbHXc5"/>
+<div class="absolute -bottom-1 -right-1 bg-primary text-on-primary rounded-full p-1 border-2 border-surface-container-low">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">mode_comment</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="font-headline font-semibold text-on-surface">
+                            Marcus Chen <span class="text-on-surface-variant font-normal">commented on your post</span> "The Future of Minimalist UI"
+                        </p>
+<span class="text-xs font-label text-on-surface-variant whitespace-nowrap ml-4 uppercase tracking-wider">3h ago</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">
+                        "The way you handled the whitespace in the sidebar navigation is a masterclass in 'No-Line' philosophy. Have you considered..."
+                    </p>
+</div>
+</div>
+<!-- Yesterday Divider -->
+<div class="py-6 flex items-center gap-4">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-[0.2em] font-bold">Yesterday</span>
+<div class="flex-1 h-px bg-surface-container-high"></div>
+</div>
+<!-- Follow Activity -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 rounded-xl p-5 flex gap-4 cursor-pointer">
+<div class="relative">
+<img alt="Sarah Blake profile" class="w-12 h-12 rounded-full object-cover" data-alt="portrait of a young woman with a warm smile and blonde hair in a natural outdoor setting with soft sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUB5dGseZPPaxx2vTx-oX5rfbc7PPu0nz8l40hOVq120wmynrOhl-AVlAKrsWfx3TPZzqYpLPzI3T8xnhrcqpCD9F7YVjRc_Gre3zi5Vf9cI6FLdutZDBMa5KsARMrSQXvidL8r1CaXTacLZOUliwZsTa7mYTi5gNdicRBV3jBONJCG0XjBCkT415TgRG3xmk9RoaIx9rOSFY94ZetAfDbO6D1xjMiQun04A_d39RUbodErFFwMcbXITVIOrgh5lT_iSe9R04CB9zn"/>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-on-secondary rounded-full p-1 border-2 border-surface-container-low">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">person_add</span>
+</div>
+</div>
+<div class="flex-1 flex justify-between items-center">
+<p class="font-headline font-semibold text-on-surface">
+                        Sarah Blake <span class="text-on-surface-variant font-normal">started following your collections.</span>
+</p>
+<button class="px-4 py-1.5 border border-outline-variant text-on-surface rounded-full text-xs font-bold hover:bg-surface-container-high transition-colors">Follow Back</button>
+</div>
+<span class="text-xs font-label text-on-surface-variant whitespace-nowrap uppercase tracking-wider">1d ago</span>
+</div>
+<!-- Load More -->
+<div class="flex justify-center pt-8">
+<button class="flex items-center gap-2 text-primary font-headline font-bold text-sm hover:underline">
+                    View Older Activity
+                    <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full py-12 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-6">
+<div class="text-center md:text-left">
+<span class="font-manrope font-bold text-on-surface text-lg">The Gallery</span>
+<p class="text-zinc-500 dark:text-zinc-400 font-inter text-sm mt-1">© 2024 The Gallery. Curated for the community.</p>
+</div>
+<div class="flex gap-8 font-inter text-sm">
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Privacy</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Terms</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Guidelines</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<!-- SideNavBar (Mobile Floating - Shown as conceptual responsive element) -->
+<div class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center bg-zinc-900/90 backdrop-blur-xl px-6 py-3 rounded-full shadow-2xl gap-8 z-50">
+<button class="text-white opacity-60"><span class="material-symbols-outlined">home</span></button>
+<button class="text-white opacity-60"><span class="material-symbols-outlined">trending_up</span></button>
+<button class="text-white"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span></button>
+<button class="text-white opacity-60"><span class="material-symbols-outlined">mail</span></button>
+<button class="text-white opacity-60"><span class="material-symbols-outlined">settings</span></button>
+</div>
+</body></html>

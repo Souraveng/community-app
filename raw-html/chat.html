@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffeef8",
+                    "secondary-fixed": "#b6d4ff",
+                    "on-tertiary-fixed-variant": "#6c1a6c",
+                    "primary-fixed-dim": "#ff5d2e",
+                    "tertiary": "#8d3a8b",
+                    "tertiary-fixed": "#f797f0",
+                    "tertiary-container": "#f797f0",
+                    "tertiary-dim": "#7f2d7e",
+                    "on-primary": "#ffefec",
+                    "background": "#f5f6f7",
+                    "tertiary-fixed-dim": "#e88ae1",
+                    "on-background": "#2c2f30",
+                    "surface-tint": "#ac2c00",
+                    "secondary-fixed-dim": "#9dc6ff",
+                    "surface-container-low": "#eff1f2",
+                    "on-surface": "#2c2f30",
+                    "error": "#b31b25",
+                    "on-secondary": "#eef3ff",
+                    "surface": "#f5f6f7",
+                    "error-container": "#fb5151",
+                    "surface-container-high": "#e0e3e4",
+                    "on-tertiary-container": "#610e63",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#004982",
+                    "on-secondary-fixed-variant": "#005292",
+                    "on-error-container": "#570008",
+                    "surface-variant": "#dadddf",
+                    "surface-bright": "#f5f6f7",
+                    "secondary-container": "#b6d4ff",
+                    "secondary-dim": "#005190",
+                    "inverse-primary": "#ff5624",
+                    "on-surface-variant": "#595c5d",
+                    "inverse-on-surface": "#9b9d9e",
+                    "on-primary-fixed-variant": "#581200",
+                    "surface-dim": "#d1d5d7",
+                    "on-primary-container": "#480d00",
+                    "outline": "#757778",
+                    "inverse-surface": "#0c0f10",
+                    "on-primary-fixed": "#000000",
+                    "on-secondary-fixed": "#003562",
+                    "on-error": "#ffefee",
+                    "surface-container-highest": "#dadddf",
+                    "primary-container": "#ff7852",
+                    "outline-variant": "#abadae",
+                    "secondary": "#005da4",
+                    "primary-fixed": "#ff7852",
+                    "primary": "#ac2c00",
+                    "primary-dim": "#972500",
+                    "surface-container": "#e6e8ea",
+                    "on-tertiary-fixed": "#400042",
+                    "error-dim": "#9f0519"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #abadae44; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #abadae66; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased overflow-hidden h-screen">
+<!-- TopNavBar Shell -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none flex justify-between items-center px-8 h-16 max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">The Gallery</span>
+<div class="hidden md:flex gap-6 font-manrope tracking-tight text-sm font-medium">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors duration-200" href="#">Home</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors duration-200" href="#">Popular</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors duration-200" href="#">Explore</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex gap-2 mr-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-full transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+</button>
+</div>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-full font-manrope font-bold text-sm hover:opacity-90 active:scale-95 transition-all">Create Post</button>
+<img alt="User profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-white" data-alt="Close-up portrait of a professional man with a friendly expression in a modern office environment with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUsCIpTejLIAVwFCMT5iW5dQdebZcSM8KfJorSsO4pXbhmJfaIxsC40_MKXYVLY4WO_8p-qkmFbgNxgJS-DMYR8PCYFOI4L3cTmCDzz1N5JnYCgKcpoX37nvN_BhHPg9vAOaYOuuWggseI5sP4PuKz_P7eZkzKND5QVHa9VxG-f1Fio0WXJNtws04YJ3Zzep2j7KakfRJBB38pLQX4TIRWFvQXDPnS4mhnwlw6TCviFNdHJb3oxKu9j3hM6N_bZ6QY3XCcmkXTaS_c"/>
+</div>
+</nav>
+<div class="flex pt-16 h-full">
+<!-- Left Pane: SideNavBar -->
+<aside class="hidden lg:flex flex-col p-6 space-y-8 h-screen w-64 bg-slate-50 dark:bg-slate-950 font-manrope text-sm font-semibold uppercase tracking-wider">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">gallery_thumbnail</span>
+</div>
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white normal-case tracking-normal">Discovery</h3>
+<p class="text-[10px] text-slate-500 font-normal normal-case -mt-1">Curated feed</p>
+</div>
+</div>
+<div class="space-y-1">
+<a class="flex items-center gap-4 px-3 py-2 text-slate-500 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">home</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-4 px-3 py-2 text-slate-500 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">trending_up</span>
+<span>Popular</span>
+</a>
+<a class="flex items-center gap-4 px-3 py-2 text-slate-500 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">group</span>
+<span>Communities</span>
+</a>
+<a class="flex items-center gap-4 px-3 py-2 text-slate-500 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">topic</span>
+<span>Topics</span>
+</a>
+<a class="flex items-center gap-4 px-3 py-2 text-slate-500 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-auto pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
+<div class="p-4 bg-gradient-to-br from-primary to-primary-container rounded-xl text-white normal-case tracking-normal">
+<p class="font-bold text-sm">Join Premium</p>
+<p class="text-[11px] opacity-80 mt-1">Unlock exclusive community features</p>
+</div>
+<div class="space-y-1 opacity-70">
+<a class="flex items-center gap-2 text-[10px] hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="flex items-center gap-2 text-[10px] hover:text-primary transition-colors" href="#">Terms</a>
+<a class="flex items-center gap-2 text-[10px] hover:text-primary transition-colors" href="#">Help</a>
+</div>
+</div>
+</aside>
+<!-- Middle Pane: Contacts/Conversations List -->
+<main class="flex-1 lg:flex-none lg:w-96 bg-surface-container-low flex flex-col h-full border-r border-outline-variant/10">
+<div class="p-6 space-y-4">
+<h2 class="text-2xl font-headline font-extrabold tracking-tight">Messages</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-on-surface-variant/50 transition-all" placeholder="Search people or groups..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-4 space-y-1 pb-20">
+<!-- Active Chat Item -->
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-sm cursor-pointer transition-all border-l-4 border-primary">
+<div class="relative">
+<img alt="Contact" class="w-12 h-12 rounded-full object-cover" data-alt="Close-up portrait of a cheerful young woman with radiant skin and braided hair against a soft pastel background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCImqmHvWRIuu_nO87HpvS7fLO-OCeEkFCF_NG12kaQSJjNSr3rauvCaue_DLOWcUI7VxBpuACXGB2D3a2zJxrTuJZuP8t3MBHVUbt7YM7HDXIazlzmssYfRquS0OVs0JxQDzrvmtKFxcp7Uf1wXQ-R5JC9ThULxpfzYeMQtZD9TkYTzjgiMOnqCeAPh16jxZdCqHVMnv2ImPqbaw8YpiW9gkICyoZ_EqWTijcWKYWz_DkIlZRhrkCK4XJ1e9KQE-IkqNH4PtBX_et"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-container-lowest rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="font-headline font-bold text-on-surface truncate">Elena Vance</span>
+<span class="text-[10px] text-on-surface-variant font-medium">12:45 PM</span>
+</div>
+<p class="text-sm text-primary font-semibold truncate italic">Typing...</p>
+</div>
+</div>
+<!-- Chat Item -->
+<div class="flex items-center gap-4 p-4 hover:bg-surface-container-highest/50 rounded-xl cursor-pointer transition-all group">
+<div class="relative">
+<img alt="Contact" class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a creative professional man with glasses and a thoughtful expression, warm studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpyrsSB7AwN5WWYvLl4ZRaD94LK1tcYnT9DFhdwCR2XgVwSO_6ssVD6fzhhjRklrJnkWYabCpxfshyUHbXKfqeUBDK7zrWVmmbKwc0VsmMVzbSJa5DQVcHTK96DtMl8gAA-hVUt328YHEopE0HAbCmq3QBW4J-6KTyTTBnSRMwXIw1n3wrcF986kSWXiVO-kPmzSIIJpEIYrAbdDyH1w8ApQJmoyAgwaJ90j5SpuNwJkqTDVgUhUj4-NASOzbY77rNkJjzdDxhoh7R"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="font-headline font-bold text-on-surface truncate">Marcus Chen</span>
+<span class="text-[10px] text-on-surface-variant font-medium">11:20 AM</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">The gallery exhibit is live! Have you checked...</p>
+</div>
+</div>
+<!-- Chat Item -->
+<div class="flex items-center gap-4 p-4 hover:bg-surface-container-highest/50 rounded-xl cursor-pointer transition-all group">
+<div class="relative">
+<img alt="Contact" class="w-12 h-12 rounded-full object-cover" data-alt="Fashionable young woman with striking features and minimalist jewelry, soft daylight photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf75uYgWBXg6CMyxtuUbUCnXNCglSWMpTVpe_i5hKR91AuyEs3JXdI-ozajXmsOccYmrQ5ObaCM3EUHgHy_MyYxKwpz6zp4bJnSEKDhiwDK2r0z8ufwYL21dgGGdx1jwSz2lGe53du75YxIiKvoc79xuLQV9wP8OrWGkdULu42_eTqiiAfLnA3WpE2IyagmkJBkvIW0ZzxIA4sQnUFxaWe1g6VMBZ-atg1kdRQ5aQ9PdoHFOaq25xrZjvJyM0Z97XVj1w9vO7pWU5D"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-slate-300 border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="font-headline font-bold text-on-surface truncate">Sasha Grey</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Yesterday</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">Sent a photo</p>
+</div>
+</div>
+<!-- Chat Item -->
+<div class="flex items-center gap-4 p-4 hover:bg-surface-container-highest/50 rounded-xl cursor-pointer transition-all group">
+<div class="relative">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">palette</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="font-headline font-bold text-on-surface truncate">Design Community</span>
+<span class="text-[10px] text-on-surface-variant font-medium">Yesterday</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate"><span class="font-semibold">You:</span> Thanks for the invite!</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Pane: Active Chat Window -->
+<section class="hidden md:flex flex-col flex-1 bg-surface-container-lowest h-full relative">
+<!-- Header -->
+<header class="h-20 px-8 flex items-center justify-between bg-surface-container-lowest/80 backdrop-blur-md sticky top-0 z-10">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Active Chat Partner" class="w-11 h-11 rounded-full object-cover ring-2 ring-primary-container/20" data-alt="Portrait of Elena Vance, smiling softly, natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtml2ZlNEN80k9sPLQQVif4QHOj2_DvSGvKTDFavL8aFeHswrl7sLB69K8-a_694BhssGh23MGOoejWWCPbx_qDSE_PmLQLJT4FiotGaNGd8Kw257bLLBDHVo_1dx8pSonnMwo1yk8ieQTmyBQMz7qRbqujVCTuXTOPRl8_17o5rkEAGJlP5omwn7E73u4xF3j8gRbUflNzOMq6ETafGHK7eFLiU9uNOCEU4tfYfY4K89M1sbtPvvkkNgW6nYpFDaKPM9lUCgCoFxC"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div>
+<h3 class="font-headline font-extrabold text-lg text-on-surface tracking-tight leading-tight">Elena Vance</h3>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+<span class="text-[11px] font-label font-semibold text-green-600 uppercase tracking-wider">Online Now</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-all">
+<span class="material-symbols-outlined">call</span>
+</button>
+<button class="p-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-all">
+<span class="material-symbols-outlined">videocam</span>
+</button>
+<button class="p-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-xl transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Message Area -->
+<div class="flex-1 overflow-y-auto p-8 space-y-10 bg-surface-bright">
+<!-- Date Separator -->
+<div class="flex items-center justify-center gap-4">
+<div class="h-px flex-1 bg-outline-variant/10"></div>
+<span class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-[0.2em]">Wednesday, Oct 24</span>
+<div class="h-px flex-1 bg-outline-variant/10"></div>
+</div>
+<!-- Other Person Message -->
+<div class="flex gap-4 max-w-[85%]">
+<img class="w-8 h-8 rounded-full self-end" data-alt="Small profile avatar of Elena" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmDwaMksK6ek3CPmE2SL4xT9ZMMiExbl6RVKPmhrDcdbUSof44H42XUJh2EiM9141Ao2xu4OdZ2BRsUYBPsE6By20QvHmjP1SriDQ6p6zr3e6Kd3kwDPgFCnK7vKaOJRiM2ioKq-CNMdOxPZvkvgXC2HyRaNk3QQ1Jk06flZDJkVjKg2z50bZVT-hM30uADtiKXfVvmjkWP5MKOfb9tVkWeLVOfd_Glc9WaaQbaNkhXVOaZU1yHifdIxf4IXDU_-gNq-eEXfFpqyJx"/>
+<div class="space-y-1">
+<div class="bg-white p-5 rounded-2xl rounded-bl-none shadow-sm border border-outline-variant/5">
+<p class="text-sm leading-relaxed text-on-surface">Hey! I saw your latest contribution to the "Modernist Canvas" community. The way you balanced those color tones is absolutely brilliant. Would you be open to collaborating on a new editorial piece for The Gallery? 🎨</p>
+</div>
+<span class="text-[10px] text-on-surface-variant font-medium ml-1">12:38 PM</span>
+</div>
+</div>
+<!-- My Message -->
+<div class="flex gap-4 max-w-[85%] ml-auto flex-row-reverse">
+<div class="space-y-1 flex flex-col items-end">
+<div class="bg-secondary-container text-on-secondary-container p-5 rounded-2xl rounded-br-none shadow-sm">
+<p class="text-sm leading-relaxed font-medium">Thank you so much, Elena! That means a lot coming from you. I've been following your work for a while now.</p>
+</div>
+<div class="bg-secondary-container text-on-secondary-container p-5 rounded-2xl rounded-br-none shadow-sm mt-1">
+<p class="text-sm leading-relaxed font-medium">I'd love to collaborate. Do you have a specific theme in mind already? I'm currently exploring "Tonal Depth" over traditional borders. 🖼️</p>
+</div>
+<span class="text-[10px] text-on-surface-variant font-medium mr-1">12:42 PM · Read</span>
+</div>
+</div>
+<!-- Other Person Typing State -->
+<div class="flex gap-4 max-w-[85%] items-center animate-pulse">
+<img class="w-8 h-8 rounded-full" data-alt="Small profile avatar of Elena" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMnAU4lx5jG6STH2O2zGzoI_BS6pOtmrw89Cm9W1uZkwdEyZ1MNRkNnkdNLMGffh1Pl_U8GQcVs9WL7eL9f3pn9FdkDCdQBX9AcwmAP4kbuj35kCgQliM6_gDp_tDAx2o6NC79pPaDP_JYVU76stLGxNWDzHlq2g39Vrj2Ncc7_AzpGu6JM5pLwfOU6k5Xo8FIFMSVIaNCs8Zf-P75LNYYipZJWPapITa-1MLxq8QgGjfYx4sFQwxqWiE_ishDOBAjMDBhpKrZ90fs"/>
+<div class="bg-white px-4 py-3 rounded-full shadow-sm border border-outline-variant/5 flex gap-1">
+<div class="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce"></div>
+<div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></div>
+<div class="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce delay-150"></div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-6 bg-surface-container-lowest">
+<div class="max-w-4xl mx-auto bg-surface-container-low rounded-2xl p-2 flex items-center gap-1 shadow-inner ring-1 ring-outline-variant/10">
+<div class="flex items-center">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</button>
+</div>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-3 placeholder:text-on-surface-variant/50" placeholder="Type your message..." type="text"/>
+<div class="flex items-center gap-1">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary w-10 h-10 rounded-xl flex items-center justify-center hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+<p class="text-center text-[10px] text-on-surface-variant/40 mt-3 font-medium uppercase tracking-widest">Shift + Enter to add a new line</p>
+</div>
+</section>
+</div>
+</body></html>

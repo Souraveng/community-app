@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Gallery | Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#ffffff",
+                      "on-background": "#2c2f30",
+                      "error-dim": "#9f0519",
+                      "on-error-container": "#570008",
+                      "surface-container-highest": "#dadddf",
+                      "secondary-dim": "#005190",
+                      "on-primary": "#ffefec",
+                      "outline": "#757778",
+                      "on-error": "#ffefee",
+                      "tertiary-dim": "#7f2d7e",
+                      "on-secondary-fixed-variant": "#005292",
+                      "outline-variant": "#abadae",
+                      "surface-bright": "#f5f6f7",
+                      "surface-container": "#e6e8ea",
+                      "surface-variant": "#dadddf",
+                      "primary-fixed-dim": "#ff5d2e",
+                      "surface-container-low": "#eff1f2",
+                      "secondary-fixed-dim": "#9dc6ff",
+                      "tertiary": "#8d3a8b",
+                      "inverse-on-surface": "#9b9d9e",
+                      "on-tertiary-fixed-variant": "#6c1a6c",
+                      "surface-tint": "#ac2c00",
+                      "primary-dim": "#972500",
+                      "error-container": "#fb5151",
+                      "on-tertiary-container": "#610e63",
+                      "on-tertiary": "#ffeef8",
+                      "surface-dim": "#d1d5d7",
+                      "error": "#b31b25",
+                      "on-surface": "#2c2f30",
+                      "secondary-fixed": "#b6d4ff",
+                      "on-secondary": "#eef3ff",
+                      "on-secondary-fixed": "#003562",
+                      "surface-container-high": "#e0e3e4",
+                      "primary-fixed": "#ff7852",
+                      "on-primary-container": "#480d00",
+                      "on-tertiary-fixed": "#400042",
+                      "primary": "#ac2c00",
+                      "surface": "#f5f6f7",
+                      "primary-container": "#ff7852",
+                      "on-primary-fixed-variant": "#581200",
+                      "inverse-surface": "#0c0f10",
+                      "on-secondary-container": "#004982",
+                      "inverse-primary": "#ff5624",
+                      "secondary": "#005da4",
+                      "secondary-container": "#b6d4ff",
+                      "tertiary-fixed": "#f797f0",
+                      "background": "#f5f6f7",
+                      "tertiary-fixed-dim": "#e88ae1",
+                      "on-primary-fixed": "#000000",
+                      "on-surface-variant": "#595c5d",
+                      "tertiary-container": "#f797f0"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f6f7;
+            color: #2c2f30;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm flex justify-between items-center px-8 h-16 max-w-full">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-black text-slate-900 tracking-tighter">The Gallery</span>
+<div class="hidden md:flex items-center space-x-8 font-manrope tracking-tight text-sm font-medium">
+<a class="text-blue-600 border-b-2 border-blue-600 pb-1 hover:text-blue-500 transition-colors duration-200" href="#">Home</a>
+<a class="text-slate-500 hover:text-blue-500 transition-colors duration-200" href="#">Popular</a>
+<a class="text-slate-500 hover:text-blue-500 transition-colors duration-200" href="#">Explore</a>
+</div>
+</div>
+<div class="flex-1 max-w-md mx-8">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-lg">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all outline-none" placeholder="Search the gallery..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-all scale-95 active:opacity-80">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-all scale-95 active:opacity-80">chat_bubble</span>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2 rounded-full font-manrope font-bold text-sm scale-95 active:opacity-80 transition-all">Create Post</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden cursor-pointer border border-outline-variant/15">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a creative professional in a bright studio with soft lighting and minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACyy7X8KD8yw2MDX7VkMdn1d_4Uu-sEyEgcsMjgpThVPaybPbCfFOJce8HveGFfZUepnFVkoMqB8F6XN3W78ruRKZz9i1piezOCSAWFrUKYCWzjloy_ua2VhE3Qy80BoVL0b_MIOa5LiOkU26QbdnnWhwkGkvg3FL-0zdH1v9n_KGn-jPjHKmO2J3i1kEsxywNFSx7hvNg_6sxO602USCSeWziMJVnJAM9A_Nf-ZESSyIbd8T-qHVlRMQ96ChNMmwEVvgde4EKyyZe"/>
+</div>
+</div>
+</nav>
+<!-- Sidebar & Main Canvas -->
+<div class="flex pt-16">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-4rem)] w-64 fixed left-0 top-16 bg-slate-50 p-6 space-y-8">
+<div>
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm" style="font-variation-settings: 'FILL' 1;">gallery_thumbnail</span>
+</div>
+<div>
+<h3 class="text-xl font-bold text-slate-900 leading-tight">Discovery</h3>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Curated feed</p>
+</div>
+</div>
+<ul class="space-y-1 font-manrope text-sm font-semibold uppercase tracking-wider">
+<li>
+<a class="flex items-center gap-3 p-3 text-blue-600 font-bold hover:bg-slate-200/50 rounded-lg transition-all translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+                            Home
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+                            Popular
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+                            Communities
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">topic</span>
+                            Topics
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 p-3 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+                            Settings
+                        </a>
+</li>
+</ul>
+</div>
+<div class="flex-1">
+<div class="bg-tertiary-container/20 p-4 rounded-xl">
+<p class="font-headline font-bold text-tertiary-dim text-sm mb-2">The Gallery Pro</p>
+<p class="text-xs text-on-surface-variant mb-4 font-body leading-relaxed">Ad-free browsing and exclusive profile flairs.</p>
+<button class="w-full py-2 bg-tertiary-dim text-on-tertiary rounded-full text-xs font-bold scale-95 active:opacity-80 transition-all">Join Premium</button>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/15">
+<ul class="space-y-2 font-manrope text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<li class="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer"><span class="material-symbols-outlined text-sm">security</span> Privacy</li>
+<li class="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer"><span class="material-symbols-outlined text-sm">description</span> Terms</li>
+<li class="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer"><span class="material-symbols-outlined text-sm">help</span> Help</li>
+</ul>
+</div>
+</aside>
+<!-- Main Feed Canvas -->
+<main class="flex-1 ml-0 md:ml-64 p-8 max-w-4xl mx-auto">
+<!-- Featured Section (Asymmetric Bento) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="md:col-span-2 bg-surface-container-lowest rounded-xl p-6 relative overflow-hidden group border border-outline-variant/15 cursor-pointer">
+<div class="relative z-10">
+<span class="inline-block bg-primary text-on-primary text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full mb-4">Trending Community</span>
+<h2 class="text-3xl font-headline font-extrabold text-on-surface mb-2 leading-tight">Abstract Minimalism</h2>
+<p class="text-on-surface-variant text-sm font-body max-w-md">Discover the power of negative space and curated aesthetics in our latest community highlight.</p>
+<div class="mt-6 flex items-center gap-4">
+<button class="bg-on-surface text-surface-bright px-6 py-2 rounded-full font-bold text-sm">Visit Gallery</button>
+<span class="text-xs font-bold text-on-surface-variant">12.4k Curators online</span>
+</div>
+</div>
+<div class="absolute right-0 top-0 w-1/3 h-full opacity-10 group-hover:opacity-20 transition-opacity">
+<img alt="Abstract shape" class="w-full h-full object-cover" data-alt="minimalist abstract geometric sculpture with sharp shadows and clean lines on a white pedestal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXG02ewvEW8cLGUHkEH7Nxp5u_Fcu0wI9VkqEdbCYiQoQdklX73qJ_46LOiywoYQ0_8D41kce0FUTlg0nNYdXC3ViJ71yw07YdhJPcksleFCG3wXjvI9ga4lgSLLZZQs-5ci2kd4GZ1oMgQXBEwVw1a_maMp8rPnS_05gb8M97wVdshQa3bkYjZMPxrcjebVIoMwSSiJXxxCS-khsXnRgZzc3L4g6jl2OXbfiyGYQKTPftpJ5_-Cds3cfQZdG6IIz2wmPKA9j33a6S"/>
+</div>
+</div>
+<div class="bg-secondary-container/30 rounded-xl p-6 border border-outline-variant/15 flex flex-col justify-between">
+<span class="material-symbols-outlined text-secondary text-4xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<div>
+<h3 class="font-headline font-bold text-secondary-dim text-lg">Daily Curated</h3>
+<p class="text-xs text-on-secondary-container mt-1">Refined content hand-picked by our editors for your morning scroll.</p>
+</div>
+</div>
+</div>
+<!-- Feed Header -->
+<div class="flex items-center justify-between mb-8">
+<h1 class="text-2xl font-headline font-extrabold tracking-tight">Main Exhibit</h1>
+<div class="flex items-center bg-surface-container-high rounded-full p-1">
+<button class="px-4 py-1.5 bg-surface-container-lowest rounded-full text-xs font-bold shadow-sm">Hot</button>
+<button class="px-4 py-1.5 text-xs font-bold text-on-surface-variant">Newest</button>
+<button class="px-4 py-1.5 text-xs font-bold text-on-surface-variant">Top</button>
+</div>
+</div>
+<!-- Posts List (No-Line Philosophy) -->
+<div class="space-y-10">
+<!-- Post 1: Image Focus -->
+<article class="group">
+<div class="flex gap-6">
+<!-- Upvote/Downvote Column -->
+<div class="flex flex-col items-center gap-2 pt-2">
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-all">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+<span class="text-sm font-black font-headline">1.2k</span>
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-secondary-container hover:text-on-secondary-container transition-all">
+<span class="material-symbols-outlined">arrow_downward</span>
+</button>
+</div>
+<!-- Content Column -->
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-5 h-5 rounded-full bg-slate-300"></div>
+<span class="text-xs font-bold text-on-surface">u/arch_digest</span>
+<span class="text-[10px] text-outline">• 2 hours ago</span>
+<span class="ml-auto bg-surface-container-highest px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Architecture</span>
+</div>
+<h2 class="text-xl font-headline font-bold text-on-surface mb-3 group-hover:text-primary transition-colors cursor-pointer">The hidden Brutalist gems of Eastern Europe that you need to see.</h2>
+<div class="rounded-xl overflow-hidden aspect-video mb-4 cursor-pointer border border-outline-variant/15">
+<img alt="Architecture" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="dramatic monolithic concrete building with geometric patterns under a heavy grey sky with moody lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAizjQ9cJzECNeloGSkppbg2GsSTLwAJ8RplR7ywIkTY-W_RzJcg52mdFhKSOBi9n56qvcxzPCY0oQeonmOKHEyp5dca0zs1F3V_Bm3w3vbd35pD6_p6SrkgX3qjU4m3mxzHDsFMTPuvKk3GyUU9NBfkpILLMmFUsUkaFRo4v_o260nbkez53V6kaJeeTfTGOFXBnNhg6iviy7AsZspER8JjEFJRo1JVyj4V0sQbFJymxXvqTOzDUj3xXEwNolg7J7k65n6_yGTOV-0"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-2 text-primary font-bold text-xs hover:opacity-70 transition-all">
+<span class="material-symbols-outlined text-sm">mode_comment</span>
+                                    248 Comments
+                                </button>
+<button class="flex items-center gap-2 text-primary font-bold text-xs hover:opacity-70 transition-all">
+<span class="material-symbols-outlined text-sm">share</span>
+                                    Share
+                                </button>
+<button class="flex items-center gap-2 text-primary font-bold text-xs hover:opacity-70 transition-all">
+<span class="material-symbols-outlined text-sm">bookmark</span>
+                                    Save
+                                </button>
+</div>
+</div>
+</div>
+</article>
+<!-- Post 2: Text Focus -->
+<article class="group bg-surface-container-low/50 p-6 rounded-2xl border border-transparent hover:bg-surface-container-lowest hover:shadow-xl hover:shadow-on-surface/5 transition-all">
+<div class="flex gap-6">
+<div class="flex flex-col items-center gap-2">
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-all">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+<span class="text-sm font-black font-headline">854</span>
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-secondary-container hover:text-on-secondary-container transition-all">
+<span class="material-symbols-outlined">arrow_downward</span>
+</button>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-5 h-5 rounded-full bg-tertiary-container"></div>
+<span class="text-xs font-bold text-on-surface">u/tech_minimal</span>
+<span class="text-[10px] text-outline">• 5 hours ago</span>
+<span class="ml-auto bg-surface-container-highest px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Discussion</span>
+</div>
+<h2 class="text-xl font-headline font-bold text-on-surface mb-3 group-hover:text-primary transition-colors cursor-pointer">Why I'm switching back to a dumb-phone in 2024. The mental clarity is worth it.</h2>
+<p class="text-sm font-body text-on-surface-variant leading-relaxed mb-4 line-clamp-3">After a decade of being tethered to constant notifications, I finally decided to make the jump. Here's a breakdown of the psychological shifts I've noticed in the first 30 days of digital detox and why the current smartphone ecosystem is designed to fragment our attention...</p>
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-2 text-primary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">mode_comment</span>
+                                    1.1k Comments
+                                </button>
+<button class="flex items-center gap-2 text-primary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">share</span>
+                                    Share
+                                </button>
+</div>
+</div>
+</div>
+</article>
+<!-- Post 3: Short Media -->
+<article class="group">
+<div class="flex gap-6">
+<div class="flex flex-col items-center gap-2 pt-2">
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-all">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+<span class="text-sm font-black font-headline">4.5k</span>
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-secondary-container hover:text-on-secondary-container transition-all">
+<span class="material-symbols-outlined">arrow_downward</span>
+</button>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-5 h-5 rounded-full bg-secondary-fixed"></div>
+<span class="text-xs font-bold text-on-surface">u/color_palettes</span>
+<span class="text-[10px] text-outline">• 8 hours ago</span>
+<span class="ml-auto bg-surface-container-highest px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Design</span>
+</div>
+<h2 class="text-xl font-headline font-bold text-on-surface mb-3 group-hover:text-primary transition-colors cursor-pointer">The color of the year: "Tonal Dusk". Thoughts?</h2>
+<div class="grid grid-cols-2 gap-2 mb-4">
+<div class="aspect-square bg-slate-100 rounded-lg overflow-hidden border border-outline-variant/10">
+<img alt="Tonal palette 1" class="w-full h-full object-cover" data-alt="soft aesthetic background with gradients of dusty blue and warm sand, high grain texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgCQGKRHSzQcU2QpuY114H5d-VDciVAk0TR9fTTiUVVZxerd8ZwqoVcjmbebjMoc662NNMABoxZNCHkZuAGqNhjjQ-ECWiOQhTqJazLxrYNkXTSLVae3z8vwx-7DnuHBSePm6gF2mYkmT_pkOEDVi3xMTyMvNI1kOmFCMpYej_Rl4CvirUKPf01jU_9xsQxwJZey0yqTmYvBk9sF6vf1JgY3N_X4_9g9PkzWS0ytqJMVqV-5pc7YexXC29J04EeAEvb0_-JUadER7F"/>
+</div>
+<div class="aspect-square bg-slate-100 rounded-lg overflow-hidden border border-outline-variant/10">
+<img alt="Tonal palette 2" class="w-full h-full object-cover" data-alt="minimalist interior design with muted earth tones and soft natural light from a side window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhut0jVk6f0ZuopMTI3arcBzFt312ctnw4D-HHSk0B8BcFF1Oq04UFOqsanvaHNCGaDZ81xky_W8EREF6PlavqjXfkk_INi8Jy5krJ2wF3Mjt8Xc6cFnM8VAOTBQHvRVHd2LPJ_ENbj2sOLy0Eo2qvS9CLa6UFK7ZMk5g6gQaipmGA5qb8RiuImkQMnjRpDFoewkXKfuFDzH6CTSmezwGeo55pYe4mUM9GZqlN-bXdnx9gblD98Jxc13cs8a1BC3uZGJp-B-S3Ww7_"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-2 text-primary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">mode_comment</span>
+                                    156 Comments
+                                </button>
+<button class="flex items-center gap-2 text-primary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">share</span>
+                                    Share
+                                </button>
+</div>
+</div>
+</div>
+</article>
+<!-- Infinite Scroll Loading Indicator -->
+<div class="py-12 flex justify-center">
+<div class="flex items-center gap-3 text-outline">
+<span class="material-symbols-outlined animate-spin">refresh</span>
+<span class="text-sm font-headline font-bold uppercase tracking-widest">Loading new exhibits</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Navigation (Responsive Pivot) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-t border-outline-variant/10 flex justify-around items-center px-4 z-50">
+<a class="flex flex-col items-center gap-1 text-blue-600" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-bold uppercase">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-bold uppercase">Explore</span>
+</a>
+<button class="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center -mt-8 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+</button>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-bold uppercase">Inbox</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase">Profile</span>
+</a>
+</nav>
+<!-- Contextual FAB (Only for Home Feed) -->
+<button class="hidden md:flex fixed bottom-8 right-8 bg-gradient-to-br from-primary to-primary-container text-on-primary p-4 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all group items-center gap-2">
+<span class="material-symbols-outlined">edit</span>
+<span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 font-bold text-sm whitespace-nowrap px-0 group-hover:px-2">Create New Post</span>
+</button>
+</body></html>

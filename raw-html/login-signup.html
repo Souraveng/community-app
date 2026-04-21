@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome Back to The Gallery</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffeef8",
+                    "on-surface-variant": "#595c5d",
+                    "outline": "#757778",
+                    "error-container": "#fb5151",
+                    "on-error-container": "#570008",
+                    "inverse-on-surface": "#9b9d9e",
+                    "tertiary-fixed-dim": "#e88ae1",
+                    "primary-fixed-dim": "#ff5d2e",
+                    "error-dim": "#9f0519",
+                    "on-error": "#ffefee",
+                    "inverse-surface": "#0c0f10",
+                    "surface-container-high": "#e0e3e4",
+                    "on-primary-fixed": "#000000",
+                    "surface-container-highest": "#dadddf",
+                    "tertiary-container": "#f797f0",
+                    "on-primary-fixed-variant": "#581200",
+                    "tertiary-fixed": "#f797f0",
+                    "tertiary-dim": "#7f2d7e",
+                    "surface-dim": "#d1d5d7",
+                    "on-surface": "#2c2f30",
+                    "primary-fixed": "#ff7852",
+                    "on-primary": "#ffefec",
+                    "tertiary": "#8d3a8b",
+                    "surface-bright": "#f5f6f7",
+                    "surface": "#f5f6f7",
+                    "secondary": "#005da4",
+                    "surface-container-low": "#eff1f2",
+                    "surface-variant": "#dadddf",
+                    "outline-variant": "#abadae",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#005292",
+                    "on-background": "#2c2f30",
+                    "inverse-primary": "#ff5624",
+                    "secondary-dim": "#005190",
+                    "on-tertiary-fixed-variant": "#6c1a6c",
+                    "on-tertiary-fixed": "#400042",
+                    "background": "#f5f6f7",
+                    "on-secondary-container": "#004982",
+                    "surface-container": "#e6e8ea",
+                    "secondary-fixed": "#b6d4ff",
+                    "surface-tint": "#ac2c00",
+                    "on-tertiary-container": "#610e63",
+                    "on-primary-container": "#480d00",
+                    "error": "#b31b25",
+                    "primary": "#ac2c00",
+                    "primary-container": "#ff7852",
+                    "on-secondary": "#eef3ff",
+                    "on-secondary-fixed": "#003562",
+                    "secondary-container": "#b6d4ff",
+                    "primary-dim": "#972500",
+                    "secondary-fixed-dim": "#9dc6ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface min-h-screen flex items-center justify-center p-6 selection:bg-primary-container selection:text-on-primary-container">
+<!-- Auth Container -->
+<main class="w-full max-w-[480px]">
+<!-- Logo & Title Section -->
+<div class="text-center mb-10 space-y-4">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-primary-container shadow-xl shadow-primary/10 mb-2">
+<span class="material-symbols-outlined text-on-primary text-3xl" data-icon="gallery_thumbnail">gallery_thumbnail</span>
+</div>
+<h1 class="font-headline text-3xl font-bold tracking-tight text-on-surface">Welcome Back to The Gallery</h1>
+<p class="text-on-surface-variant font-body">Continue your journey through the curated canvas.</p>
+</div>
+<!-- Auth Card -->
+<div class="bg-surface-container-lowest rounded-xl p-8 md:p-10 shadow-[0_8px_32px_rgba(44,47,48,0.04)] relative overflow-hidden">
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-4 mb-8">
+<button class="flex items-center justify-center gap-3 py-3 px-4 rounded-full bg-surface-container-low hover:bg-surface-container-high transition-colors text-label-md font-semibold text-on-surface ring-1 ring-outline-variant/15">
+<img alt="Google Logo" class="w-5 h-5" data-alt="Official Google icon with colorful branding on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpxBRrkBXcabHTKKAwYmZo_nUNmctpCkAE0a27vk2Id0HnozBI2gduowX9V5Sw1-yp-eBw8D01_H_-Ymn3ocJ4sePWLtZ19ITH7QGp1V2uXmHqxzAcLwl-xpMEP9E0x9NzA5ty7-Kfa9_FQ3fDrTkeiUmnem8Co9aT0A5TcihrrAQjIQZlbEa1yLmvQ37G7lP-uWGinU6RmQdgXrWTrR4tYLFUI6gSC8JA4QH9mlItvC5aXi9MWiDjCNIhGqc_CQWJCdzgY1G-c0u5"/>
+<span>Google</span>
+</button>
+<button class="flex items-center justify-center gap-3 py-3 px-4 rounded-full bg-surface-container-low hover:bg-surface-container-high transition-colors text-label-md font-semibold text-on-surface ring-1 ring-outline-variant/15">
+<span class="material-symbols-outlined text-[20px]" data-icon="apple">ios</span>
+<span>Apple</span>
+</button>
+</div>
+<div class="relative flex items-center mb-8">
+<div class="flex-grow border-t border-outline-variant/20"></div>
+<span class="flex-shrink mx-4 text-xs font-label uppercase tracking-widest text-on-surface-variant/60">Or email</span>
+<div class="flex-grow border-t border-outline-variant/20"></div>
+</div>
+<!-- Login Form -->
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="block text-sm font-label font-medium text-on-surface-variant ml-1" for="email">Email address</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[20px]" data-icon="mail">mail</span>
+<input class="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border-none rounded-lg focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline/50 text-on-surface" id="email" placeholder="curator@gallery.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<label class="block text-sm font-label font-medium text-on-surface-variant" for="password">Password</label>
+<a class="text-sm font-label font-semibold text-secondary hover:text-secondary-dim transition-colors" href="#">Forgot?</a>
+</div>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[20px]" data-icon="lock">lock</span>
+<input class="w-full pl-11 pr-12 py-3.5 bg-surface-container-low border-none rounded-lg focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline/50 text-on-surface" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility_off">visibility_off</span>
+</button>
+</div>
+<!-- Example Error State (Hidden by default, shown for "Simplicity and Clear Error States") -->
+<div class="hidden items-center gap-2 mt-2 text-error text-sm ml-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="error">error</span>
+<span>Invalid credentials. Please try again.</span>
+</div>
+</div>
+<div class="flex items-center space-x-3 ml-1">
+<input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" id="remember" type="checkbox"/>
+<label class="text-sm font-label text-on-surface-variant" for="remember">Remember me for 30 days</label>
+</div>
+<button class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-headline font-bold text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] transition-all" type="submit">
+                    Sign In
+                </button>
+</form>
+<!-- Sign Up Footer -->
+<div class="mt-8 text-center">
+<p class="text-on-surface-variant font-body">
+                    Don't have an account? 
+                    <a class="text-primary font-bold hover:underline ml-1" href="#">Join the community</a>
+</p>
+</div>
+</div>
+<!-- System Status/Footer -->
+<footer class="mt-12 flex flex-wrap justify-center gap-6">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high/50">
+<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+<span class="text-[10px] font-label font-bold uppercase tracking-tighter text-on-surface-variant">Systems Operational</span>
+</div>
+<div class="flex gap-4">
+<a class="text-xs font-label text-outline hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
+<a class="text-xs font-label text-outline hover:text-on-surface transition-colors" href="#">Terms of Service</a>
+</div>
+</footer>
+</main>
+<!-- Decorative Background Elements -->
+<div class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-40 overflow-hidden">
+<div class="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] rounded-full bg-primary-container/20 blur-[120px]"></div>
+<div class="absolute top-[60%] -right-[10%] w-[50%] h-[50%] rounded-full bg-secondary-container/20 blur-[120px]"></div>
+<div class="absolute top-[20%] left-[60%] w-[30%] h-[30%] rounded-full bg-tertiary-container/10 blur-[100px]"></div>
+</div>
+</body></html>

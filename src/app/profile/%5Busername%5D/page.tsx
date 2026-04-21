@@ -1,0 +1,381 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Navbar from '../../../components/layout/Navbar';
+import Sidebar from '../../../components/layout/Sidebar';
+import Image from 'next/image';
+import Button from '../../../components/common/Button';
+import Input from '../../../components/common/Input';
+import { supabase } from '../../../lib/supabase';
+import { useAuth } from '../../../hooks/useAuth';
+import { useProfile } from '../../../hooks/useProfile';
+import { useFollows } from '../../../hooks/useFollows';
+import { useDirectMessages } from '../../../hooks/useDirectMessages';
+import { uploadFile } from '../../../lib/storage';
+
+export default function UserProfilePage() {
+  const params = useParams();
+  const username = params.username as string;
+  const { user: currentUser } = useAuth();
+  const { profile, loading: profileLoading, updateProfile } = useProfile(username);
+  const { isFollowing, followerCount, followingCount, follow, unfollow, loading: followLoading } = useFollows(profile?.id);
+  const { createConversation } = useDirectMessages();
+  const router = useRouter();
+
+  const isOwnProfile = currentUser?.uid === profile?.id;
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [editData, setEditData] = useState({
+    full_name: '',
+    bio: '',
+    username: ''
+  });
+  const [showConnections, setShowConnections] = useState<'followers' | 'following' | null>(null);
+  const [connectionList, setConnectionList] = useState<any[]>([]);
+  const [loadingConnections, setLoadingConnections] = useState(false);
+
+  const handleStartEdit = () => {
+    if (profile) {
+      setEditData({
+        full_name: profile.full_name || '',
+        bio: profile.bio || '',
+        username: profile.username || ''
+      });
+      setIsEditing(true);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      let avatarUrl = profile?.avatar_url;
+
+      if (avatarFile && currentUser) {
+        const path = `avatars/${currentUser.uid}/${Date.now()}_${avatarFile.name}`;
+        avatarUrl = await uploadFile('avatars', path, avatarFile);
+      }
+
+      await updateProfile({ ...editData, avatar_url: avatarUrl });
+      setIsEditing(false);
+      setAvatarFile(null);
+      setPreviewUrl(null);
+      
+      if (editData.username !== username) {
+        router.push(`/profile/${editData.username}`);
+      }
+    } catch (err) {
+      alert('Failed to update profile.');
+    }
+  };
+
+  const handleMessage = async () => {
+    if (!profile) return;
+    try {
+      const convId = await createConversation(profile.id);
+      if (convId) {
+        router.push('/chat');
+      }
+    } catch (err) {
+      console.error('Error starting conversation:', err);
+    }
+  };
+
+  useEffect(() => {
+    const fetchConnections = async () => {
+      if (!showConnections || !profile) return;
+      setLoadingConnections(true);
+      try {
+        let data;
+        if (showConnections === 'followers') {
+          const { data: follows, error } = await supabase
+            .from('follows')
+            .select('follower_id, profiles!follows_follower_id_fkey(*)')
+            .eq('following_id', profile.id);
+          if (error) throw error;
+          data = follows.map(f => f.profiles);
+        } else {
+          const { data: follows, error } = await supabase
+            .from('follows')
+            .select('following_id, profiles!follows_following_id_fkey(*)')
+            .eq('follower_id', profile.id);
+          if (error) throw error;
+          data = follows.map(f => f.profiles);
+        }
+        setConnectionList(data || []);
+      } catch (err) {
+        console.error('Error fetching connections:', err);
+      } finally {
+        setLoadingConnections(false);
+      }
+    };
+
+    fetchConnections();
+  }, [showConnections, profile]);
+
+  if (profileLoading) return <div className="min-h-screen bg-background flex items-center justify-center font-headlines text-2xl"><Navbar />Analyzing Curator...</div>;
+  
+  if (!profile) return (
+    <div className="min-h-screen bg-background flex items-center justify-center flex-col gap-4">
+      <Navbar />
+      <p className="font-headlines text-2xl text-on-surface">Curator not found.</p>
+      <Button variant="primary" onClick={() => router.push('/home')}>Back to Home</Button>
+    </div>
+  );
+
+  const stats = [
+    { label: 'Exhibits', value: '12', icon: 'gallery_thumbnail' },
+    { label: 'Following', value: followingCount.toString(), icon: 'group' },
+    { label: 'Followers', value: followerCount.toString(), icon: 'diversity_3' },
+    { label: 'Curation Score', value: '890', icon: 'award_star' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-background text-on-surface">
+      <Navbar />
+      
+      <div className="flex pt-16">
+        <Sidebar mb-visible={false} />
+        
+        <main className="flex-1 ml-0 lg:ml-64 p-4 md:p-12 max-w-6xl mx-auto w-full">
+          {/* Header Profile Section */}
+          <div className="relative mb-16">
+            <div className="h-41 md:h-64 w-full rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-tr from-surface-container-highest via-primary/5 to-secondary/5 border border-outline-variant/10 ambient-shadow overflow-hidden">
+               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5" />
+            </div>
+            
+            <div className="absolute -bottom-12 left-8 md:left-12 flex items-end gap-5 md:gap-8">
+              <div className="w-24 h-24 md:w-36 md:h-36 rounded-3xl md:rounded-[2rem] bg-surface-container-lowest p-2 ambient-shadow border border-outline-variant/10 group relative">
+                <div className="w-full h-full rounded-2xl md:rounded-[1.5rem] overflow-hidden relative">
+                  {previewUrl || profile.avatar_url ? (
+                    <Image 
+                      src={previewUrl || profile.avatar_url || ''} 
+                      alt={profile.username} 
+                      fill 
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100px, 150px"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-4xl text-primary">person</span>
+                    </div>
+                  )}
+                </div>
+                {isOwnProfile && isEditing && (
+                   <label htmlFor="avatar-upload" className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <span className="material-symbols-outlined text-white">photo_camera</span>
+                      <input 
+                        id="avatar-upload"
+                        type="file" 
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarChange}
+                      />
+                   </label>
+                )}
+              </div>
+              
+              <div className="mb-4">
+                <h1 className="text-xl md:text-4xl font-extrabold font-headlines tracking-tighter mb-0.5">
+                  {profile.full_name || profile.username}
+                </h1>
+                <p className="text-xs md:text-base font-bold text-primary flex items-center gap-1.5 uppercase tracking-widest opacity-80">
+                  u/{profile.username} <span className="material-symbols-outlined text-sm">verified</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-10 right-8 md:right-12 flex items-center gap-4">
+              {isOwnProfile ? (
+                 isEditing ? (
+                  <>
+                    <Button variant="ghost" onClick={() => setIsEditing(false)}>Cancel</Button>
+                    <Button variant="primary" onClick={handleSave}>Save Changes</Button>
+                  </>
+                ) : (
+                  <Button variant="secondary" className="px-6 md:px-8" onClick={handleStartEdit}>
+                    <span className="material-symbols-outlined text-sm mr-2">edit</span> Edit Profile
+                  </Button>
+                )
+              ) : (
+                <div className="flex gap-4">
+                  <Button 
+                    variant="ghost" 
+                    className="w-12 h-12 p-0 rounded-2xl flex items-center justify-center border border-outline-variant/10"
+                    onClick={handleMessage}
+                  >
+                    <span className="material-symbols-outlined">forum</span>
+                  </Button>
+                  <Button 
+                    variant={isFollowing ? 'secondary' : 'primary'} 
+                    className="px-8 md:px-12 py-4"
+                    onClick={isFollowing ? unfollow : follow}
+                    disabled={followLoading}
+                  >
+                    {isFollowing ? 'Connected' : 'Connect'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 mt-16 md:mt-24">
+            {/* Left Column: Info */}
+            <div className="lg:col-span-4 space-y-8">
+              <div className="bg-surface-container-low/30 p-8 rounded-[2.5rem] border border-outline-variant/10 shadow-sm">
+                <h3 className="font-headlines font-extrabold text-xl mb-6 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">info</span> Manifesto
+                </h3>
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <Input 
+                      label="Visual Name" 
+                      value={editData.full_name} 
+                      onChange={(e) => setEditData({...editData, full_name: e.target.value})} 
+                    />
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-on-surface-variant ml-1 uppercase tracking-widest">Bio</label>
+                      <textarea 
+                        className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-4 text-sm font-body text-on-surface min-h-[120px] focus:ring-1 focus:ring-primary"
+                        value={editData.bio}
+                        onChange={(e) => setEditData({...editData, bio: e.target.value})}
+                        placeholder="Describe your creative vision..."
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="font-body text-on-surface-variant leading-relaxed text-base italic opacity-80">
+                    "{profile.bio || 'This curator has not yet defined their manifesto.'}"
+                  </p>
+                )}
+                
+                <div className="mt-8 pt-8 border-t border-outline-variant/10 space-y-4">
+                  <div className="flex items-center gap-3 text-sm font-bold text-on-surface">
+                    <span className="material-symbols-outlined text-primary-container text-lg">calendar_today</span> Joined April 2024
+                  </div>
+                  <div className="flex items-center gap-3 text-sm font-bold text-on-surface">
+                    <span className="material-symbols-outlined text-primary-container text-lg">public</span> Global Curator
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {stats.map((stat, i) => (
+                  <div 
+                    key={i} 
+                    className="bg-surface-container-low/30 p-6 rounded-[2rem] border border-outline-variant/10 text-center hover:ambient-shadow transition-all group cursor-pointer"
+                    onClick={() => {
+                      if (stat.label === 'Followers' || stat.label === 'Following') {
+                        setShowConnections(stat.label.toLowerCase() as any);
+                      }
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity">{stat.icon}</span>
+                    <div className="text-2xl font-black font-headlines tracking-tighter">{stat.value}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: Feed/Content */}
+            <div className="lg:col-span-8">
+               <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                  {['Collection', 'Upvoted', 'Drafts', 'Tags'].map((tab, i) => (
+                    <button key={i} className={`pb-4 text-[10px] md:text-sm font-black uppercase tracking-widest transition-all relative ${i === 0 ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
+                      {tab}
+                      {i === 0 && <span className="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-full" />}
+                    </button>
+                  ))}
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 {[1, 2, 3, 4].map((item) => (
+                   <div key={item} className="aspect-square rounded-[2rem] bg-surface-container-low/30 border border-outline-variant/10 p-2 group cursor-pointer overflow-hidden relative">
+                      <div className="w-full h-full rounded-[1.5rem] bg-surface-container-highest overflow-hidden relative">
+                         <Image 
+                          src={`https://images.unsplash.com/photo-${1534528741775 + item}-53994a69daeb?auto=format&fit=crop&q=80&w=800`} 
+                          alt="Gallery item" 
+                          fill 
+                          className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" 
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                        <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                           <span className="text-white font-headlines font-black text-xl translate-y-4 group-hover:translate-y-0 transition-transform">VIEW EXHIBIT</span>
+                        </div>
+                      </div>
+                   </div>
+                 ))}
+               </div>
+            </div>
+          </div>
+
+          {/* Connections List Overlay */}
+          {showConnections && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" onClick={() => setShowConnections(null)} />
+              <div className="relative w-full max-w-lg bg-surface-container-low border border-outline-variant/10 rounded-[3rem] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-black font-headlines tracking-tighter capitalize">{showConnections}</h2>
+                  <button onClick={() => setShowConnections(null)} className="w-10 h-10 rounded-full hover:bg-surface-container-highest transition-colors flex items-center justify-center">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+                
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-4 scrollbar-hide">
+                  {loadingConnections ? (
+                    <div className="flex justify-center py-12">
+                      <span className="material-symbols-outlined animate-spin text-primary">sync</span>
+                    </div>
+                  ) : connectionList.length > 0 ? (
+                    connectionList.map((connUser) => (
+                      <div 
+                        key={connUser.id} 
+                        className="flex items-center justify-between p-4 rounded-3xl bg-surface-container-low hover:bg-surface-container-lowest transition-all group border border-transparent hover:border-outline-variant/10 cursor-pointer"
+                        onClick={() => {
+                          setShowConnections(null);
+                          router.push(`/profile/${connUser.username}`);
+                        }}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl overflow-hidden relative border border-outline-variant/5">
+                            {connUser.avatar_url ? (
+                              <Image src={connUser.avatar_url} alt={connUser.username} fill className="object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-primary/5 flex items-center justify-center text-primary">
+                                <span className="material-symbols-outlined">person</span>
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-on-surface">{connUser.full_name || connUser.username}</p>
+                            <p className="text-xs font-bold text-primary opacity-60 uppercase tracking-widest">u/{connUser.username}</p>
+                          </div>
+                        </div>
+                        <span className="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity text-primary">arrow_forward</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-12">
+                      <p className="text-on-surface-variant font-medium">No results found.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}

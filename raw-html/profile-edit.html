@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Edit Profile - Julian_Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffeef8",
+                        "on-surface-variant": "#595c5d",
+                        "outline": "#757778",
+                        "error-container": "#fb5151",
+                        "on-error-container": "#570008",
+                        "inverse-on-surface": "#9b9d9e",
+                        "tertiary-fixed-dim": "#e88ae1",
+                        "primary-fixed-dim": "#ff5d2e",
+                        "error-dim": "#9f0519",
+                        "on-error": "#ffefee",
+                        "inverse-surface": "#0c0f10",
+                        "surface-container-high": "#e0e3e4",
+                        "on-primary-fixed": "#000000",
+                        "surface-container-highest": "#dadddf",
+                        "tertiary-container": "#f797f0",
+                        "on-primary-fixed-variant": "#581200",
+                        "tertiary-fixed": "#f797f0",
+                        "tertiary-dim": "#7f2d7e",
+                        "surface-dim": "#d1d5d7",
+                        "on-surface": "#2c2f30",
+                        "primary-fixed": "#ff7852",
+                        "on-primary": "#ffefec",
+                        "tertiary": "#8d3a8b",
+                        "surface-bright": "#f5f6f7",
+                        "surface": "#f5f6f7",
+                        "secondary": "#005da4",
+                        "surface-container-low": "#eff1f2",
+                        "surface-variant": "#dadddf",
+                        "outline-variant": "#abadae",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#005292",
+                        "on-background": "#2c2f30",
+                        "inverse-primary": "#ff5624",
+                        "secondary-dim": "#005190",
+                        "on-tertiary-fixed-variant": "#6c1a6c",
+                        "on-tertiary-fixed": "#400042",
+                        "background": "#f5f6f7",
+                        "on-secondary-container": "#004982",
+                        "surface-container": "#e6e8ea",
+                        "secondary-fixed": "#b6d4ff",
+                        "surface-tint": "#ac2c00",
+                        "on-tertiary-container": "#610e63",
+                        "on-primary-container": "#480d00",
+                        "error": "#b31b25",
+                        "primary": "#ac2c00",
+                        "primary-container": "#ff7852",
+                        "on-secondary": "#eef3ff",
+                        "on-secondary-fixed": "#003562",
+                        "secondary-container": "#b6d4ff",
+                        "primary-dim": "#972500",
+                        "secondary-fixed-dim": "#9dc6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f5f6f7; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .glass-nav { backdrop-filter: blur(24px); }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- SideNavBar (Shared Component Shell) -->
+<aside class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-zinc-50 dark:bg-zinc-900 flex-col gap-4 p-4 overflow-y-auto bg-zinc-100 dark:bg-zinc-800 z-40">
+<div class="mb-8 px-2">
+<h1 class="text-xl font-black text-zinc-900 dark:text-white tracking-tighter">The Gallery</h1>
+<p class="text-xs font-label text-on-surface-variant">Curated Discovery</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-300 ease-in-out rounded-lg font-label" href="#">
+<span class="material-symbols-outlined">home</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-300 ease-in-out rounded-lg font-label" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span>Trending</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-300 ease-in-out rounded-lg font-label" href="#">
+<span class="material-symbols-outlined">bookmark</span>
+<span>Saved</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-300 ease-in-out rounded-lg font-label" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span>Messages</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 rounded-lg shadow-sm font-semibold transition-all duration-300 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-4 bg-surface-container-low rounded-xl">
+<button class="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-bold text-sm shadow-lg active:scale-95 transition-transform">
+                Create Collection
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen">
+<!-- Header (Contextual Sub-page Header) -->
+<header class="sticky top-0 z-30 glass-nav bg-white/80 dark:bg-zinc-950/80 px-8 py-6 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-2xl font-extrabold tracking-tight">Edit Profile</h2>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2 text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors">Cancel</button>
+<button class="px-6 py-2 text-sm font-bold bg-primary text-on-primary rounded-full hover:shadow-xl active:scale-95 transition-all">Save Changes</button>
+</div>
+</header>
+<div class="max-w-4xl mx-auto px-8 py-10">
+<!-- Visual Branding Section (Bento Inspired) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<!-- Cover Photo Column -->
+<div class="md:col-span-2 group relative h-64 rounded-xl overflow-hidden bg-surface-container-high transition-all">
+<img alt="Architectural header" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="Modernist concrete building facade with clean lines and blue sky reflecting in large glass windows at noon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw114xr4KfLMU7SABki1iux4AAzKGMJ8glWOZEnQWrhQfW2SI0GMWtDlVnNm-lBj-J4rSW6rG-Cfcs5xuoRByKhwnQOkc7szXU-9chTio2l081WKVnZG3DuagmsTfkP2V9OsM0FOoFv67zGkaVO2y_ZaSdYmkUjSB1ogl_9qxI6hFspfWjfYZIoZ8v5lsbS7r7PS26QSYs9JrQ-Ry6ReGux-xRfpcwQb_tpZS3PZ9Yi5xIPXqsEBgOAN17EBFtXDM45xkfJO_SyHtn"/>
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white font-bold border border-white/30">
+<span class="material-symbols-outlined">photo_camera</span>
+                            Change Cover
+                        </button>
+</div>
+</div>
+<!-- Profile Avatar Column -->
+<div class="group relative aspect-square rounded-xl overflow-hidden bg-surface-container-low transition-all">
+<img alt="Julian Architect Profile" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Professional portrait of a male architect in black turtleneck with minimal interior design background and soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ6zng53eV-LUAuBQSJjeTqy5ihfApC8jjNUHp1N8ZLJXDgQzPU2oi7yWPTL8QtDZ-9BW7HJ_LdTQOutDTA5TkxK9-IsQMtwTNsyv2zJTuLjwVS8-ElLoejToO3NpI7P80Lzy4VuBrA73-c68eE-NDmSS-nQC9QGdWciyHh0_tH44DXlH9J8_-ksxELECY1jz-A0YiivlyPNXrcPibzP94zCnEy35oD6GP4fWaFJ7OE1gsBw9iumS8S7YLBBXKevgb_ScioLQddXOC"/>
+<div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity p-4">
+<span class="material-symbols-outlined text-white text-3xl mb-2">add_a_photo</span>
+<span class="text-white text-xs font-bold text-center">UPDATE AVATAR</span>
+</div>
+</div>
+</section>
+<!-- Information Form Sections -->
+<div class="space-y-12">
+<!-- Basic Info -->
+<div class="space-y-6">
+<div class="flex items-baseline justify-between">
+<h3 class="text-xl font-bold tracking-tight text-on-surface">Basic Information</h3>
+<p class="text-xs font-label text-outline uppercase tracking-widest">Mandatory Fields</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant px-1">DISPLAY NAME</label>
+<input class="w-full px-4 py-3 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface placeholder:text-outline-variant font-medium" type="text" value="Julian Architect"/>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant px-1">USERNAME</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">@</span>
+<input class="w-full pl-8 pr-4 py-3 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface font-medium" type="text" value="Julian_Architect"/>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant px-1">BIO</label>
+<textarea class="w-full px-4 py-3 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface font-medium resize-none" rows="4">Architectural designer specializing in brutalist-revivalism and sustainable urban voids. Curating the future of spatial experiences through a minimalist lens.</textarea>
+</div>
+</div>
+<!-- Online Presence -->
+<div class="space-y-6">
+<h3 class="text-xl font-bold tracking-tight text-on-surface">Online Presence</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl group transition-all hover:bg-surface-container">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">language</span>
+</div>
+<div class="flex-1">
+<label class="block text-[10px] font-bold text-outline uppercase tracking-wider">Website URL</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface font-semibold placeholder:text-outline-variant" placeholder="https://yourportfolio.com" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl group transition-all hover:bg-surface-container">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">alternate_email</span>
+</div>
+<div class="flex-1">
+<label class="block text-[10px] font-bold text-outline uppercase tracking-wider">Twitter/X Profile</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface font-semibold" type="text" value="twitter.com/julian_space"/>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl group transition-all hover:bg-surface-container">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">linked_camera</span>
+</div>
+<div class="flex-1">
+<label class="block text-[10px] font-bold text-outline uppercase tracking-wider">Instagram</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface font-semibold" type="text" value="instagram.com/void.studies"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Account Privacy (Tonal Transition) -->
+<div class="p-8 rounded-2xl bg-surface-container-low space-y-4">
+<h3 class="text-lg font-bold">Preferences</h3>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-on-surface">Private Profile</p>
+<p class="text-sm text-on-surface-variant">Only approved followers can see your collections.</p>
+</div>
+<button class="w-12 h-6 rounded-full bg-surface-container-highest relative transition-colors">
+<span class="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm"></span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div>
+<p class="font-bold text-on-surface">Display Creator Badge</p>
+<p class="text-sm text-on-surface-variant">Show your verified status on your public profile.</p>
+</div>
+<button class="w-12 h-6 rounded-full bg-primary relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm"></span>
+</button>
+</div>
+</div>
+</div>
+<!-- Danger Zone -->
+<div class="mt-20 pt-12 border-t border-outline-variant/20">
+<button class="flex items-center gap-2 text-error font-bold hover:bg-error-container/10 px-4 py-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined">delete_forever</span>
+                    Deactivate Account
+                </button>
+</div>
+</div>
+<!-- Footer (Shared Component) -->
+<footer class="bg-zinc-50 dark:bg-zinc-950 w-full py-12 border-t border-zinc-100 dark:border-zinc-800">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-8">
+<div class="text-center md:text-left">
+<span class="font-manrope font-bold text-on-surface">The Gallery</span>
+<p class="font-inter text-sm text-zinc-500 dark:text-zinc-400 mt-1">© 2024 The Gallery. Curated for the community.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-inter text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Privacy</a>
+<a class="font-inter text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Terms</a>
+<a class="font-inter text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Guidelines</a>
+<a class="font-inter text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity opacity-80 hover:opacity-100" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

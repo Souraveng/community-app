@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffeef8",
+                    "on-surface-variant": "#595c5d",
+                    "outline": "#757778",
+                    "error-container": "#fb5151",
+                    "on-error-container": "#570008",
+                    "inverse-on-surface": "#9b9d9e",
+                    "tertiary-fixed-dim": "#e88ae1",
+                    "primary-fixed-dim": "#ff5d2e",
+                    "error-dim": "#9f0519",
+                    "on-error": "#ffefee",
+                    "inverse-surface": "#0c0f10",
+                    "surface-container-high": "#e0e3e4",
+                    "on-primary-fixed": "#000000",
+                    "surface-container-highest": "#dadddf",
+                    "tertiary-container": "#f797f0",
+                    "on-primary-fixed-variant": "#581200",
+                    "tertiary-fixed": "#f797f0",
+                    "tertiary-dim": "#7f2d7e",
+                    "surface-dim": "#d1d5d7",
+                    "on-surface": "#2c2f30",
+                    "primary-fixed": "#ff7852",
+                    "on-primary": "#ffefec",
+                    "tertiary": "#8d3a8b",
+                    "surface-bright": "#f5f6f7",
+                    "surface": "#f5f6f7",
+                    "secondary": "#005da4",
+                    "surface-container-low": "#eff1f2",
+                    "surface-variant": "#dadddf",
+                    "outline-variant": "#abadae",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#005292",
+                    "on-background": "#2c2f30",
+                    "inverse-primary": "#ff5624",
+                    "secondary-dim": "#005190",
+                    "on-tertiary-fixed-variant": "#6c1a6c",
+                    "on-tertiary-fixed": "#400042",
+                    "background": "#f5f6f7",
+                    "on-secondary-container": "#004982",
+                    "surface-container": "#e6e8ea",
+                    "secondary-fixed": "#b6d4ff",
+                    "surface-tint": "#ac2c00",
+                    "on-tertiary-container": "#610e63",
+                    "on-primary-container": "#480d00",
+                    "error": "#b31b25",
+                    "primary": "#ac2c00",
+                    "primary-container": "#ff7852",
+                    "on-secondary": "#eef3ff",
+                    "on-secondary-fixed": "#003562",
+                    "secondary-container": "#b6d4ff",
+                    "primary-dim": "#972500",
+                    "secondary-fixed-dim": "#9dc6ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl shadow-sm dark:shadow-none font-manrope tracking-tight">
+<div class="flex items-center justify-between px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-zinc-900 dark:text-white">The Gallery</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-blue-600 dark:text-blue-400 font-semibold transition-colors" href="#">Explore</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors" href="#">Communities</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors" href="#">Creators</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 font-body" placeholder="Search communities..." type="text"/>
+</div>
+<button class="text-zinc-600 dark:text-zinc-400 font-semibold hover:text-primary transition-colors px-4 py-2">Sign In</button><button class="bg-primary text-on-primary px-6 py-2 rounded-full font-semibold transition-all active:scale-95 duration-200 shadow-sm hover:shadow-md hover:bg-primary-dim">Sign Up</button><div class="w-px h-6 bg-zinc-200 dark:bg-zinc-800 mx-2 hidden md:block"></div><button class="bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 text-zinc-900 dark:text-white px-5 py-2 rounded-full font-semibold text-sm transition-all active:scale-95 duration-200 border border-zinc-200 dark:border-zinc-700">New Post</button>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-zinc-500 cursor-pointer hover:text-zinc-900">notifications</span>
+<span class="material-symbols-outlined text-zinc-500 cursor-pointer hover:text-zinc-900">account_circle</span>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative px-6 py-20 lg:py-32 overflow-hidden">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="z-10">
+<span class="inline-block px-4 py-1.5 bg-tertiary-container text-on-tertiary-container rounded-full text-sm font-semibold mb-6">
+                        Curated Discovery
+                    </span>
+<h1 class="font-headline text-5xl lg:text-7xl font-extrabold tracking-tighter text-on-surface mb-6 leading-tight">
+                        Where Community <br/> Meets <span class="text-primary italic">Artistry.</span>
+</h1>
+<p class="text-lg lg:text-xl text-on-surface-variant max-w-lg mb-10 leading-relaxed">
+                        A digital sanctuary for high-end discourse. Join a community where content isn't just posted—it's curated like a gallery.
+                    </p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-full font-bold text-lg shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+                            Join the Community
+                        </button>
+<button class="bg-surface-container-highest text-on-surface px-8 py-4 rounded-full font-bold text-lg active:scale-95 transition-transform">
+                            Explore Featured
+                        </button>
+</div>
+</div>
+<div class="relative group">
+<div class="absolute -inset-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[2rem] blur-2xl group-hover:blur-3xl transition-all"></div>
+<div class="relative aspect-square rounded-[2rem] overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105" data-alt="Modern art gallery interior with minimalist concrete walls, soft natural lighting, and a single striking abstract painting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_2bKY240Um5cHrOmN8_YVGNWLJKbw_A--lJ844ZBOOcy2nZm1SCmJhDWZnvK1rYOuVDReqwyq4oT5T4uTQ_njsNRLDjAGDrf73WLNwJAHlOk_LCtrhehQiRa5C0cHNW5d6hM31GDJUH3yHULOwEvmuqKzQAQ2k6I4PZLEAlWVvTIs-7LxjGsoxuYOtcVWN3ONJrGAMUTWddj-y8fIvrGMAuxP8v2a_VQ9OH1of-Me0iTQx-XLEwxvU1FmT0ECN06p-Cs8UJzm_XQb"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Asymmetric Bento Grid Features -->
+<section class="px-6 py-24 bg-surface">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline text-3xl lg:text-5xl font-bold tracking-tight mb-4">Featured Exhibits</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">Our communities are organized as collections, not just lists. Experience discovery that flows organically.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Large Feature Card -->
+<div class="md:col-span-8 group relative overflow-hidden rounded-[2rem] bg-surface-container-lowest p-8 min-h-[400px] flex flex-col justify-end">
+<img class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000" data-alt="Elegant minimalist living room with designer furniture, neutral tones, and a large window overlooking a misty morning garden" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUUN1_9GN6Vb5x_ewBc4ZMFDP68hdAq4z_OfnOxcGpXqeZYT4X_PgX61Ky7hIhRgB96Y2PgoFuqBcYAwpZ9GwFfgWy4cuSjnZlQbx3Q4a6zCPplv04aHiiGgwNzGNp7W4sDWyVA0KJrfyC0mFW5s1KNxFdy-fwX0eQCGshhFb2ik3V8J6MTJwEfFOfGfLk6sG0XfdpAmKMmDSuj62ZecsmVyPPu-d3Ri-CUX4FxYcvy-gYKqWO_q6TUo8pltC4po4EAJQXf5Wn3jVh"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="relative z-10 text-white">
+<span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block">Architecture</span>
+<h3 class="text-3xl font-bold mb-2">Minimalist Living</h3>
+<p class="text-white/80 max-w-sm">Exploring the intersection of function and form in modern residential spaces.</p>
+</div>
+</div>
+<!-- Small Feature Card 1 -->
+<div class="md:col-span-4 bg-tertiary-container rounded-[2rem] p-8 flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-4xl text-on-tertiary-container mb-4">palette</span>
+<h3 class="text-2xl font-bold text-on-tertiary-container leading-tight">Digital Artisans</h3>
+</div>
+<p class="text-on-tertiary-container/80 mb-6">A space for digital painters and concept artists to share techniques.</p>
+<button class="bg-white text-tertiary px-6 py-2 rounded-full font-bold w-fit active:scale-95 transition-transform">Explore</button>
+</div>
+<!-- Small Feature Card 2 -->
+<div class="md:col-span-4 bg-surface-container-lowest rounded-[2rem] p-8 shadow-sm group">
+<div class="aspect-video rounded-xl overflow-hidden mb-6">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="Breathtaking mountain range at sunset with glowing orange peaks and deep blue shadows in a cinematic landscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8aOhm8bCXqVwBOp9AIkcvZqTc7MtBdMG_Dp1N2NBiVzRplh2gfds6OnR7NUUiNBRxaCeNT5ARAsflvvfEjsRdViD2BKEJs6K3pkxpRmJu9TUDCvIc48szRgM8Z_1j2utW7dENbIh2AuBczflEFsbIHJM8YJReEMMvfinGoKugiRwy9ikP4MHrPrJmqHfmEqhMzJ2fC1Em9RzDwd9womUE7UDe2lomtwCm0agOWGaWbk9XBW8i-7g1ydZ5JeV7Q900OtCqQVCtA9mN"/>
+</div>
+<h3 class="text-xl font-bold mb-2">Wilderness Lens</h3>
+<p class="text-on-surface-variant text-sm mb-4">Capturing the raw beauty of the natural world through professional photography.</p>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-zinc-200"></div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-zinc-300"></div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-zinc-400"></div>
+<span class="pl-4 text-xs font-bold text-on-surface-variant flex items-center">+2.4k members</span>
+</div>
+</div>
+<!-- Medium Feature Card -->
+<div class="md:col-span-8 bg-secondary-container rounded-[2rem] p-10 flex items-center gap-8 overflow-hidden relative">
+<div class="relative z-10 max-w-md">
+<h3 class="text-3xl font-bold text-on-secondary-container mb-4">The Curated Feed</h3>
+<p class="text-on-secondary-container/80 leading-relaxed mb-6">
+                                Tired of algorithmic noise? The Gallery uses a human-led verification system to ensure only the highest quality content reaches your main exhibit.
+                            </p>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-secondary-container">verified</span>
+<span class="text-sm font-bold text-on-secondary-container uppercase tracking-widest">Quality Guaranteed</span>
+</div>
+</div>
+<div class="absolute right-[-10%] top-1/2 -translate-y-1/2 w-64 h-64 bg-white/20 rounded-full blur-3xl"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- How it Works Section -->
+<section class="px-6 py-24 bg-white">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col lg:flex-row gap-16 items-start">
+<div class="lg:sticky lg:top-32 w-full lg:w-1/3">
+<h2 class="font-headline text-4xl lg:text-5xl font-extrabold tracking-tighter mb-6">How The Gallery <br/> Works</h2>
+<p class="text-on-surface-variant leading-relaxed">We've reimagined community building by applying the principles of physical galleries to digital spaces.</p>
+<div class="mt-10 p-6 bg-surface-container-low rounded-2xl">
+<p class="text-sm font-medium text-primary mb-2 italic">"The internet's front room for quality discourse."</p>
+<p class="text-xs text-on-surface-variant">— Creative Review</p>
+</div>
+</div>
+<div class="w-full lg:w-2/3 space-y-12">
+<div class="flex gap-8 items-start">
+<span class="text-6xl font-black text-primary/10">01</span>
+<div>
+<h4 class="text-2xl font-bold mb-3">Claim Your Canvas</h4>
+<p class="text-on-surface-variant leading-relaxed">Start a community or join an existing one. Every space is a "Canvas" designed to showcase work with elegance.</p>
+</div>
+</div>
+<div class="flex gap-8 items-start">
+<span class="text-6xl font-black text-primary/10">02</span>
+<div>
+<h4 class="text-2xl font-bold mb-3">Curate with Purpose</h4>
+<p class="text-on-surface-variant leading-relaxed">Use our editorial tools to highlight the best posts. Move beyond simple upvotes with "Featured Slots" and "Collection Folders."</p>
+</div>
+</div>
+<div class="flex gap-8 items-start">
+<span class="text-6xl font-black text-primary/10">03</span>
+<div>
+<h4 class="text-2xl font-bold mb-3">Build Your Legacy</h4>
+<p class="text-on-surface-variant leading-relaxed">Our platform rewards long-term curation. Your profile grows as a recognized tastemaker in your chosen fields.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="px-6 py-24">
+<div class="max-w-5xl mx-auto bg-on-surface rounded-[3rem] p-12 lg:p-20 relative overflow-hidden text-center">
+<div class="absolute inset-0 opacity-20">
+<img class="w-full h-full object-cover" data-alt="Soft ethereal light leaking through translucent glass fabric with subtle iridescent colors and smooth gradients" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6AaxuZOQxBbkg2QydQMrmI1ttQDy8rZqKpT4IQ4oFE-67n4CfaNE4ChEYTbG20hy_Le-bSj-NKMwatuyRCdSo9-IIvF1qOHa7ngrIA25vYyk4yOtRU-WMNqJqksy3lsn29HpN2C81g4_TJtTRilu5OulwY5vTzMa2I4h2aXgCOVQyHvOUVvwBZLNIWjTiQs7y0UlvtpMQIDadZWLgNosMDNS43Xj98Ze8XPqulkgJ9tJ_e85E3dMybIDiZwlHSfHKw3FAYe2l81v0"/>
+</div>
+<div class="relative z-10">
+<h2 class="font-headline text-4xl lg:text-6xl font-extrabold tracking-tighter text-white mb-8">Ready to curate your space?</h2>
+<p class="text-white/60 text-lg lg:text-xl mb-12 max-w-xl mx-auto font-body">
+                        Join 50,000+ creators and enthusiasts who have already claimed their place in The Gallery.
+                    </p>
+<div class="flex flex-col sm:flex-row justify-center gap-6">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-full font-bold text-lg active:scale-95 transition-transform">Get Started Today</button>
+<button class="bg-white/10 backdrop-blur-md text-white border border-white/20 px-10 py-4 rounded-full font-bold text-lg active:scale-95 transition-transform">Book a Demo</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 font-inter text-sm">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto">
+<div class="mb-8 md:mb-0 text-center md:text-left">
+<span class="font-manrope font-bold text-xl block mb-2">The Gallery</span>
+<p class="text-zinc-500 dark:text-zinc-400">© 2024 The Gallery. Curated for the community.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity" href="#">Privacy</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity" href="#">Terms</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity" href="#">Guidelines</a>
+<a class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-opacity" href="#">Contact</a>
+</div>
+<div class="flex gap-4 mt-8 md:mt-0">
+<span class="material-symbols-outlined text-zinc-400 cursor-pointer hover:text-primary transition-colors">language</span>
+<span class="material-symbols-outlined text-zinc-400 cursor-pointer hover:text-primary transition-colors">share</span>
+</div>
+</div>
+</footer>
+</body></html>

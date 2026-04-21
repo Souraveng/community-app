@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#2c2f30",
+                    "error-dim": "#9f0519",
+                    "on-error-container": "#570008",
+                    "surface-container-highest": "#dadddf",
+                    "secondary-dim": "#005190",
+                    "on-primary": "#ffefec",
+                    "outline": "#757778",
+                    "on-error": "#ffefee",
+                    "tertiary-dim": "#7f2d7e",
+                    "on-secondary-fixed-variant": "#005292",
+                    "outline-variant": "#abadae",
+                    "surface-bright": "#f5f6f7",
+                    "surface-container": "#e6e8ea",
+                    "surface-variant": "#dadddf",
+                    "primary-fixed-dim": "#ff5d2e",
+                    "surface-container-low": "#eff1f2",
+                    "secondary-fixed-dim": "#9dc6ff",
+                    "tertiary": "#8d3a8b",
+                    "inverse-on-surface": "#9b9d9e",
+                    "on-tertiary-fixed-variant": "#6c1a6c",
+                    "surface-tint": "#ac2c00",
+                    "primary-dim": "#972500",
+                    "error-container": "#fb5151",
+                    "on-tertiary-container": "#610e63",
+                    "on-tertiary": "#ffeef8",
+                    "surface-dim": "#d1d5d7",
+                    "error": "#b31b25",
+                    "on-surface": "#2c2f30",
+                    "secondary-fixed": "#b6d4ff",
+                    "on-secondary": "#eef3ff",
+                    "on-secondary-fixed": "#003562",
+                    "surface-container-high": "#e0e3e4",
+                    "primary-fixed": "#ff7852",
+                    "on-primary-container": "#480d00",
+                    "on-tertiary-fixed": "#400042",
+                    "primary": "#ac2c00",
+                    "surface": "#f5f6f7",
+                    "primary-container": "#ff7852",
+                    "on-primary-fixed-variant": "#581200",
+                    "inverse-surface": "#0c0f10",
+                    "on-secondary-container": "#004982",
+                    "inverse-primary": "#ff5624",
+                    "secondary": "#005da4",
+                    "secondary-container": "#b6d4ff",
+                    "tertiary-fixed": "#f797f0",
+                    "background": "#f5f6f7",
+                    "tertiary-fixed-dim": "#e88ae1",
+                    "on-primary-fixed": "#000000",
+                    "on-surface-variant": "#595c5d",
+                    "tertiary-container": "#f797f0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f6f7;
+            color: #2c2f30;
+        }
+        .glass-nav {
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 max-w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter font-headline">The Gallery</span>
+<div class="hidden md:flex items-center space-x-6 font-manrope tracking-tight text-sm font-medium">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">Home</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">Popular</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">Explore</a>
+</div>
+</div>
+<div class="flex-1 max-w-md mx-8">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="Search Discovery" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 mr-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</button>
+</div>
+<button class="hidden lg:block px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-headline text-sm font-bold scale-95 active:opacity-80 transition-all">Create Post</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest ring-2 ring-offset-2 ring-transparent hover:ring-primary transition-all cursor-pointer">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man with clean lighting and minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm4vJKWRYkcLrS4lFA5xm2q-P2P9F5kSdm12BDCpWq80ME-UbAacLcBC480-JoG0Vv1_7TK7TNGvPsnb7kU06dLwinHrWBKjQOsuPJA6PuViV-eUSyX5mPi4jRYYidxOY_-99CU35Q60tfhTWWGzyorvWKNyx2zFo5AVf-8IwEsAz5_c2qM-bZ2eOrZspPQC_zd-iAHY9YTwiOIXDnxbt_p5UHYIl98JRC8V-SGEHba2z3BfpoLrrs0MChQqB2s87HpZZyfKjBD6YJ"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="hidden md:flex h-screen w-64 fixed left-0 top-16 flex-col p-6 space-y-8 bg-slate-50 dark:bg-slate-950 font-manrope text-sm font-semibold uppercase tracking-wider">
+<div class="space-y-2">
+<p class="text-[10px] text-outline px-2 mb-4">Discovery Feed</p>
+<a class="flex items-center gap-3 p-3 rounded-lg text-slate-500 hover:bg-slate-200/50 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="home">home</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-slate-500 hover:bg-slate-200/50 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="trending_up">trending_up</span>
+<span>Popular</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-blue-600 font-bold bg-slate-200/50 transition-all group" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span>Communities</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-slate-500 hover:bg-slate-200/50 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="topic">topic</span>
+<span>Topics</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-slate-500 hover:bg-slate-200/50 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-auto space-y-4 pt-8">
+<div class="p-4 rounded-xl bg-tertiary-container/20 border border-tertiary-container/30">
+<p class="text-xs font-bold text-tertiary mb-2 uppercase tracking-widest">Premium</p>
+<p class="text-[11px] text-on-surface-variant normal-case font-medium mb-3">Support the gallery and get exclusive features.</p>
+<button class="w-full py-2 bg-tertiary text-white rounded-lg text-xs font-bold hover:opacity-90 transition-opacity">Join Premium</button>
+</div>
+<div class="flex flex-wrap gap-x-4 gap-y-2 px-2 text-[10px] text-outline normal-case">
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms</a>
+<a class="hover:text-primary transition-colors" href="#">Help</a>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="md:ml-64 pt-16 min-h-screen">
+<!-- Community Banner & Header -->
+<header class="relative">
+<div class="h-48 md:h-64 w-full overflow-hidden">
+<img alt="r/design banner" class="w-full h-full object-cover" data-alt="minimalist architectural detail with smooth concrete curves and soft shadows in warm daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtY8kcKtOQwIdgNwC1F4nyTLbfZqsSKF076WHq8U8T719yvITr7cJS9ivp72RTdSI7byQT4R0x-qg9URNDkleVYO62Gr2fu7LAFzF5uQ8dyfuI4Tb86PsvxH1Ecm8w7YywiHdtIXeqhhXu2xsk0vhhCvWwNK_lAcEnTbSeKsgTqVIqPRpRBqyXVF-WZELO_IhevwWITMt5BUdo4B-qcBtFXF3ozWTmbn4z3dvjffRRoypLkU6shlo71zYBWIJHK8fDFgjfIikKOoY6"/>
+</div>
+<div class="max-w-5xl mx-auto px-8">
+<div class="relative -mt-12 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8">
+<div class="flex items-end gap-6">
+<div class="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-surface-container-lowest p-1 shadow-xl">
+<div class="w-full h-full rounded-2xl overflow-hidden bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-5xl" style="font-variation-settings: 'FILL' 1;">architecture</span>
+</div>
+</div>
+<div class="mb-2">
+<h1 class="text-3xl md:text-4xl font-black font-headline tracking-tighter text-on-background">r/design</h1>
+<p class="text-on-surface-variant font-medium">1.2M Designers • 4.2k Active</p>
+</div>
+</div>
+<div class="flex items-center gap-3 mb-2">
+<button class="px-8 py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-headline font-extrabold tracking-tight hover:shadow-lg hover:scale-105 active:scale-95 transition-all">Join Community</button>
+<button class="p-3 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Grid -->
+<div class="max-w-5xl mx-auto px-8 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-10">
+<!-- Feed Section -->
+<div class="lg:col-span-8 space-y-10">
+<!-- Sorting & Filters -->
+<div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-4 py-2 bg-surface-container-highest text-on-surface rounded-full text-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="local_fire_department">local_fire_department</span> Hot
+                    </button>
+<button class="px-4 py-2 hover:bg-surface-container-low text-on-surface-variant rounded-full text-sm font-medium flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="new_releases">new_releases</span> New
+                    </button>
+<button class="px-4 py-2 hover:bg-surface-container-low text-on-surface-variant rounded-full text-sm font-medium flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span> Top
+                    </button>
+</div>
+<!-- Posts -->
+<article class="group bg-transparent hover:bg-surface-container-lowest rounded-xl p-4 transition-all duration-300">
+<div class="flex gap-4">
+<div class="flex flex-col items-center gap-1">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="arrow_upward">arrow_upward</span></button>
+<span class="text-xs font-bold font-headline">1.4k</span>
+<button class="p-1 hover:text-secondary transition-colors"><span class="material-symbols-outlined" data-icon="arrow_downward">arrow_downward</span></button>
+</div>
+<div class="flex-1 space-y-3">
+<div class="flex items-center gap-2 text-[11px] font-medium text-on-surface-variant uppercase tracking-widest">
+<span class="text-primary font-bold">Case Study</span>
+<span>•</span>
+<span>u/alex_minimalist</span>
+<span>•</span>
+<span>4h ago</span>
+</div>
+<h2 class="text-xl md:text-2xl font-headline font-bold leading-tight group-hover:text-primary transition-colors">The evolution of minimalist interfaces in high-end automotive design</h2>
+<p class="text-on-surface-variant line-clamp-3 font-body leading-relaxed">Looking at how brands like Rivian and Polestar are redefining the digital dashboard by removing cognitive load through intentional whitespace and limited color palettes...</p>
+<div class="rounded-2xl overflow-hidden aspect-video">
+<img alt="post content" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="sleek modern car interior with digital dashboard showing clean minimalist interface in soft twilight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDizWRDlCeAzKnqGa-IhNpTfx2QyEZZV-ehfVVsa1nGr8KecjVT2KG3w4KNt8xc8tlXB2qwVpTAaFaZhQfZ4nKlvgYF5_n5yi7dxAE0HEY0Dl_c8oUuDkcg9VaOkGlmo59oCrWOhkzUTFBmrzEivAs5r0B-vrHMTOMwBvqB5avkoSwKct7pxl_t6U4vGOIczwAeSQxGUAImRqTuRHuWkRsOgw4iDMcPA7Q6blPk-HRELZOxcvoj7lXkl01xqHO3zCN3qbp5ooI-JerA"/>
+</div>
+<div class="flex items-center gap-6 pt-2">
+<button class="flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chat_bubble">chat_bubble</span> 128 Comments
+                                </button>
+<button class="flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="share">share</span> Share
+                                </button>
+<button class="flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="bookmark">bookmark</span> Save
+                                </button>
+</div>
+</div>
+</div>
+</article>
+<article class="group bg-transparent hover:bg-surface-container-lowest rounded-xl p-4 transition-all duration-300">
+<div class="flex gap-4">
+<div class="flex flex-col items-center gap-1">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="arrow_upward">arrow_upward</span></button>
+<span class="text-xs font-bold font-headline">852</span>
+<button class="p-1 hover:text-secondary transition-colors"><span class="material-symbols-outlined" data-icon="arrow_downward">arrow_downward</span></button>
+</div>
+<div class="flex-1 space-y-3">
+<div class="flex items-center gap-2 text-[11px] font-medium text-on-surface-variant uppercase tracking-widest">
+<span class="text-secondary font-bold">Discussion</span>
+<span>•</span>
+<span>u/grid_master</span>
+<span>•</span>
+<span>8h ago</span>
+</div>
+<h2 class="text-xl md:text-2xl font-headline font-bold leading-tight group-hover:text-primary transition-colors">Why we need to stop using 1px borders for everything</h2>
+<p class="text-on-surface-variant font-body leading-relaxed">Tonal depth is far more sophisticated than sharp lines. Let's discuss why background shifts are the future of premium UI design systems...</p>
+<div class="flex items-center gap-6 pt-2">
+<button class="flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chat_bubble">chat_bubble</span> 42 Comments
+                                </button>
+<button class="flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="share">share</span> Share
+                                </button>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- Sidebar Section -->
+<aside class="lg:col-span-4 space-y-8">
+<!-- About Card -->
+<section class="bg-surface-container-low rounded-2xl p-6 space-y-4">
+<h3 class="font-headline font-bold text-on-background">About Community</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                        The world's largest creative community for sharing and exploring high-end design, from architecture to digital interfaces. Curating the best of the aesthetic world.
+                    </p>
+<div class="flex items-center gap-4 py-2 border-y border-outline-variant/10">
+<div>
+<p class="text-lg font-bold font-headline">1.2M</p>
+<p class="text-[10px] uppercase tracking-tighter text-outline">Members</p>
+</div>
+<div class="w-px h-8 bg-outline-variant/20"></div>
+<div>
+<p class="text-lg font-bold font-headline">4.2k</p>
+<p class="text-[10px] uppercase tracking-tighter text-outline">Online</p>
+</div>
+</div>
+<div class="space-y-3 pt-2">
+<div class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">calendar_month</span>
+<span>Created Jan 12, 2011</span>
+</div>
+<div class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">public</span>
+<span>Public Community</span>
+</div>
+</div>
+</section>
+<!-- Rules Card -->
+<section class="bg-surface-container-low rounded-2xl p-6 space-y-4">
+<h3 class="font-headline font-bold text-on-background">Community Rules</h3>
+<div class="space-y-4">
+<div class="group">
+<button class="w-full flex justify-between items-center text-left">
+<span class="text-sm font-bold">1. Keep it aesthetic</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="group">
+<button class="w-full flex justify-between items-center text-left">
+<span class="text-sm font-bold">2. Credit the creator</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="group">
+<button class="w-full flex justify-between items-center text-left">
+<span class="text-sm font-bold">3. No low-effort posts</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Featured Communities (Bento style) -->
+<section class="space-y-4">
+<h3 class="font-headline font-bold text-on-background px-1">Related Galleries</h3>
+<div class="grid grid-cols-2 gap-3">
+<a class="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900" href="#">
+<img alt="Architecture" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500" data-alt="extreme close-up of a glass skyscraper reflecting a clear blue sky with sharp geometric patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtxwyRPiP2GwmW_rK26kT_jgBiMSGSA2cEREqRfrb8cPZ-kAbcAXbFhpH2Ov-gJ18fgkRtbEKrJHIDF94VUJcyLdaH20uM0nYH5GLITxqGj2lMJ8RWW9us2QI1766rqtHZPUf-wPf-Kawc9tEfAD4b_CGdEjwQMl7hKrlzW-s92eNuZ_5419Ws7LEgo6wgTU-Vr639BCkEX-Vx0g9SQARqM39x8ZqIT-lDWsl3D1W4ui7VSODZgwBKhWLQ4em0xsugt5wbYmAIM7wz"/>
+<div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+<p class="text-xs font-bold text-white">r/arch</p>
+</div>
+</a>
+<a class="group relative aspect-square rounded-2xl overflow-hidden bg-slate-900" href="#">
+<img alt="Tech" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500" data-alt="retro-futuristic desk setup with vintage tech and neon orange accents in a dimly lit room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvPFqLaC_9kRiETetjnohSLEGxNtskRY0nxgS7tlnbr0z_CHQrddi9h0owg0TYDeRmFlCZ2yAarYUEgrpVDs7aJahEwAlhQ7r9tagI2mOEHoG0lfwfyX2qJIF1flv12Zibqrkieyz_6PGgBpO1PoZ70qvGp0jkp0ROvOxsQtSfIXd73A3uES9rs61yQAe7EffwBpoU1fHHVS3g80Xc67IU7kDixZW0cY6Ly4yFuQ1yz-p6sPvhBc99A3hf3UVFEop5lzZmh3zX2RkF"/>
+<div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+<p class="text-xs font-bold text-white">r/tech_art</p>
+</div>
+</a>
+</div>
+</section>
+</aside></div>
+</main>
+<!-- FAB for Mobile -->
+<button class="md:hidden fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center z-40 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</body></html>

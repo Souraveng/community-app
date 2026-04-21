@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#2c2f30",
+                        "error-dim": "#9f0519",
+                        "on-error-container": "#570008",
+                        "surface-container-highest": "#dadddf",
+                        "secondary-dim": "#005190",
+                        "on-primary": "#ffefec",
+                        "outline": "#757778",
+                        "on-error": "#ffefee",
+                        "tertiary-dim": "#7f2d7e",
+                        "on-secondary-fixed-variant": "#005292",
+                        "outline-variant": "#abadae",
+                        "surface-bright": "#f5f6f7",
+                        "surface-container": "#e6e8ea",
+                        "surface-variant": "#dadddf",
+                        "primary-fixed-dim": "#ff5d2e",
+                        "surface-container-low": "#eff1f2",
+                        "secondary-fixed-dim": "#9dc6ff",
+                        "tertiary": "#8d3a8b",
+                        "inverse-on-surface": "#9b9d9e",
+                        "on-tertiary-fixed-variant": "#6c1a6c",
+                        "surface-tint": "#ac2c00",
+                        "primary-dim": "#972500",
+                        "error-container": "#fb5151",
+                        "on-tertiary-container": "#610e63",
+                        "on-tertiary": "#ffeef8",
+                        "surface-dim": "#d1d5d7",
+                        "error": "#b31b25",
+                        "on-surface": "#2c2f30",
+                        "secondary-fixed": "#b6d4ff",
+                        "on-secondary": "#eef3ff",
+                        "on-secondary-fixed": "#003562",
+                        "surface-container-high": "#e0e3e4",
+                        "primary-fixed": "#ff7852",
+                        "on-primary-container": "#480d00",
+                        "on-tertiary-fixed": "#400042",
+                        "primary": "#ac2c00",
+                        "surface": "#f5f6f7",
+                        "primary-container": "#ff7852",
+                        "on-primary-fixed-variant": "#581200",
+                        "inverse-surface": "#0c0f10",
+                        "on-secondary-container": "#004982",
+                        "inverse-primary": "#ff5624",
+                        "secondary": "#005da4",
+                        "secondary-container": "#b6d4ff",
+                        "tertiary-fixed": "#f797f0",
+                        "background": "#f5f6f7",
+                        "tertiary-fixed-dim": "#e88ae1",
+                        "on-primary-fixed": "#000000",
+                        "on-surface-variant": "#595c5d",
+                        "tertiary-container": "#f797f0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none flex justify-between items-center px-8 h-16 max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">The Gallery</span>
+<div class="hidden md:flex items-center space-x-6 font-manrope tracking-tight text-sm font-medium">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200" href="#">Home</a>
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1" href="#">Popular</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200" href="#">Explore</a>
+</div>
+</div>
+<div class="flex-1 max-w-md mx-8 hidden lg:block">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 focus:ring-1 focus:ring-primary text-sm transition-all" placeholder="Search the gallery..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container rounded-full">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container rounded-full">chat_bubble</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-5 py-2 rounded-full font-manrope text-sm font-bold scale-95 active:opacity-80 transition-all">Create Post</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/20">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a man with friendly expression and modern spectacles in a bright studio environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-qqM9OYPWbU8BZ9hbTMuGwX3i4V0_Jk_TP35JhS9XusSrGLopQV1pajY1e-1giiVtLPqQ4utLPr2AXjwAw8zvMbPFmPDAeL1shpV7NfB4K-vHghPlddWX74hkiykMBehIHLG-li0wJA2Xd_SyRZexszjlpcppY_ISGNmHDEjrR42xYlFO-DPHVHYkarGfs0krsoeXPkIRTZ1V9SFxTyX3lTppFrlftASpyOZzoBrQ0NWAwuqiplNUkEf46rOZf3YiRHcA0h0Veh7p"/>
+</div>
+</div>
+</nav>
+<!-- Sidebar & Main Content Wrapper -->
+<div class="pt-16 flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col p-6 space-y-8 h-screen w-64 fixed left-0 top-16 bg-slate-50 dark:bg-slate-950">
+<div class="space-y-1">
+<div class="flex items-center gap-3 px-3 py-4">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gallery_thumbnail</span>
+</div>
+<div>
+<p class="text-xl font-bold text-slate-900 dark:text-white leading-tight">Discovery</p>
+<p class="text-[10px] font-manrope font-semibold uppercase tracking-wider text-slate-500">Curated feed</p>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-manrope text-sm font-semibold uppercase tracking-wider hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all translate-x-1" href="#">
+<span class="material-symbols-outlined">home</span> Home
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-blue-600 dark:text-blue-400 font-bold font-manrope text-sm uppercase tracking-wider bg-surface-container rounded-lg" href="#">
+<span class="material-symbols-outlined">trending_up</span> Popular
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-manrope text-sm font-semibold uppercase tracking-wider hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">group</span> Communities
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-manrope text-sm font-semibold uppercase tracking-wider hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">topic</span> Topics
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-manrope text-sm font-semibold uppercase tracking-wider hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+                </a>
+</nav>
+<div class="mt-auto p-4 rounded-2xl bg-gradient-to-br from-secondary to-secondary-dim text-on-secondary">
+<p class="font-manrope font-bold text-sm">Join Premium</p>
+<p class="text-xs opacity-80 mt-1">Unlock exclusive themes and custom gallery views.</p>
+</div>
+<div class="flex flex-wrap gap-x-4 gap-y-2 pt-4 opacity-50">
+<a class="text-[10px] font-bold uppercase tracking-widest" href="#">Privacy</a>
+<a class="text-[10px] font-bold uppercase tracking-widest" href="#">Terms</a>
+<a class="text-[10px] font-bold uppercase tracking-widest" href="#">Help</a>
+</div>
+</aside>
+<!-- Post Content Canvas -->
+<main class="flex-1 lg:ml-64 p-4 md:p-8 max-w-5xl mx-auto w-full">
+<!-- Post Header -->
+<div class="mb-8">
+<div class="flex items-center gap-3 mb-4">
+<span class="bg-surface-container-highest px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-on-surface">Design/Tech</span>
+<span class="text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">history</span> 4 hours ago
+                    </span>
+<span class="text-label-sm text-on-surface-variant">•</span>
+<span class="text-label-sm font-bold text-secondary">u/minimalist_alex</span>
+</div>
+<h1 class="text-4xl font-extrabold font-headline text-on-surface tracking-tight leading-none mb-6">The Future of Asymmetric Interfaces: Moving Beyond the Grid</h1>
+</div>
+<!-- Post Content -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm mb-12">
+<div class="aspect-video w-full relative">
+<img alt="Post content visual" class="w-full h-full object-cover" data-alt="abstract digital landscape with soft organic shapes in terracotta and deep blue tones, minimalist aesthetic with clean lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPbY_2qvbSSuMKdc6O5lqtMhdtYgrL_a-xA7QRzyGba1JGaCSEXUis_pco0AhYMNTc-7fg8NhZ_BPINSzjmKBy7FmcTQmY3s29UInbq3labnyp-U8yKmI5DspTlqJ1FsD4c1Vk4P4ZqEYhvhV5LIF6nv4wYGxdscdt9uZ4S0wdpbLTzVhl_4v4k1OQDPOWgdz-RAN__Ys9BRF4Wp70OAW-Q11RJ6hKKEoNECeqTWx0Qw1umEPOjj0HPnyUy8EWtS_IGRUsD2PoWIGk"/>
+</div>
+<div class="p-8 md:p-10">
+<div class="prose prose-slate max-w-none text-on-surface font-body text-lg leading-relaxed space-y-6">
+<p>We've spent a decade trapped in the 12-column grid. While it brought order to the chaos of early web design, it also created a visual monotony that makes every landing page feel like a template. The next wave of "The Gallery" isn't about chaos; it's about intentional asymmetry.</p>
+<p>By leveraging tonal depth instead of hard borders, we allow content to breathe. Notice how the negative space in this layout isn't just "empty"—it's a structural element that guides your eye toward the focal point.</p>
+</div>
+<div class="mt-10 flex items-center gap-6 pt-8 border-t border-outline-variant/10">
+<div class="flex items-center bg-surface-container-high rounded-full p-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 hover:text-primary transition-all">
+<span class="material-symbols-outlined">expand_less</span>
+</button>
+<span class="px-2 font-bold font-headline text-sm">1.2k</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-secondary/10 hover:text-secondary transition-all">
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-primary font-bold text-sm hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">share</span> Share
+                        </button>
+<button class="flex items-center gap-2 text-primary font-bold text-sm hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">bookmark</span> Save
+                        </button>
+</div>
+</div>
+</article>
+<!-- Comments Section -->
+<section class="space-y-10">
+<div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
+<h3 class="font-headline font-extrabold text-xl">Conversation <span class="text-on-surface-variant font-medium">(42)</span></h3>
+<div class="flex gap-2">
+<span class="text-label-sm font-bold opacity-40 uppercase tracking-widest">Sort by:</span>
+<select class="bg-transparent border-none p-0 pr-6 text-sm font-bold text-primary focus:ring-0">
+<option>Best</option>
+<option>Newest</option>
+<option>Oldest</option>
+</select>
+</div>
+</div>
+<!-- Comment Input -->
+<div class="bg-surface-container-low p-4 rounded-xl">
+<textarea class="w-full bg-surface-container-lowest border-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary min-h-[100px]" placeholder="Add to the discussion..."></textarea>
+<div class="flex justify-end mt-3">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2 rounded-full font-manrope text-sm font-bold transition-all active:scale-95">Post Comment</button>
+</div>
+</div>
+<!-- Threaded Comments -->
+<div class="space-y-10">
+<!-- Comment Parent 1 -->
+<div class="group">
+<div class="flex gap-4">
+<div class="flex-shrink-0 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="professional headshot of a person with clear eyes and warm lighting on a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAd1dSqUoKVzd27AnidEJwkRp3NE0BxRfiOSsWyG_ivdU7vmTZ1yux8j2TzvmQ0Fdq6Jb6Dbvfu3XiP4KOY7SuiKQklnHrIPpQU2MvMXJVkIgxKp2a-L4p8ko3MGG8SUQzOl1SR0smFzRIRNTPegzgjmATeUtlfW_EE3pdJeaIsdhEjDLx_pD12wUaniyUzGbp20h2nq5yyQb4Qinv-oImOGUYPxp07Mo1eJR-WLOzEB8H0GiubrhSfszeYqnyyy4cVaXoLX-UqpfDx"/>
+</div>
+<div class="w-0.5 grow bg-surface-container-highest rounded-full"></div>
+</div>
+<div class="flex-1 pb-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="font-bold text-sm">modern_sarah</span>
+<span class="text-label-sm text-on-surface-variant opacity-60">2h ago</span>
+</div>
+<p class="text-on-surface leading-relaxed text-sm">The "No-Line" rule is something I've been experimenting with in my own projects. It's surprisingly difficult to pull off without the layout feeling disjointed, but when it works, it feels so much more premium.</p>
+<div class="flex items-center gap-4 mt-3">
+<div class="flex items-center gap-1">
+<button class="material-symbols-outlined text-sm hover:text-primary">expand_less</button>
+<span class="text-xs font-bold">142</span>
+<button class="material-symbols-outlined text-sm hover:text-secondary">expand_more</button>
+</div>
+<button class="text-xs font-bold text-primary hover:underline">Reply</button>
+</div>
+<!-- Child Comment -->
+<div class="mt-8 space-y-6 pl-4 border-l-2 border-surface-container-highest">
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+<img alt="User" class="w-full h-full object-cover" data-alt="portrait of a creative professional woman in a bright modern office with natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnMKuu3Q6UZkoXRDH2BSocRuGg5SQJHaFOwKPcjGNOuJIzWiIVLRk7GK3kdScTz0xs0SZXK9KqSALqaynucrgAj9YJVvS-r49L_-2Kx21AoLYhNlqVxRVTh7zO-G7H6yA1xfjKIhR2IPeKx3dQByAo64ERusO7HwDe0k5fHZwKaVY0_7Rpu7rTYF7V5EUBfpLAliElBauTs5fBs0Z4EUBkCoIyRCPEExjyGAsg-1WWg4jCZ0B9Qt8EUAnErxEzGOPqa2EOI8NU2oLj"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-xs">ui_wizard</span>
+<span class="text-[10px] text-on-surface-variant opacity-60">1h ago</span>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed">Totally agree. The hierarchy comes from the contrast in surface colors rather than visual dividers. It forces you to be much more intentional with spacing.</p>
+<div class="flex items-center gap-4 mt-2">
+<div class="flex items-center gap-1">
+<button class="material-symbols-outlined text-xs hover:text-primary">expand_less</button>
+<span class="text-[10px] font-bold">12</span>
+<button class="material-symbols-outlined text-xs hover:text-secondary">expand_more</button>
+</div>
+<button class="text-[10px] font-bold text-primary hover:underline">Reply</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment Parent 2 -->
+<div class="group">
+<div class="flex gap-4">
+<div class="flex-shrink-0">
+<div class="w-10 h-10 rounded-full overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="vibrant portrait of a man with a beard and energetic expression in soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmnh5wAJZRuxfgQ_ZlWkESDohqxkd9ayJpwoEeVM4TZJMzt44KkFSeiP7RQQPfAvh9kqMcFnTW6CK4ZyHl6myjQHIVMMk5q8K90m9v6tdyYoqNYZtTGJLzmsGpJUJkuE7sghjv_3T9I0Aye5KXDbtOTi_s-0WEhrI6Ld6jbQGdgUP3Z-bkHKwvLGyojmf44XfqcYPcCeqNiM9VMh0GrzHLqgfnx371cmJVpE2B31vzFONYp_9AtXbBAbjyymx2bocq1QkIpOSkNbXG"/>
+</div>
+</div>
+<div class="flex-1 bg-surface-container-low p-6 rounded-xl">
+<div class="flex items-center gap-2 mb-2">
+<span class="font-bold text-sm">grid_lover_99</span>
+<span class="text-label-sm text-on-surface-variant opacity-60">5h ago</span>
+</div>
+<p class="text-on-surface leading-relaxed text-sm">I'm still a fan of the grid for data-heavy views. Asymmetric layouts are beautiful for editorial, but do they scale for dashboards?</p>
+<div class="flex items-center gap-4 mt-3">
+<div class="flex items-center gap-1">
+<button class="material-symbols-outlined text-sm hover:text-primary">expand_less</button>
+<span class="text-xs font-bold">89</span>
+<button class="material-symbols-outlined text-sm hover:text-secondary">expand_more</button>
+</div>
+<button class="text-xs font-bold text-primary hover:underline">Reply</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Mobile Bottom Navigation -->
+<div class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl flex justify-around items-center py-4 px-6 z-50">
+<button class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">home</button>
+<button class="material-symbols-outlined text-on-surface-variant">trending_up</button>
+<div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-container rounded-full flex items-center justify-center -mt-8 shadow-lg text-on-primary">
+<span class="material-symbols-outlined">add</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant">chat_bubble</button>
+<button class="material-symbols-outlined text-on-surface-variant">person</button>
+</div>
+</body></html>

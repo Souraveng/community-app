@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#2c2f30",
+                        "error-dim": "#9f0519",
+                        "on-error-container": "#570008",
+                        "surface-container-highest": "#dadddf",
+                        "secondary-dim": "#005190",
+                        "on-primary": "#ffefec",
+                        "outline": "#757778",
+                        "on-error": "#ffefee",
+                        "tertiary-dim": "#7f2d7e",
+                        "on-secondary-fixed-variant": "#005292",
+                        "outline-variant": "#abadae",
+                        "surface-bright": "#f5f6f7",
+                        "surface-container": "#e6e8ea",
+                        "surface-variant": "#dadddf",
+                        "primary-fixed-dim": "#ff5d2e",
+                        "surface-container-low": "#eff1f2",
+                        "secondary-fixed-dim": "#9dc6ff",
+                        "tertiary": "#8d3a8b",
+                        "inverse-on-surface": "#9b9d9e",
+                        "on-tertiary-fixed-variant": "#6c1a6c",
+                        "surface-tint": "#ac2c00",
+                        "primary-dim": "#972500",
+                        "error-container": "#fb5151",
+                        "on-tertiary-container": "#610e63",
+                        "on-tertiary": "#ffeef8",
+                        "surface-dim": "#d1d5d7",
+                        "error": "#b31b25",
+                        "on-surface": "#2c2f30",
+                        "secondary-fixed": "#b6d4ff",
+                        "on-secondary": "#eef3ff",
+                        "on-secondary-fixed": "#003562",
+                        "surface-container-high": "#e0e3e4",
+                        "primary-fixed": "#ff7852",
+                        "on-primary-container": "#480d00",
+                        "on-tertiary-fixed": "#400042",
+                        "primary": "#ac2c00",
+                        "surface": "#f5f6f7",
+                        "primary-container": "#ff7852",
+                        "on-primary-fixed-variant": "#581200",
+                        "inverse-surface": "#0c0f10",
+                        "on-secondary-container": "#004982",
+                        "inverse-primary": "#ff5624",
+                        "secondary": "#005da4",
+                        "secondary-container": "#b6d4ff",
+                        "tertiary-fixed": "#f797f0",
+                        "background": "#f5f6f7",
+                        "tertiary-fixed-dim": "#e88ae1",
+                        "on-primary-fixed": "#000000",
+                        "on-surface-variant": "#595c5d",
+                        "tertiary-container": "#f797f0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none flex justify-between items-center px-8 h-16 max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">The Gallery</span>
+<div class="hidden md:flex gap-6 font-manrope tracking-tight text-sm font-medium">
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1" href="#">Home</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200" href="#">Popular</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200" href="#">Explore</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">chat_bubble</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/20">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a man with a friendly expression in a professional studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7MspqX-Bl12jfpaf266yp4Yps3NclTwfpDZLAdcNfkqwzr6xU-2SyBRP-V4pwoUA1amP8gPmjrJ65vaIB9kP10PyXhtCUlPuikZ2vP8Jcp1StJKMrXzDxP1cNv23cWDMl7llnxlAQecWXLspWvBGCzNC0mzrDi2lLz9PfnqGTB3WaMbc8TTLE5i5M02xImfNfOYSgFeaPY3nYfZ6Xa816UFU-zUlo93zhL0zTnreWM4pmR0QglajHZP_1BmPyDF5xmfGThXiUXpDD"/>
+</div>
+</div>
+</nav>
+<!-- Side Navigation -->
+<aside class="hidden lg:flex flex-col p-6 space-y-8 h-screen w-64 fixed left-0 top-16 bg-slate-50 dark:bg-slate-950">
+<div class="space-y-1">
+<h3 class="font-manrope text-sm font-semibold uppercase tracking-wider text-on-surface-variant px-2 pb-2">Discovery</h3>
+<a class="flex items-center gap-3 p-2 text-blue-600 dark:text-blue-400 font-bold hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">home</span> Home
+            </a>
+<a class="flex items-center gap-3 p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">trending_up</span> Popular
+            </a>
+<a class="flex items-center gap-3 p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">group</span> Communities
+            </a>
+</div>
+<div class="mt-auto p-4 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary">
+<p class="font-headline font-bold text-sm">Join Premium</p>
+<p class="text-xs opacity-90 mt-1">Get exclusive features and support the creators.</p>
+</div>
+</aside>
+<!-- Main Content Canvas (Background content to be overlaid) -->
+<main class="pt-24 pl-0 lg:pl-64 pr-0 min-h-screen bg-surface">
+<div class="max-w-4xl mx-auto px-6">
+<div class="mb-12">
+<h1 class="text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">Feed</h1>
+<p class="text-on-surface-variant">The latest curated exhibits from your communities.</p>
+</div>
+<!-- Post Skeleton/Background Feed -->
+<div class="space-y-10">
+<div class="p-8 rounded-xl bg-surface-container-low transition-colors duration-300">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest"></div>
+<span class="text-xs font-label font-medium uppercase tracking-widest text-on-surface-variant">Photography</span>
+</div>
+<h2 class="text-2xl font-headline font-bold text-on-surface mb-4">The play of light in Nordic architecture</h2>
+<div class="aspect-video rounded-lg overflow-hidden bg-surface-container-high mb-4">
+<img class="w-full h-full object-cover" data-alt="minimalist architectural shot of sharp concrete angles against a clear blue sky with dramatic shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa-QxZPGrV2rFDbcIzdsHjRPAe7ASkyuMpNUDTS8yrtnkZNGa3RPK6zU6D1Cn2MtJo-H7B-093IE8f18AHIrkGL40Ylu3Y4FH_GvLeJzZ376mI7USCU3MAdEgZ9Sv5eEFD_jE2DcVgM8GivLuCc0W3XpgCHMfCzTV0Q2ttBP9JL1OxsCbz9DWLRcXyovBcjKxqI9BrFLagu7MwOCvgtY3pkuj2pWG1hiquZLehf1uYIywzq_b85bu-V6Z3BkPuROsgrwm35HJYQ_jg"/>
+</div>
+</div>
+<div class="p-8 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest"></div>
+<span class="text-xs font-label font-medium uppercase tracking-widest text-on-surface-variant">Philosophy</span>
+</div>
+<h2 class="text-2xl font-headline font-bold text-on-surface mb-4">Why we seek meaning in the mundane</h2>
+<p class="text-on-surface-variant leading-relaxed">The quiet moments between our major milestones often hold the most profound truths about our existence...</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Post Creation Modal Overlay -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-background/10 backdrop-blur-md">
+<!-- Modal Container -->
+<div class="w-full max-w-2xl bg-surface-container-lowest rounded-xl shadow-[0px_8px_32px_rgba(44,47,48,0.06)] overflow-hidden flex flex-col max-h-[921px]">
+<!-- Modal Header -->
+<div class="px-8 pt-8 pb-4 flex justify-between items-center bg-surface-container-lowest">
+<h2 class="text-2xl font-headline font-extrabold tracking-tight text-on-surface">Create Post</h2>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<!-- Modal Content (Scrollable Area) -->
+<div class="px-8 pb-8 overflow-y-auto space-y-6">
+<!-- Community Selector -->
+<div class="group">
+<label class="block text-xs font-label font-bold uppercase tracking-widest text-on-surface-variant mb-2 px-1">Select Community</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 appearance-none focus:ring-1 focus:ring-primary text-on-surface font-medium cursor-pointer transition-all">
+<option>r/DigitalArt</option>
+<option>r/MinimalistDesign</option>
+<option>r/WebDevelopment</option>
+<option>r/Architecture</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Title Input -->
+<div class="space-y-2">
+<input class="w-full text-2xl font-headline font-bold border-none bg-transparent p-0 placeholder:text-surface-variant focus:ring-0 focus:outline-none text-on-surface" placeholder="Title" type="text"/>
+<div class="h-[1px] w-full bg-outline-variant/10"></div>
+</div>
+<!-- Body Text Area -->
+<div class="min-h-[200px] flex flex-col">
+<textarea class="w-full flex-grow border-none bg-transparent p-0 placeholder:text-surface-variant focus:ring-0 focus:outline-none text-on-surface resize-none leading-relaxed body-md" placeholder="Share your thoughts or drop an image here..."></textarea>
+</div>
+<!-- Media Upload Preview Area (Asymmetric Bento-ish Style) -->
+<div class="grid grid-cols-4 gap-3">
+<div class="col-span-3 aspect-video bg-surface-container-low rounded-lg flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/20 hover:border-primary/30 transition-all cursor-pointer group">
+<span class="material-symbols-outlined text-4xl text-outline-variant group-hover:text-primary transition-colors mb-2">add_photo_alternate</span>
+<p class="text-xs font-label font-semibold text-on-surface-variant">Add Media</p>
+</div>
+<div class="col-span-1 aspect-square bg-surface-container-high/50 rounded-lg flex flex-col items-center justify-center opacity-40 grayscale">
+<span class="material-symbols-outlined text-outline-variant">link</span>
+</div>
+</div>
+<!-- Flair Chips -->
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface text-xs font-semibold font-label cursor-pointer hover:bg-primary/10 hover:text-primary transition-all">#OC</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface text-xs font-semibold font-label cursor-pointer hover:bg-primary/10 hover:text-primary transition-all">#Discussion</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface text-xs font-semibold font-label cursor-pointer hover:bg-primary/10 hover:text-primary transition-all">#Help</span>
+<button class="px-3 py-1.5 rounded-full border border-outline-variant/20 text-on-surface-variant text-xs font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">add</span> Add Tag
+                    </button>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-8 py-6 bg-surface-container-low flex justify-between items-center">
+<div class="flex gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">format_bold</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">format_italic</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">list</button>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 text-on-surface-variant font-bold text-sm hover:text-on-surface transition-colors">Save Draft</button>
+<button class="px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-sm shadow-lg shadow-primary/20 scale-100 hover:scale-[1.02] active:scale-95 transition-all">Post Exhibit</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Mobile Bottom Navigation Shell -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-xl flex items-center justify-around px-4 z-50">
+<button class="flex flex-col items-center text-blue-600">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-bold uppercase mt-1">Explore</span>
+</button>
+<button class="flex flex-col items-center -mt-8 bg-primary rounded-full p-3 shadow-xl text-white">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-bold uppercase mt-1">Groups</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-bold uppercase mt-1">Profile</span>
+</button>
+</div>
+</body></html>
