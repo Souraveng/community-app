@@ -359,7 +359,7 @@ export default function UserProfilePage() {
                     onClick={isFollowing ? unfollow : follow}
                     disabled={followLoading}
                   >
-                    {isFollowing ? 'Connected' : 'Connect'}
+                    {isFollowing ? 'Following' : 'Follow'}
                   </Button>
                 </div>
               )}
@@ -439,8 +439,8 @@ export default function UserProfilePage() {
 
             {/* Right Column: Feed/Content */}
             <div className="lg:col-span-8">
-               <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                  {['Collection', 'Communities', 'Saved', 'Drafts'].map((tab) => (
+                <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                  {(['Collection', 'Communities', isOwnProfile && 'Saved', isOwnProfile && 'Drafts'].filter(Boolean) as string[]).map((tab) => (
                     <button 
                       key={tab} 
                       onClick={() => setActiveTab(tab as any)}

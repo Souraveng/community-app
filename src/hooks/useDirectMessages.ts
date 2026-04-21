@@ -20,11 +20,7 @@ export function useDirectMessages() {
 
   useEffect(() => {
     if (user?.uid) {
-      if (!isValidUUID(user.uid)) {
-        setLoading(false);
-        return;
-      }
-
+      // Fetch conversations directly without strict UUID formatting guard
       fetchConversations();
       
       // Real-time subscription for new conversations or status changes
@@ -46,20 +42,12 @@ export function useDirectMessages() {
     }
   }, [user?.uid]);
 
-  const isValidUUID = (id: string) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
-  };
 
   const fetchConversations = async () => {
     if (!user?.uid) return;
     
-    // Smart Guard
-    if (!isValidUUID(user.uid)) {
-      setConversations([]);
-      setRequests([]);
-      setLoading(false);
-      return;
-    }
+    // Guard against missing user session
+    if (!user?.uid) return;
 
     setLoading(true);
     try {
@@ -78,8 +66,8 @@ export function useDirectMessages() {
       const processed = await Promise.all((data || []).map(async (conv: any) => {
         const otherId = conv.participants.find((id: string) => id !== user.uid);
         
-        // Guard nested profile fetch
-        if (!otherId || !isValidUUID(otherId)) {
+        // Guard nested profile fetch for missing participants
+        if (!otherId) {
           return { ...conv, other_user: null };
         }
 
@@ -111,9 +99,9 @@ export function useDirectMessages() {
   const createConversation = async (otherUserId: string, initialMessage?: string) => {
     if (!user?.uid) return null;
 
-    // Smart Guard
-    if (!isValidUUID(user.uid) || !isValidUUID(otherUserId)) {
-      console.warn('Conversation creation blocked: Incompatible ID format (Firebase vs UUID).');
+    // Smart Guard - relaxed to allow alphanumeric Firebase UIDs
+    if (!user.uid || !otherUserId) {
+      console.warn('Conversation creation blocked: Missing User IDs.');
       return null;
     }
 
