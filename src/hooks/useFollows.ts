@@ -23,8 +23,8 @@ export function useFollows(targetUserId?: string) {
   const checkFollowStatus = async () => {
     if (!user?.uid || !targetUserId) return;
     
-    // Smart Guard
-    if (!isValidUUID(user.uid) || !isValidUUID(targetUserId)) {
+    // Relaxed guard to allow alphanumeric Firebase UIDs
+    if (!user.uid || !targetUserId) {
       setIsFollowing(false);
       return;
     }
@@ -46,8 +46,8 @@ export function useFollows(targetUserId?: string) {
   const fetchCounts = async () => {
     if (!targetUserId) return;
     
-    // Smart Guard
-    if (!isValidUUID(targetUserId)) {
+    // Relaxed guard to allow alphanumeric Firebase UIDs
+    if (!targetUserId) {
       setFollowerCount(0);
       setFollowingCount(0);
       setLoading(false);
@@ -79,9 +79,9 @@ export function useFollows(targetUserId?: string) {
   const follow = async () => {
     if (!user?.uid || !targetUserId) return;
     
-    // Smart Guard
-    if (!isValidUUID(user.uid) || !isValidUUID(targetUserId)) {
-      console.warn('Follow action blocked: Incompatible ID format (Firebase vs UUID).');
+    // Relaxed guard to allow alphanumeric Firebase UIDs
+    if (!user?.uid || !targetUserId) {
+      console.warn('Follow action blocked: Missing User IDs.');
       return;
     }
 
@@ -110,8 +110,8 @@ export function useFollows(targetUserId?: string) {
   const unfollow = async () => {
     if (!user?.uid || !targetUserId) return;
     
-    // Smart Guard
-    if (!isValidUUID(user.uid) || !isValidUUID(targetUserId)) {
+    // Relaxed guard to allow alphanumeric Firebase UIDs
+    if (!user?.uid || !targetUserId) {
       return;
     }
 

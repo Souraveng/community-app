@@ -97,7 +97,12 @@ const Navbar: React.FC = () => {
                       {searchResults.communities.length > 0 ? (
                         <div className="space-y-1">
                           {searchResults.communities.map((c) => (
-                            <Link key={c.name} href={`/community/${c.name}`} className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container-low transition-colors group">
+                            <Link 
+                              key={c.name} 
+                              href={`/community/${c.name}`} 
+                              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                              className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container-low transition-colors group"
+                            >
                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary overflow-hidden relative">
                                  {c.avatar_url ? <Image src={c.avatar_url} alt={c.name} fill className="object-cover" /> : <span className="material-symbols-outlined text-lg">group</span>}
                                </div>
@@ -119,7 +124,12 @@ const Navbar: React.FC = () => {
                       {searchResults.profiles.length > 0 ? (
                         <div className="space-y-1">
                           {searchResults.profiles.map((p) => (
-                            <Link key={p.id} href={`/profile/${p.username}`} className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container-low transition-colors group">
+                            <Link 
+                              key={p.id} 
+                              href={`/profile/${p.username}`} 
+                              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                              className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container-low transition-colors group"
+                            >
                                <div className="w-8 h-8 rounded-full bg-secondary/10 overflow-hidden relative border border-outline-variant/10">
                                  {p.avatar_url ? <Image src={p.avatar_url} alt={p.username} fill className="object-cover" /> : <span className="material-symbols-outlined text-zinc-400">account_circle</span>}
                                </div>

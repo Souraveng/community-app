@@ -26,8 +26,8 @@ export function useChat(conversationId?: string) {
 
   useEffect(() => {
     if (conversationId && user?.uid) {
-      // Smart Guard
-      if (!isValidUUID(user.uid) || !isValidUUID(conversationId)) {
+      // Relaxed guard to allow alphanumeric Firebase UIDs
+      if (!user.uid || !conversationId) {
         setLoading(false);
         setCanSendMessage(false);
         return;
@@ -59,13 +59,10 @@ export function useChat(conversationId?: string) {
     }
   }, [conversationId, user?.uid]);
 
-  const isValidUUID = (id: string) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
-  };
+
 
   const fetchConversationMeta = async () => {
     if (!conversationId || !user?.uid) return;
-    if (!isValidUUID(conversationId) || !isValidUUID(user.uid)) return;
 
     const { data } = await supabase
       .from('conversations')
@@ -92,7 +89,6 @@ export function useChat(conversationId?: string) {
 
   const fetchMessages = async () => {
     if (!conversationId || !user?.uid) return;
-    if (!isValidUUID(conversationId) || !isValidUUID(user.uid)) return;
 
     setLoading(true);
     try {
@@ -116,7 +112,7 @@ export function useChat(conversationId?: string) {
       const otherId = conv?.participants.find((id: string) => id !== user.uid);
 
       const decrypted = await Promise.all(raw.map(async (msg: Message) => {
-        if (!msg.iv || msg.type !== 'text' || !otherId || !isValidUUID(user.uid!) || !isValidUUID(otherId)) {
+        if (!msg.iv || msg.type !== 'text' || !otherId) {
           return { ...msg, decryptedContent: msg.content };
         }
         try {
@@ -137,7 +133,6 @@ export function useChat(conversationId?: string) {
 
   const checkMessagingConstraints = async () => {
     if (!conversationId || !user?.uid) return;
-    if (!isValidUUID(conversationId) || !isValidUUID(user.uid)) return;
 
     try {
       const { data: conv } = await supabase
@@ -166,7 +161,6 @@ export function useChat(conversationId?: string) {
 
   const sendMessage = async (content: string) => {
     if (!conversationId || !user?.uid || !content.trim()) return false;
-    if (!isValidUUID(conversationId) || !isValidUUID(user.uid)) return false;
     
     if (!canSendMessage) {
       alert('You can only send one message until the curator accepts your request.');
@@ -186,7 +180,7 @@ export function useChat(conversationId?: string) {
       let encryptedContent = content.trim();
       let iv: string | undefined;
 
-      if (otherId && isValidUUID(otherId)) {
+      if (otherId) {
         const encrypted = await encryptMessage(content.trim(), user.uid, otherId);
         encryptedContent = encrypted.ciphertext;
         iv = encrypted.iv;
@@ -218,7 +212,6 @@ export function useChat(conversationId?: string) {
 
   const sendMedia = async (file: File) => {
     if (!conversationId || !user?.uid) return false;
-    if (!isValidUUID(conversationId) || !isValidUUID(user.uid)) return false;
 
     if (!canSendMessage) {
       alert('You can only send one message until the curator accepts your request.');
@@ -277,7 +270,6 @@ export function useChat(conversationId?: string) {
 
   const markAsRead = async () => {
     if (!conversationId || !user?.uid) return;
-    if (!isValidUUID(conversationId) || !isValidUUID(user.uid)) return;
 
     try {
       await supabase

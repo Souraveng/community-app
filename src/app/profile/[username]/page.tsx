@@ -60,6 +60,20 @@ export default function UserProfilePage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const { communities, loading: communitiesLoading } = useUserCommunities(profile?.id);
+  const [existingConversation, setExistingConversation] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchConv = async () => {
+      if (!currentUser?.uid || !profile?.id) return;
+      const { data } = await supabase
+        .from('conversations')
+        .select('*')
+        .contains('participants', [currentUser.uid, profile.id])
+        .maybeSingle();
+      setExistingConversation(data);
+    };
+    fetchConv();
+  }, [currentUser, profile]);
 
 
   const handleStartEdit = () => {
@@ -346,13 +360,20 @@ export default function UserProfilePage() {
                  </div>
               ) : (
                 <div className="flex gap-4">
-                  <Button 
-                    variant="ghost" 
-                    className="w-12 h-12 p-0 rounded-2xl flex items-center justify-center border border-outline-variant/10"
-                    onClick={handleMessage}
-                  >
-                    <span className="material-symbols-outlined">forum</span>
-                  </Button>
+                   <div className="relative group">
+                    <Button 
+                      variant="ghost" 
+                      className={`w-12 h-12 p-0 rounded-2xl flex items-center justify-center border border-outline-variant/10 ${existingConversation?.status === 'pending' ? 'text-secondary' : ''}`}
+                      onClick={handleMessage}
+                    >
+                      <span className="material-symbols-outlined">{existingConversation?.status === 'pending' ? 'hourglass_empty' : 'forum'}</span>
+                    </Button>
+                    {existingConversation?.status === 'pending' && (
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-secondary text-on-secondary text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                        Request Pending
+                      </div>
+                    )}
+                  </div>
                   <Button 
                     variant={isFollowing ? 'secondary' : 'primary'} 
                     className="px-8 md:px-12 py-4"

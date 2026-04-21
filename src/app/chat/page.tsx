@@ -218,7 +218,12 @@ export default function ChatPage() {
                 {searchResults.length > 0 && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-surface-container-lowest border border-outline-variant/10 rounded-2xl shadow-2xl z-50 overflow-hidden">
                     {searchResults.map(u => (
-                      <div key={u.id} onClick={() => handleStartChat(u)} className="flex items-center gap-3 p-3 hover:bg-surface-container-low cursor-pointer transition-colors border-b border-outline-variant/5 last:border-none">
+                      <div 
+                        key={u.id} 
+                        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onClick={() => handleStartChat(u)} 
+                        className="flex items-center gap-3 p-3 hover:bg-surface-container-low cursor-pointer transition-colors border-b border-outline-variant/5 last:border-none"
+                      >
                         <div className="w-8 h-8 rounded-full overflow-hidden relative border border-outline-variant/10">
                           {u.avatar_url ? <Image src={u.avatar_url} alt={u.username} fill className="object-cover" sizes="32px" /> : <span className="material-symbols-outlined text-zinc-400">account_circle</span>}
                         </div>
