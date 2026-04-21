@@ -12,6 +12,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useProfile } from '../../../hooks/useProfile';
 import { useFollows } from '../../../hooks/useFollows';
 import { useDirectMessages } from '../../../hooks/useDirectMessages';
+import { useUserCommunities } from '../../../hooks/useUserCommunities';
 import { uploadFile } from '../../../lib/storage';
 
 export default function UserProfilePage() {
@@ -33,9 +34,12 @@ export default function UserProfilePage() {
     bio: '',
     username: ''
   });
+  const [activeTab, setActiveTab] = useState<'Collection' | 'Upvoted' | 'Communities' | 'Drafts'>('Collection');
   const [showConnections, setShowConnections] = useState<'followers' | 'following' | null>(null);
   const [connectionList, setConnectionList] = useState<any[]>([]);
   const [loadingConnections, setLoadingConnections] = useState(false);
+  const { communities, loading: communitiesLoading } = useUserCommunities(profile?.id);
+
 
   const handleStartEdit = () => {
     if (profile) {
@@ -196,16 +200,28 @@ export default function UserProfilePage() {
 
             <div className="absolute -bottom-10 right-8 md:right-12 flex items-center gap-4">
               {isOwnProfile ? (
-                 isEditing ? (
-                  <>
-                    <Button variant="ghost" onClick={() => setIsEditing(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleSave}>Save Changes</Button>
-                  </>
-                ) : (
-                  <Button variant="secondary" className="px-6 md:px-8" onClick={handleStartEdit}>
-                    <span className="material-symbols-outlined text-sm mr-2">edit</span> Edit Profile
-                  </Button>
-                )
+                 <div className="flex items-center gap-6">
+                   <div className="hidden md:flex gap-4 mr-4">
+                      <div className="text-center cursor-pointer hover:opacity-70 transition-opacity" onClick={() => setShowConnections('followers')}>
+                        <p className="text-xl font-black font-headlines tracking-tighter">{followerCount}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Followers</p>
+                      </div>
+                      <div className="text-center cursor-pointer hover:opacity-70 transition-opacity" onClick={() => setShowConnections('following')}>
+                        <p className="text-xl font-black font-headlines tracking-tighter">{followingCount}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Following</p>
+                      </div>
+                   </div>
+                   {isEditing ? (
+                    <>
+                      <Button variant="ghost" onClick={() => setIsEditing(false)}>Cancel</Button>
+                      <Button variant="primary" onClick={handleSave}>Save Changes</Button>
+                    </>
+                  ) : (
+                    <Button variant="secondary" className="px-6 md:px-8" onClick={handleStartEdit}>
+                      <span className="material-symbols-outlined text-sm mr-2">edit</span> Edit Profile
+                    </Button>
+                  )}
+                 </div>
               ) : (
                 <div className="flex gap-4">
                   <Button 
@@ -226,6 +242,7 @@ export default function UserProfilePage() {
                 </div>
               )}
             </div>
+
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 mt-16 md:mt-24">
@@ -291,33 +308,91 @@ export default function UserProfilePage() {
             {/* Right Column: Feed/Content */}
             <div className="lg:col-span-8">
                <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                  {['Collection', 'Upvoted', 'Drafts', 'Tags'].map((tab, i) => (
-                    <button key={i} className={`pb-4 text-[10px] md:text-sm font-black uppercase tracking-widest transition-all relative ${i === 0 ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
+                  {['Collection', 'Communities', 'Upvoted', 'Drafts'].map((tab) => (
+                    <button 
+                      key={tab} 
+                      onClick={() => setActiveTab(tab as any)}
+                      className={`pb-4 text-[10px] md:text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === tab ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
+                    >
                       {tab}
-                      {i === 0 && <span className="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-full" />}
+                      {activeTab === tab && <span className="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-full" />}
                     </button>
                   ))}
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 {[1, 2, 3, 4].map((item) => (
-                   <div key={item} className="aspect-square rounded-[2rem] bg-surface-container-low/30 border border-outline-variant/10 p-2 group cursor-pointer overflow-hidden relative">
-                      <div className="w-full h-full rounded-[1.5rem] bg-surface-container-highest overflow-hidden relative">
-                         <Image 
-                          src={`https://images.unsplash.com/photo-${1534528741775 + item}-53994a69daeb?auto=format&fit=crop&q=80&w=800`} 
-                          alt="Gallery item" 
-                          fill 
-                          className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" 
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                        <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                           <span className="text-white font-headlines font-black text-xl translate-y-4 group-hover:translate-y-0 transition-transform">VIEW EXHIBIT</span>
+               {activeTab === 'Collection' && (
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   {[1, 2, 3, 4].map((item) => (
+                     <div key={item} className="aspect-square rounded-[2rem] bg-surface-container-low/30 border border-outline-variant/10 p-2 group cursor-pointer overflow-hidden relative">
+                        <div className="w-full h-full rounded-[1.5rem] bg-surface-container-highest overflow-hidden relative">
+                           <Image 
+                            src={`https://images.unsplash.com/photo-${1534528741775 + item}-53994a69daeb?auto=format&fit=crop&q=80&w=800`} 
+                            alt="Gallery item" 
+                            fill 
+                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" 
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                          <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                             <span className="text-white font-headlines font-black text-xl translate-y-4 group-hover:translate-y-0 transition-transform">VIEW EXHIBIT</span>
+                          </div>
                         </div>
-                      </div>
-                   </div>
-                 ))}
-               </div>
+                     </div>
+                   ))}
+                 </div>
+               )}
+
+               {activeTab === 'Communities' && (
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   {communitiesLoading ? (
+                     <div className="col-span-2 py-12 flex flex-col items-center gap-4 text-on-surface-variant">
+                       <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
+                       <p className="font-headlines font-bold uppercase tracking-widest">Scanning Networks...</p>
+                     </div>
+                   ) : communities.length > 0 ? (
+                     communities.map((comm) => (
+                       <div 
+                         key={comm.name} 
+                         className="flex flex-col gap-4 p-6 rounded-[2.5rem] bg-surface-container-low/30 border border-outline-variant/10 hover:ambient-shadow transition-all group cursor-pointer"
+                         onClick={() => router.push(`/community/${comm.name}`)}
+                       >
+                         <div className="flex items-center gap-4">
+                           <div className="w-16 h-16 rounded-[1.2rem] overflow-hidden relative border border-outline-variant/10">
+                             {comm.avatar_url ? (
+                               <Image src={comm.avatar_url} alt={comm.name} fill className="object-cover" />
+                             ) : (
+                               <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary">
+                                 <span className="material-symbols-outlined text-3xl">groups</span>
+                               </div>
+                             )}
+                           </div>
+                           <div className="flex-1">
+                             <h4 className="font-headlines font-black text-lg tracking-tight group-hover:text-primary transition-colors">{comm.name}</h4>
+                             <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{comm.member_count} Members</p>
+                           </div>
+                         </div>
+                         <p className="text-sm text-on-surface-variant line-clamp-2 leading-relaxed opacity-70">
+                           {comm.description || 'Welcome to this gallery of creativity and curation.'}
+                         </p>
+                       </div>
+                     ))
+                   ) : (
+                     <div className="col-span-2 py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
+                       <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">explore</span>
+                       <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Communities Found</p>
+                       <p className="text-sm text-on-surface-variant/60 mt-2">Start your journey by joining or building a gallery.</p>
+                       <Button variant="ghost" className="mt-6" onClick={() => router.push('/home')}>Explore All</Button>
+                     </div>
+                   )}
+                 </div>
+               )}
+
+               {(activeTab === 'Upvoted' || activeTab === 'Drafts') && (
+                 <div className="py-24 text-center">
+                   <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest opacity-40">Coming Soon to your Space</p>
+                 </div>
+               )}
             </div>
+
           </div>
 
           {/* Connections List Overlay */}
