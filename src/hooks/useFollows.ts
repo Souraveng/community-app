@@ -16,9 +16,7 @@ export function useFollows(targetUserId?: string) {
     }
   }, [targetUserId, user]);
 
-  const isValidUUID = (id: string) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
-  };
+
 
   const checkFollowStatus = async () => {
     if (!user?.uid || !targetUserId) return;
@@ -102,8 +100,9 @@ export function useFollows(targetUserId?: string) {
         target_id: user.uid
       });
 
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error following user:', err);
+      alert(`Follow failed: ${err.message || 'Unknown error'}. Check if your Supabase "follows" table columns are TEXT instead of UUID.`);
     }
   };
 
@@ -125,8 +124,9 @@ export function useFollows(targetUserId?: string) {
       if (error) throw error;
       setIsFollowing(false);
       setFollowerCount(prev => prev - 1);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error unfollowing user:', err);
+      alert(`Unfollow failed: ${err.message || 'Unknown error'}`);
     }
   };
 
