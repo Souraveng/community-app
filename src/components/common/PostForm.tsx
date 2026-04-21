@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { uploadFile } from '../../lib/storage';
@@ -126,137 +128,130 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(({
 
   if (!user) return null;
 
-  // Render logic for Modal-style Box
+  // Render logic for Global Modal (PIXEL PERFECT RESTORATION)
   if (isBox) {
     return (
-      <div className="space-y-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 p-0.5">
-              <img 
-                src={profile?.avatar_url || 'https://via.placeholder.com/150'} 
-                alt="Profile" 
-                className="w-full h-full rounded-full object-cover"
+      <div className="flex flex-col">
+        <form onSubmit={handleSubmit} className="space-y-8 p-4">
+          <div className="space-y-6">
+            {/* Title Section */}
+            <div className="space-y-3">
+              <label className="text-sm font-headlines font-bold text-on-surface/80">Title</label>
+              <input
+                type="text"
+                placeholder="What's this discovery about?"
+                className="w-full bg-surface-container-low border-none rounded-xl py-4 px-6 text-sm font-medium text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div>
-              <h3 className="font-headlines font-bold text-on-surface tracking-tight">New Exhibit</h3>
-              <p className="text-xs text-on-surface-variant font-medium">Curating as @{profile?.username}</p>
+
+            {/* Community Section */}
+            <div className="space-y-3">
+              <label className="text-sm font-headlines font-bold text-on-surface/80">Community</label>
+              <div className="relative">
+                <select
+                  className="w-full bg-surface-container-low border-none rounded-xl py-4 px-6 text-sm font-medium text-on-surface appearance-none focus:ring-2 focus:ring-primary/10 cursor-pointer"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  {CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/60">
+                  expand_more
+                </span>
+              </div>
             </div>
+
+            {/* Media Section */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-widest text-primary">Cover Image</label>
+                <div 
+                  className={`relative rounded-2xl border-2 border-dashed aspect-[16/9] flex flex-col items-center justify-center gap-3 overflow-hidden transition-all group cursor-pointer ${
+                    imageFile ? 'border-primary bg-primary/5' : 'border-outline-variant/30 bg-white/50 hover:bg-surface-container-low'
+                  }`}
+                  onClick={() => document.getElementById('global-image-input')?.click()}
+                >
+                  {imageFile ? (
+                    <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-4xl text-on-surface/40 group-hover:text-primary transition-colors">add_photo_alternate</span>
+                      <span className="text-[10px] font-bold text-on-surface-variant/60">Select Visual</span>
+                    </>
+                  )}
+                  <input id="global-image-input" type="file" accept="image/*" className="hidden" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-widest text-secondary">Motion Video (2MB Limit)</label>
+                <div 
+                  className={`relative rounded-2xl border-2 border-dashed aspect-[16/9] flex flex-col items-center justify-center gap-3 overflow-hidden transition-all group cursor-pointer ${
+                    videoFile ? 'border-secondary bg-secondary/5' : 'border-outline-variant/30 bg-white/50 hover:bg-surface-container-low'
+                  }`}
+                  onClick={() => document.getElementById('global-video-input')?.click()}
+                >
+                  {videoFile ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-secondary">movie</span>
+                      <span className="text-[10px] font-bold text-secondary px-4 truncate w-full text-center">{videoFile.name}</span>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-4xl text-on-surface/40 group-hover:text-secondary transition-colors">movie</span>
+                      <span className="text-[10px] font-bold text-on-surface-variant/60">Select Motion</span>
+                    </>
+                  )}
+                  <input id="global-video-input" type="file" accept="video/*" className="hidden" onChange={(e) => setVideoFile(e.target.files?.[0] || null)} />
+                </div>
+              </div>
+            </div>
+
+            {/* Composition Section */}
+            <div className="space-y-3">
+              <label className="text-sm font-headlines font-bold text-on-surface/80">Composition</label>
+              <textarea
+                placeholder="Describe your find..."
+                className="w-full bg-surface-container-low border-none rounded-2xl py-6 px-6 min-h-[160px] text-sm font-medium text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary/10 resize-none transition-all"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+              />
+            </div>
+
+            {error && <p className="text-error text-xs font-bold bg-error/5 p-4 rounded-xl border border-error/10">{error}</p>}
           </div>
 
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Exhibit Title"
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-xl font-headlines font-extrabold text-on-surface placeholder:text-on-surface-variant/30 focus:border-primary focus:outline-none transition-all"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            
-            <textarea
-              placeholder="Tell the story behind this collection..."
-              className="w-full bg-white/5 border border-white/10 rounded-[2rem] text-on-surface p-6 min-h-[160px] focus:border-primary transition-all outline-none placeholder:opacity-30 resize-none font-medium leading-relaxed"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-
-            {(imageFile || videoFile) && (
-              <div className="relative group rounded-[2.5rem] overflow-hidden border-2 border-primary/20 aspect-video bg-black/40">
-                {imageFile && (
-                  <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover animate-in fade-in zoom-in duration-700" />
-                )}
-                {videoFile && (
-                  <video src={URL.createObjectURL(videoFile)} className="w-full h-full object-cover" autoPlay muted loop />
-                )}
-                <button 
-                  type="button"
-                  onClick={() => { setImageFile(null); setVideoFile(null); }}
-                  className="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-black/60 backdrop-blur-xl text-white flex items-center justify-center hover:bg-error transition-all hover:scale-110 active:scale-95"
-                >
-                  <span className="material-symbols-outlined">delete</span>
-                </button>
-              </div>
-            )}
-
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
-              <div className="flex gap-2">
-                <label className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-2xl cursor-pointer transition-all active:scale-95 group">
-                  <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">image</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-on-surface">Image</span>
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) { setImageFile(file); setVideoFile(null); }
-                  }} />
-                </label>
-                <label className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-2xl cursor-pointer transition-all active:scale-95 group">
-                  <span className="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform">videocam</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-on-surface">Video</span>
-                  <input type="file" accept="video/*" className="hidden" onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) { setVideoFile(file); setImageFile(null); }
-                  }} />
-                </label>
-              </div>
-
-              {mode === 'global' && (
-                <div className="w-full pt-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60 block mb-3">Discovery Category</label>
-                  <div className="flex flex-wrap gap-2">
-                    {CATEGORIES.map(cat => (
-                      <button
-                        key={cat}
-                        type="button"
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                          selectedCategory === cat 
-                            ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' 
-                            : 'bg-white/5 text-on-surface-variant hover:bg-white/10'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {error && <p className="text-error text-xs font-bold bg-error/10 p-3 rounded-xl">{error}</p>}
-            {uploadProgress && (
-              <div className="flex items-center gap-3 text-primary animate-pulse">
-                <span className="material-symbols-outlined text-sm">refresh</span>
-                <p className="text-[10px] font-black uppercase tracking-widest leading-none">{uploadProgress}</p>
-              </div>
-            )}
-
-            <div className="flex gap-3 justify-end pt-6 border-t border-white/5">
-              {onCancel && (
-                <button 
-                  type="button"
-                  onClick={onCancel}
-                  className="px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all"
-                >
-                  Discard Changes
-                </button>
-              )}
-              <Button 
-                type="submit" 
-                disabled={loading || !title || !content}
-                className="px-12 py-4 rounded-2xl shadow-xl shadow-primary/20"
+          {/* Footer Action Bar */}
+          <div className="flex items-center justify-end gap-4 pt-4 border-t border-outline-variant/10">
+            {onCancel && (
+              <button 
+                type="button"
+                onClick={onCancel}
+                className="px-6 py-2.5 text-on-surface-variant/60 font-bold text-[10px] uppercase tracking-[0.2em] hover:text-on-surface transition-colors"
               >
-                {loading ? uploadProgress || 'Publishing...' : 'Publish Exhibit'}
-              </Button>
-            </div>
+                Discard Changes
+              </button>
+            )}
+            <button 
+              type="submit" 
+              disabled={loading || !title || !content}
+              className="px-10 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headlines font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100"
+            >
+              {loading ? uploadProgress || 'Publishing...' : 'Publish Exhibit'}
+            </button>
           </div>
         </form>
       </div>
     );
   }
 
-  // Render logic for Inline Bar
+  // Render logic for Inline Bar (Gallery Owners style) - PRESERVED
   return (
-    <div className={`bg-surface-container-lowest rounded-[2rem] border border-outline-variant/10 overflow-hidden transition-all duration-500 ease-out mb-8 ${collapsed ? 'p-4' : 'p-8'} ambient-shadow`}>
+    <div className={`bg-surface-container-lowest rounded-2xl border border-outline-variant/10 overflow-hidden transition-all duration-500 ease-out mb-8 ${collapsed ? 'p-4' : 'p-8'} shadow-sm`}>
       {collapsed ? (
         <div 
           className="flex items-center gap-4 cursor-pointer group"
@@ -271,10 +266,10 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(({
               </div>
             )}
           </div>
-          <div className="flex-1 bg-surface-container-high/50 rounded-full px-6 py-2.5 text-on-surface-variant/60 text-sm font-medium group-hover:bg-surface-container-high transition-colors">
-            {mode === 'global' ? 'Share a discovery with the world...' : `Exhibit something in ${communityName}...`}
+          <div className="flex-1 bg-surface-container-low rounded-full px-6 py-2.5 text-on-surface-variant/60 text-sm font-medium group-hover:bg-surface-container-high transition-colors">
+            {mode === 'global' ? 'Share a discovery...' : `Exhibit something here...`}
           </div>
-          <button className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center ambient-shadow active:scale-95 transition-all">
+          <button className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/10 active:scale-95 transition-all">
             <span className="material-symbols-outlined text-sm">add</span>
           </button>
         </div>
@@ -321,7 +316,7 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(({
 
             <div className="grid grid-cols-2 gap-4">
               <div 
-                className={`relative rounded-2xl border-2 border-dashed border-outline-variant/30 aspect-video flex flex-col items-center justify-center gap-2 overflow-hidden group hover:border-primary/40 transition-colors cursor-pointer ${imageFile ? 'border-primary/40' : ''}`}
+                className={`relative rounded-xl border-2 border-dashed border-outline-variant/30 aspect-video flex flex-col items-center justify-center gap-2 overflow-hidden group hover:border-primary/40 transition-colors cursor-pointer ${imageFile ? 'border-primary/40' : ''}`}
                 onClick={() => document.getElementById('image-input')?.click()}
               >
                 {imageFile ? (
@@ -347,7 +342,7 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(({
               </div>
 
               <div 
-                className={`relative rounded-2xl border-2 border-dashed border-outline-variant/30 aspect-video flex flex-col items-center justify-center gap-2 overflow-hidden group hover:border-secondary/40 transition-colors cursor-pointer ${videoFile ? 'border-secondary/40' : ''}`}
+                className={`relative rounded-xl border-2 border-dashed border-outline-variant/30 aspect-video flex flex-col items-center justify-center gap-2 overflow-hidden group hover:border-secondary/40 transition-colors cursor-pointer ${videoFile ? 'border-secondary/40' : ''}`}
                 onClick={() => document.getElementById('video-input')?.click()}
               >
                 {videoFile ? (
@@ -370,37 +365,7 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(({
                 />
               </div>
             </div>
-
-            {mode === 'global' && (
-              <div className="pt-4">
-                <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60 block mb-3">Discovery Category</label>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                        selectedCategory === cat 
-                          ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' 
-                          : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
-
-          {error && <p className="text-error text-xs font-bold bg-error/10 p-3 rounded-xl">{error}</p>}
-          {uploadProgress && (
-            <div className="flex items-center gap-3 text-primary animate-pulse">
-              <span className="material-symbols-outlined text-sm">refresh</span>
-              <p className="text-[10px] font-black uppercase tracking-widest leading-none">{uploadProgress}</p>
-            </div>
-          )}
 
           <div className="flex justify-end pt-4 border-t border-outline-variant/10">
             <Button 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
@@ -8,11 +8,21 @@ import { supabase } from '../../lib/supabase';
 import { uploadFile } from '../../lib/storage';
 import Navbar from '../../components/layout/Navbar';
 import Sidebar from '../../components/layout/Sidebar';
-import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 
-export default function CreatePostPage() {
-  const { user } = useAuth();
+const CATEGORIES = [
+  'Design',
+  'Photography',
+  'Architecture',
+  'Art',
+  'Fashion',
+  'Travel',
+  'Nature',
+  'Technology'
+];
+
+function CreatePostPageContent() {
+  const { user, loading: authLoading } = useAuth();
   const { profile } = useProfile();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,100 +30,83 @@ export default function CreatePostPage() {
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [community, setCommunity] = useState('Design');
-  const [postType, setPostType] = useState<'gallery' | 'global'>('gallery');
   const [selectedCategory, setSelectedCategory] = useState('Design');
   const [imageFile, setImageFile] = useState<File | null>(null);
-
   const [videoFile, setVideoFile] = useState<File | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
   const [error, setError] = useState('');
-  const [communities, setCommunities] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (communityParam) {
-      if (communityParam.startsWith('c:')) {
-        setPostType('global');
-        setSelectedCategory(communityParam.replace('c:', ''));
-      } else {
-        setPostType('gallery');
-        setCommunity(communityParam);
+      const cat = communityParam.startsWith('c:') ? communityParam.replace('c:', '') : communityParam;
+      if (CATEGORIES.includes(cat)) {
+        setSelectedCategory(cat);
       }
     }
   }, [communityParam]);
 
-  const categories = [
-    'Design',
-    'Photography',
-    'Architecture',
-    'Art',
-    'Tech',
-    'Lifestyle',
-    'Automotive'
-  ];
-
-  useEffect(() => {
-    fetchCommunities();
-  }, []);
-
-  const fetchCommunities = async () => {
-    const { data } = await supabase.from('communities').select('name');
-    if (data) setCommunities(data);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !profile) return;
-    
+    if (!profile) return;
+    if (!title.trim()) {
+      setError('Title is required');
+      return;
+    }
+
     setLoading(true);
-    setUploadProgress('Preparing upload...');
-    
+    setError('');
+    setUploadProgress('Analyzing media...');
+
     try {
-      let imageUrl = null;
-      let videoUrl = null;
+      let imageUrl = '';
+      let videoUrl = '';
 
-      // 1. Upload Image if selected
       if (imageFile) {
-        setUploadProgress('Uploading visual...');
-        const path = `posts/${user.uid}/${Date.now()}_${imageFile.name}`;
-        imageUrl = await uploadFile('avatars', path, imageFile, { maxSizeMB: 5 });
+        setUploadProgress('Uploading cover image...');
+        const path = `posts/${profile.id}/${Date.now()}-${imageFile.name}`;
+        imageUrl = await uploadFile('post-media', path, imageFile);
       }
 
-      // 2. Upload Video if selected
       if (videoFile) {
-        setUploadProgress('Uploading motion...');
-        const path = `posts/${user.uid}/${Date.now()}_${videoFile.name}`;
-        videoUrl = await uploadFile('avatars', path, videoFile, { maxSizeMB: 20 });
+        setUploadProgress('Uploading motion clip...');
+        const path = `posts/${profile.id}/${Date.now()}-${videoFile.name}`;
+        videoUrl = await uploadFile('post-media', path, videoFile);
       }
 
-      // 3. Create Post
-      setUploadProgress('Publishing to network...');
-      const finalCommunity = postType === 'gallery' ? community : `c:${selectedCategory}`;
-      
-      const { error } = await supabase.from('posts').insert({
+      const { error: postError } = await supabase.from('posts').insert({
+        user_id: profile.id,
+        username: profile.username,
+        user_avatar: profile.avatar_url,
         title,
         content,
-        community_name: finalCommunity,
         image_url: imageUrl,
         video_url: videoUrl,
-        user_id: user.uid, // Required for database constraints and RLS
-        username: profile.username,
-        user_avatar: profile.avatar_url
+        community_name: `c:${selectedCategory}`,
+        upvotes: 0,
+        comment_count: 0
       });
 
+      if (postError) throw postError;
 
-
-      if (error) throw error;
       router.push('/home');
     } catch (err: any) {
       console.error('Error creating post:', err);
-      alert(err.message || 'Failed to create post. Please try again.');
+      setError(err.message || 'Failed to publish exhibit');
     } finally {
       setLoading(false);
       setUploadProgress('');
     }
   };
+
+  if (authLoading) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -122,150 +115,147 @@ export default function CreatePostPage() {
       <div className="flex pt-16">
         <Sidebar />
         
-        <main className="flex-1 ml-0 md:ml-64 p-8 max-w-3xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-4xl font-extrabold font-headlines text-on-surface tracking-tighter mb-2">Create New Exhibit</h1>
-            <p className="text-on-surface-variant font-body">Share your discovery with the community.</p>
+        <main className="flex-1 ml-0 md:ml-64 p-8 md:p-12 max-w-4xl mx-auto">
+          {/* Header Restoration from Screenshot */}
+          <div className="mb-10">
+            <h1 className="text-5xl font-extrabold font-headlines text-on-surface tracking-tighter mb-2">Create New Exhibit</h1>
+            <p className="text-on-surface-variant/60 font-body text-lg">Share your discovery with the community.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8 bg-surface-container-low/30 p-10 rounded-[2.5rem] border border-outline-variant/10 ambient-shadow">
-            <div className="md:col-span-2">
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 mb-4 ml-1">Exhibition Type</label>
-              <div className="flex p-1.5 bg-surface-container-high rounded-2xl w-fit gap-1">
-                <button 
-                  type="button"
-                  onClick={() => setPostType('gallery')}
-                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${postType === 'gallery' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:text-on-surface'}`}
-                >
-                  Gallery Post
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => setPostType('global')}
-                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${postType === 'global' ? 'bg-secondary text-on-secondary shadow-lg shadow-secondary/20' : 'text-on-surface-variant hover:text-on-surface'}`}
-                >
-                  Global Discovery
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="md:col-span-2">
-                <Input 
-                  label="Title" 
-                  placeholder="What's this discovery about?" 
+          <form onSubmit={handleSubmit} className="space-y-10 bg-white/40 backdrop-blur-sm p-10 rounded-[3rem] border border-outline-variant/10 shadow-xl shadow-on-background/5">
+            <div className="space-y-8">
+              {/* Title Section */}
+              <div className="space-y-3">
+                <label className="text-sm font-headlines font-bold text-on-surface/80 ml-1">Title</label>
+                <input
+                  type="text"
+                  placeholder="What's this discovery about?"
+                  className="w-full bg-surface-container-low/50 border-none rounded-2xl py-5 px-6 text-base font-medium text-on-surface placeholder:text-on-surface-variant/30 focus:ring-2 focus:ring-primary/10 focus:bg-white transition-all shadow-sm"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
                 />
               </div>
-              
-              <div>
-                {postType === 'gallery' ? (
-                  <>
-                    <label className="block text-sm font-bold text-on-surface-variant mb-2 ml-1">Community Gallery</label>
-                    <select 
-                      className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary font-body text-on-surface"
-                      value={community}
-                      onChange={(e) => setCommunity(e.target.value)}
-                    >
-                      {communities.length > 0 ? (
-                        communities.map(c => (
-                          <option key={c.name} value={c.name}>c/{c.name}</option>
-                        ))
-                      ) : (
-                        <option>Design</option>
-                      )}
-                    </select>
-                  </>
-                ) : (
-                  <>
-                    <label className="block text-sm font-bold text-on-surface-variant mb-2 ml-1">Global Category</label>
-                    <select 
-                      className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl px-4 py-3 text-sm focus:ring-1 focus:ring-secondary font-body text-on-surface"
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </>
-                )}
+
+              {/* Community Selector */}
+              <div className="space-y-3">
+                <label className="text-sm font-headlines font-bold text-on-surface/80 ml-1">Community</label>
+                <div className="relative">
+                  <select
+                    className="w-full bg-surface-container-low/50 border-none rounded-2xl py-5 px-6 text-base font-medium text-on-surface appearance-none focus:ring-2 focus:ring-primary/10 focus:bg-white transition-all shadow-sm cursor-pointer"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/40">
+                    expand_more
+                  </span>
+                </div>
               </div>
 
-              {/* Media Picker */}
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="space-y-2">
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-primary ml-1">Cover Image</label>
-                    <div className="relative group border-2 border-dashed border-outline-variant/20 rounded-3xl p-6 hover:border-primary/40 transition-all text-center">
-                       <input 
-                        type="file" 
-                        accept="image/*"
-                        onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                       />
-                       <span className="material-symbols-outlined text-3xl text-on-surface-variant mb-2 group-hover:text-primary transition-colors">add_photo_alternate</span>
-                       <p className="text-xs font-bold text-on-surface-variant group-hover:text-on-surface">
-                         {imageFile ? imageFile.name : 'Select Visual'}
-                       </p>
-                    </div>
-                 </div>
+              {/* Media Grid Restoration */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Cover Image</label>
+                  <div 
+                    className={`relative rounded-3xl border-2 border-dashed aspect-video flex flex-col items-center justify-center gap-3 overflow-hidden transition-all group cursor-pointer ${
+                      imageFile ? 'border-primary bg-primary/5' : 'border-outline-variant/20 bg-surface-container-low/20 hover:border-primary/40 hover:bg-white'
+                    }`}
+                    onClick={() => document.getElementById('page-image-input')?.click()}
+                  >
+                    {imageFile ? (
+                      <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-4xl text-on-surface/20 group-hover:text-primary transition-colors">add_photo_alternate</span>
+                        <span className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Select Visual</span>
+                      </>
+                    )}
+                    <input id="page-image-input" type="file" accept="image/*" className="hidden" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+                  </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-secondary ml-1">Motion Video (2MB Limit)</label>
-                    <div className={`relative group border-2 border-dashed rounded-3xl p-6 transition-all text-center ${error && videoFile ? 'border-error/40 bg-error/5' : 'border-outline-variant/20 hover:border-secondary/40'}`}>
-                       <input 
-                        type="file" 
-                        accept="video/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] || null;
-                          if (file && file.size > 2 * 1024 * 1024) {
-                            setError('Video exceeds 2MB limit. Please compress or choose a shorter clip.');
-                            setVideoFile(file);
-                          } else {
-                            setError('');
-                            setVideoFile(file);
-                          }
-                        }}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                       />
-                       <span className={`material-symbols-outlined text-3xl mb-2 transition-colors ${error && videoFile ? 'text-error' : 'text-on-surface-variant group-hover:text-secondary'}`}>movie</span>
-                       <p className={`text-xs font-bold ${error && videoFile ? 'text-error' : 'text-on-surface-variant group-hover:text-on-surface'}`}>
-                         {videoFile ? videoFile.name : 'Select Motion'}
-                       </p>
-                    </div>
-                    {error && videoFile && <p className="text-[10px] text-error font-bold mt-1 ml-1">{error}</p>}
-                 </div>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary ml-1">Motion Video (2MB Limit)</label>
+                  <div 
+                    className={`relative rounded-3xl border-2 border-dashed aspect-video flex flex-col items-center justify-center gap-3 overflow-hidden transition-all group cursor-pointer ${
+                      videoFile ? 'border-secondary bg-secondary/5' : 'border-outline-variant/20 bg-surface-container-low/20 hover:border-secondary/40 hover:bg-white'
+                    }`}
+                    onClick={() => document.getElementById('page-video-input')?.click()}
+                  >
+                    {videoFile ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-secondary">movie</span>
+                        <span className="text-[10px] font-bold text-secondary px-6 truncate w-full text-center">{videoFile.name}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-4xl text-on-surface/20 group-hover:text-secondary transition-colors">movie</span>
+                        <span className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Select Motion</span>
+                      </>
+                    )}
+                    <input id="page-video-input" type="file" accept="video/*" className="hidden" onChange={(e) => setVideoFile(e.target.files?.[0] || null)} />
+                  </div>
+                </div>
               </div>
+
+              {/* Composition Section */}
+              <div className="space-y-3">
+                <label className="text-sm font-headlines font-bold text-on-surface/80 ml-1">Composition</label>
+                <textarea
+                  placeholder="Describe your find..."
+                  className="w-full bg-surface-container-low/50 border-none rounded-[2rem] py-8 px-8 min-h-[220px] text-base font-medium text-on-surface placeholder:text-on-surface-variant/30 focus:ring-2 focus:ring-primary/10 focus:bg-white resize-none transition-all shadow-sm"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  required
+                />
+              </div>
+
+              {error && <p className="text-error text-sm font-bold bg-error/5 p-5 rounded-2xl border border-error/10 animate-in slide-in-from-top-2">{error}</p>}
+              {loading && (
+                <div className="flex items-center gap-4 text-primary bg-primary/5 p-4 rounded-2xl animate-pulse">
+                  <span className="material-symbols-outlined animate-spin">refresh</span>
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] leading-none">{uploadProgress}</p>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-bold text-on-surface-variant ml-1">Composition</label>
-              <textarea 
-                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-primary min-h-[200px] font-body text-on-surface placeholder:text-on-surface-variant/40" 
-                placeholder="Describe your find..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-              ></textarea>
-            </div>
-
-            {loading && (
-              <div className="flex items-center gap-4 text-primary font-bold text-sm animate-pulse">
-                <span className="material-symbols-outlined animate-spin">sync</span>
-                {uploadProgress}
-              </div>
-            )}
-
-            <div className="flex justify-end gap-4 pt-4">
-              <Button variant="ghost" onClick={() => router.back()}>Cancel</Button>
-              <Button variant="primary" type="submit" disabled={loading || !!error}>
-                {loading ? 'Curating...' : 'Publish Exhibit'}
-              </Button>
+            {/* Footer Buttons (Polished Aesthetics) */}
+            <div className="flex items-center justify-end gap-10 pt-8 border-t border-outline-variant/10">
+              <button 
+                type="button"
+                onClick={() => router.back()}
+                className="px-4 py-2 text-on-surface-variant/40 font-bold text-[10px] uppercase tracking-[0.3em] hover:text-on-surface transition-all"
+              >
+                Discard Changes
+              </button>
+              <button 
+                type="submit" 
+                disabled={loading || !title || !content}
+                className="px-14 py-5 rounded-full bg-primary text-on-primary font-headlines font-black text-[10px] uppercase tracking-[0.4em] shadow-[0_20px_40px_-12px_rgba(172,44,0,0.4)] hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30 disabled:grayscale disabled:scale-100 disabled:shadow-none border border-primary/20"
+              >
+                {loading ? 'Publishing...' : 'Publish Exhibit'}
+              </button>
             </div>
           </form>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function CreatePostPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-t-2 border-primary rounded-full animate-spin"></div>
+        <p className="font-headlines font-black uppercase text-[10px] tracking-widest opacity-50 italic">Initializing Curation Studio...</p>
+      </div>
+    }>
+      <CreatePostPageContent />
+    </Suspense>
   );
 }

@@ -43,7 +43,7 @@ const Sidebar = () => {
             <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Curated feed</p>
           </div>
         </div>
-        
+
         <ul className="space-y-1 font-manrope text-sm font-semibold uppercase tracking-wider mb-6">
           {menuItems.map((item) => (
             <li key={item.name}>
@@ -75,8 +75,9 @@ const Sidebar = () => {
 
 
         <Link href="/communities/create">
-          <Button variant="primary" className="w-full justify-start px-6 gap-3 py-4 rounded-2xl group shadow-lg shadow-primary/10">
-            <span className="material-symbols-outlined group-hover:rotate-90 transition-transform">add_circle</span>
+          <Button variant="primary" className="w-full justify-start px-6 gap-3 py-4 rounded-2xl group shadow-lg shadow-primary/10
+           items-center">
+            <span className="material-symbols-outlined group-hover:rotate-90 transition-transform relative top-[1px]">add_circle</span>
             <span className="font-headlines font-black text-[10px] uppercase tracking-[0.2em]">Create Gallery</span>
           </Button>
         </Link>

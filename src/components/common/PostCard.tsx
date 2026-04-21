@@ -107,7 +107,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 <div className="flex items-center gap-2">
                   <span className="font-headlines font-black text-xs uppercase tracking-widest text-on-surface truncate">u/{user}</span>
                   <span className="w-1 h-1 rounded-full bg-on-surface-variant/20"></span>
-                  {community && community.startsWith('c:') ? (
+                  {community && typeof community === 'string' && community.startsWith('c:') ? (
                     <span className="text-[10px] font-black uppercase tracking-widest text-secondary">
                       g/{community.replace('c:', '')}
                     </span>

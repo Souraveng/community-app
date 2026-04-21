@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import Sidebar from '../../components/layout/Sidebar';
 import PostCard from '../../components/common/PostCard';
-import PostForm from '../../components/common/PostForm';
-import Modal from '../../components/common/Modal';
 import CreatePostFAB from '../../components/common/CreatePostFAB';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -60,7 +58,6 @@ export default function HomeFeed() {
   const router = useRouter();
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -71,14 +68,13 @@ export default function HomeFeed() {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      // Reverted to stable 'posts' base table
       const { data, error } = await supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.warn('Database view missing, using fallback data:', error.message);
+        console.warn('Database error:', error.message);
         setPosts(fallbackPosts);
       } else {
         setPosts(data && data.length > 0 ? data : fallbackPosts);
@@ -94,11 +90,6 @@ export default function HomeFeed() {
   useEffect(() => {
     fetchPosts();
   }, []);
-
-  const handlePostCreated = () => {
-    setIsPostModalOpen(false);
-    fetchPosts();
-  };
 
   if (authLoading || profileLoading) {
     return (
@@ -118,43 +109,47 @@ export default function HomeFeed() {
         <main className="flex-1 ml-0 md:ml-64 p-8 max-w-4xl mx-auto">
           {/* Featured Section (Asymmetric Bento) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="md:col-span-2 relative group overflow-hidden rounded-[3rem] bg-surface-container-high border border-white/10 p-10 flex flex-col justify-end min-h-[400px]">
-              <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-700">
+            {/* Trending Community Card */}
+            <div className="md:col-span-2 bg-surface-container-lowest rounded-xl p-6 relative overflow-hidden group border border-outline-variant/15 cursor-pointer shadow-sm hover:shadow-md transition-all">
+              <div className="relative z-10">
+                <span className="inline-block bg-primary text-on-primary text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full mb-4">Trending Community</span>
+                <h2 className="text-3xl font-headlines font-extrabold text-on-surface mb-2 leading-tight">Abstract Minimalism</h2>
+                <p className="text-on-surface-variant text-sm font-body max-w-md opacity-80 leading-relaxed">Discover the power of negative space and curated aesthetics in our latest community highlight.</p>
+                <div className="mt-8 flex items-center gap-6">
+                  <Link href="/community/minimalism" className="bg-on-surface text-surface-bright px-8 py-2.5 rounded-full font-bold text-sm hover:opacity-90 active:scale-95 transition-all">Visit Gallery</Link>
+                  <span className="text-xs font-bold text-on-surface-variant/60">12.4k Curators online</span>
+                </div>
+              </div>
+              <div className="absolute right-0 top-0 w-2/5 h-full opacity-20 group-hover:opacity-30 transition-opacity">
                 <Image 
-                  src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=2000" 
+                  src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=1000" 
                   alt="Trending" 
                   fill 
-                  className="object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
+                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
-              </div>
-              <div className="relative z-10">
-                <span className="bg-primary text-on-primary text-[10px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-6 inline-block">Trending Community</span>
-                <h2 className="text-5xl font-black font-headlines tracking-tighter text-on-surface mb-4 leading-none italic uppercase">Abstract Minimalism</h2>
-                <p className="text-on-surface-variant font-medium max-w-md mb-8 opacity-70">Discovery the power of negative space and curated aesthetics in our latest community highlight.</p>
-                <div className="flex items-center gap-6">
-                  <Link href="/community/minimalism" className="bg-surface text-on-surface px-8 py-4 rounded-2xl font-black font-headlines text-xs uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-all active:scale-95 shadow-xl">Visit Gallery</Link>
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-40">12.4K Curators Online</span>
-                </div>
               </div>
             </div>
 
-            <div className="relative group overflow-hidden rounded-[3rem] bg-primary-container p-10 flex flex-col justify-between border border-white/5">
-              <div className="text-primary">
-                <span className="material-symbols-outlined text-4xl group-hover:rotate-12 transition-transform duration-500">sparkles</span>
-              </div>
+            {/* Daily Curated Card */}
+            <div className="bg-secondary-container/30 rounded-xl p-6 border border-outline-variant/15 flex flex-col justify-between hover:bg-secondary-container/40 transition-colors shadow-sm">
+              <span className="material-symbols-outlined text-secondary text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
               <div>
-                <h3 className="text-2xl font-black font-headlines tracking-tighter text-on-primary-container mb-4 leading-none italic uppercase">Daily Curated</h3>
-                <p className="text-primary text-[10px] font-bold leading-relaxed opacity-70 uppercase tracking-widest">Refined content hand-picked by our editors for your morning scroll.</p>
+                <h3 className="font-headlines font-bold text-secondary text-xl">Daily Curated</h3>
+                <p className="text-xs text-on-secondary-container/70 mt-2 font-medium leading-relaxed italic">Refined content hand-picked by our editors for your morning scroll.</p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="font-headlines font-black text-2xl uppercase tracking-tighter text-on-surface italic">Main Exhibit</h3>
-            <div className="flex bg-surface-container-high p-1 rounded-2xl border border-white/5">
-              <button className="bg-surface text-on-surface px-6 py-2 rounded-xl font-black font-headlines text-[10px] uppercase tracking-widest shadow-lg">Hot</button>
-              <button className="text-on-surface-variant px-6 py-2 rounded-xl font-black font-headlines text-[10px] uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Newest</button>
-              <button className="text-on-surface-variant px-6 py-2 rounded-xl font-black font-headlines text-[10px] uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Top</button>
+          {/* Feed Header (Polished Gallery Aesthetic) */}
+          <div className="flex items-center justify-between mb-10 group">
+            <div className="flex items-center gap-6 flex-1">
+              <h1 className="text-xs font-black font-headlines uppercase tracking-[0.4em] text-on-surface/50 whitespace-nowrap">Main Exhibit</h1>
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-outline-variant/30 to-transparent"></div>
+            </div>
+            <div className="flex items-center bg-surface-container-high rounded-full p-1 border border-outline-variant/10 shadow-sm">
+              <button className="px-5 py-1.5 bg-surface-container-lowest rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">Hot</button>
+              <button className="px-5 py-1.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40 hover:text-on-surface-variant transition-colors">Newest</button>
+              <button className="px-5 py-1.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40 hover:text-on-surface-variant transition-colors">Top</button>
             </div>
           </div>
 
@@ -164,7 +159,7 @@ export default function HomeFeed() {
               <p className="font-headlines font-black uppercase text-[10px] tracking-widest opacity-50 italic">Syncing with curation engine...</p>
             </div>
           ) : (
-            <div className="space-y-8 pb-24">
+            <div className="space-y-12 pb-24">
               {posts.map((post: any) => (
                 <PostCard 
                   key={post.id || `post-${Math.random()}`}
@@ -189,22 +184,9 @@ export default function HomeFeed() {
       </div>
 
       <CreatePostFAB 
-        onClick={() => setIsPostModalOpen(true)} 
+        onClick={() => router.push('/create-post')} 
         label="Share Discovery"
       />
-
-      <Modal 
-        isOpen={isPostModalOpen} 
-        onClose={() => setIsPostModalOpen(false)}
-        title="Share a Discovery"
-      >
-        <PostForm 
-          mode="global" 
-          layout="box"
-          onPostCreated={handlePostCreated}
-          onCancel={() => setIsPostModalOpen(false)}
-        />
-      </Modal>
     </div>
   );
 }
