@@ -15,7 +15,7 @@ export interface Post {
   created_at: string;
 }
 
-export function usePosts(communityName?: string) {
+export function usePosts(communityName?: string, sort: 'latest' | 'trending' = 'latest') {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,15 +38,20 @@ export function usePosts(communityName?: string) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [communityName]);
+  }, [communityName, sort]);
 
   const fetchPosts = async () => {
     setLoading(true);
     try {
       let query = supabase
         .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
+
+      if (sort === 'trending') {
+        query = query.order('upvotes', { ascending: false });
+      } else {
+        query = query.order('created_at', { ascending: false });
+      }
 
       if (communityName) {
         query = query.eq('community_name', communityName);

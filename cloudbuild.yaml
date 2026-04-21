@@ -1,0 +1,48 @@
+steps:
+  # 1. Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '$_AR_HOSTNAME/$_PROJECT_ID/$_REPOSITORY/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SUPABASE_URL=$_NEXT_PUBLIC_SUPABASE_URL'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SUPABASE_ANON_KEY=$_NEXT_PUBLIC_SUPABASE_ANON_KEY'
+      - '.'
+
+  # 2. Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$_PROJECT_ID/$_REPOSITORY/${_SERVICE_NAME}:$COMMIT_SHA'
+
+  # 3. Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image'
+      - '$_AR_HOSTNAME/$_PROJECT_ID/$_REPOSITORY/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '--region'
+      - '${_DEPLOY_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+
+images:
+  - '$_AR_HOSTNAME/$_PROJECT_ID/$_REPOSITORY/${_SERVICE_NAME}:$COMMIT_SHA'
+
+substitutions:
+  _AR_HOSTNAME: us-central1-docker.pkg.dev
+  _PROJECT_ID: genai-a-490712
+  _REPOSITORY: gallery-repo # You must create this repo in Artifact Registry first
+  _SERVICE_NAME: gallery-app
+  _DEPLOY_REGION: us-central1
+  _NEXT_PUBLIC_SUPABASE_URL: https://ddheyyvfbfsgttkdkrfo.supabase.co
+  _NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_X5hicdUW-7IutBByArDJ-A_HZ5kK9AC
+
+options:
+  logging: CLOUD_LOGGING

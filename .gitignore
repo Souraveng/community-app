@@ -88,3 +88,6 @@ next-env.d.ts
 
 # Antigravity AI brain (local assistant context)
 .antigravityignore
+
+AGENTS.md
+CLAUDE.md

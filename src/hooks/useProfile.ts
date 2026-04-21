@@ -49,6 +49,17 @@ export function useProfile(targetUsername?: string) {
       }
 
       try {
+        const isValidUUID = (id: string) => {
+          return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+        };
+
+        if (!isValidUUID(user.uid)) {
+          console.warn(`Profile Sync: Firebase UID "${user.uid}" is being matched against a UUID column. Syncing skipped to prevent database error.`);
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           .from('profiles')
           .select('*')

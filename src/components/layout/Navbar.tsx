@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Button from '../common/Button';
 import Image from 'next/image';
-import { useAuth } from '../../hooks/useAuth';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
+import { useNotifications } from '@/hooks/useNotifications';
+import { formatDistanceToNow } from 'date-fns';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -20,7 +22,10 @@ const Navbar: React.FC = () => {
     profiles: any[]
   }>({ communities: [], profiles: [] });
   const [isSearching, setIsSearching] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+
+  const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -53,7 +58,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white border-b border-outline-variant/10 shadow-sm font-manrope tracking-tight">
+    <nav className="fixed top-0 w-full z-50 bg-white border-b border-outline-variant/10 shadow-sm font-manrope tracking-tight" suppressHydrationWarning>
       <div className="flex items-center justify-between px-6 py-2 max-w-screen-2xl mx-auto">
         <div className="flex items-center gap-8">
           <Link href="/" className="text-2xl font-bold tracking-tighter text-zinc-900">
@@ -78,12 +83,12 @@ const Navbar: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowDropdown(true)}
-                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                onFocus={() => setShowSearchDropdown(true)}
+                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
               />
 
               {/* Real-time Search Dropdown */}
-              {showDropdown && (searchQuery.length > 1) && (
+              {showSearchDropdown && (searchQuery.length > 1) && (
                 <div className="absolute top-full left-0 mt-2 w-72 bg-surface-container-lowest border border-outline-variant/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
                   <div className="p-4 space-y-6">
                     {/* Communities Section */}
@@ -153,10 +158,79 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                <button className="p-2 text-zinc-500 hover:text-primary transition-colors relative">
-                  <span className="material-symbols-outlined">notifications</span>
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
-                </button>
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+                    className={`p-2 transition-colors relative ${showNotificationDropdown ? 'text-primary' : 'text-zinc-500 hover:text-primary'}`}
+                  >
+                    <span className="material-symbols-outlined">notifications</span>
+                    {unreadCount > 0 && (
+                      <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                    )}
+                  </button>
+
+                  {/* Notification Dropdown */}
+                  {showNotificationDropdown && (
+                    <div className="absolute top-full right-0 mt-2 w-80 bg-surface-container-lowest border border-outline-variant/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/30">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-on-surface">Notifications</h3>
+                        {unreadCount > 0 && (
+                          <button 
+                            onClick={markAllAsRead}
+                            className="text-[10px] font-bold text-primary hover:underline"
+                          >
+                            Mark all as read
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-[320px] overflow-y-auto scrollbar-hide">
+                        {notifications.length > 0 ? (
+                          <div className="divide-y divide-outline-variant/5">
+                            {notifications.map((n) => (
+                              <div 
+                                key={n.id} 
+                                className={`p-4 flex gap-3 hover:bg-surface-container-low transition-colors cursor-pointer ${!n.is_read ? 'bg-primary/[0.03]' : ''}`}
+                                onClick={() => markAsRead(n.id)}
+                              >
+                                <div className="w-10 h-10 rounded-full overflow-hidden relative border border-outline-variant/10 flex-shrink-0">
+                                  {n.sender?.avatar_url ? (
+                                    <Image src={n.sender.avatar_url} alt={n.sender.username} fill className="object-cover" />
+                                  ) : (
+                                    <span className="material-symbols-outlined text-zinc-400">account_circle</span>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-on-surface leading-normal">
+                                    <span className="font-bold">u/{n.sender?.username}</span>
+                                    {n.type === 'follow' && ' started following you.'}
+                                    {n.type === 'upvote' && ' upvoted your exhibition.'}
+                                    {n.type === 'comment' && ' commented on your post.'}
+                                  </p>
+                                  <p className="text-[10px] text-on-surface-variant/40 mt-1 font-medium">
+                                    {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                                  </p>
+                                </div>
+                                {!n.is_read && (
+                                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-8 text-center">
+                            <span className="material-symbols-outlined text-zinc-300 text-3xl mb-2">notifications_off</span>
+                            <p className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">Quiet in the atelier</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3 bg-surface-container-low/30 border-t border-outline-variant/10 text-center">
+                        <Link href="/notifications" className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors">
+                          View All Notifications
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center gap-3 pl-4 border-l border-outline-variant/20 ml-2">
                   <Link href="/profile" className="flex items-center gap-2 group">
                     <div className="w-8 h-8 rounded-full overflow-hidden relative border border-outline-variant/10 group-hover:border-primary transition-all">

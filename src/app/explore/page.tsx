@@ -1,49 +1,34 @@
 'use client';
 
-import React from 'react';
-import Navbar from '../../components/layout/Navbar';
-import Sidebar from '../../components/layout/Sidebar';
-import PostCard from '../../components/common/PostCard';
-
-const exploreItems = [
-  {
-    id: 'exp-1',
-    user: 'visual_story',
-    timestamp: '2h ago',
-    community: 'Architecture',
-    title: 'The Brutalist Revival in Eastern Europe',
-    content: 'Exploring the intersection of concrete and sunlight in modern Kyiv. A deep dive into sculptural forms that define neighborhoods.',
-    image: 'https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&q=80&w=2000',
-    upvotes: '3.2k',
-    comments: '45',
-  },
-  {
-    id: 'exp-2',
-    user: 'minimal_type',
-    timestamp: '5h ago',
-    community: 'UI/UX',
-    title: 'Why Kerning is the soul of UX',
-    content: 'A layout is only as strong as its white space. Let\'s look at how Swiss typography influences modern SaaS dashboards.',
-    image: 'https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?auto=format&fit=crop&q=80&w=2000',
-    upvotes: '1.1k',
-    comments: '89',
-  },
-  {
-    id: 'exp-3',
-    user: 'light_catcher',
-    timestamp: '1d ago',
-    community: 'Photography',
-    title: 'Golden Hour in the High Sierras',
-    content: 'Caught this frame just as the sun dipped behind the ridge. The dynamic range of the new sensor is incredible.',
-    image: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&q=80&w=2000',
-    upvotes: '5.6k',
-    comments: '210',
-  }
-];
+import React, { useState } from 'react';
+import Navbar from '@/components/layout/Navbar';
+import Sidebar from '@/components/layout/Sidebar';
+import PostCard from '@/components/common/PostCard';
+import { usePosts } from '@/hooks/usePosts';
 
 export default function ExplorePage() {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [sortOrder, setSortOrder] = useState<'latest' | 'trending'>('trending');
+  
+  const { posts, loading } = usePosts(
+    selectedCategory === 'All' ? undefined : selectedCategory,
+    sortOrder
+  );
+
+  const categories = ['All', 'Trending', 'Architecture', 'UI/UX', 'Photography', 'Interior', 'Curated'];
+
+  const handleCategoryClick = (category: string) => {
+    if (category === 'Trending') {
+      setSortOrder('trending');
+      setSelectedCategory('All');
+    } else {
+      setSortOrder('latest');
+      setSelectedCategory(category);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" suppressHydrationWarning>
       <Navbar />
       <div className="flex pt-16">
         <Sidebar />
@@ -56,20 +41,53 @@ export default function ExplorePage() {
           </header>
 
           <div className="flex items-center gap-4 mb-8 overflow-x-auto pb-4 scrollbar-hide">
-             {['All', 'Trending', 'Curated', 'Architecture', 'UI/UX', 'Photography', 'Interior'].map(tag => (
-               <button key={tag} className="px-6 py-2 rounded-full border border-outline-variant/10 hover:border-primary/40 hover:bg-primary/5 transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+             {categories.map(tag => (
+               <button 
+                 key={tag} 
+                 onClick={() => handleCategoryClick(tag)}
+                 className={`px-6 py-2 rounded-full border transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap ${
+                   (tag === 'Trending' && sortOrder === 'trending') || (selectedCategory === tag && sortOrder === 'latest')
+                     ? 'bg-primary text-on-primary border-transparent shadow-lg shadow-primary/20'
+                     : 'border-outline-variant/10 hover:border-primary/40 hover:bg-primary/5'
+                 }`}
+               >
                  {tag}
                </button>
              ))}
           </div>
 
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-            {exploreItems.map((item) => (
-              <div key={item.id} className="break-inside-avoid">
-                <PostCard {...item} />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <>
+              {posts.length > 0 ? (
+                <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+                  {posts.map((post) => (
+                    <div key={post.id} className="break-inside-avoid">
+                      <PostCard 
+                        id={post.id}
+                        user={post.username}
+                        timestamp={new Date(post.created_at).toLocaleDateString()}
+                        community={post.community_name}
+                        title={post.title}
+                        content={post.content}
+                        image={post.image_url || 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=800'}
+                        upvotes={post.upvotes.toString()}
+                        comments={post.comment_count.toString()}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20 bg-surface-container-low/30 rounded-[3rem] border border-dashed border-outline-variant/20">
+                  <span className="material-symbols-outlined text-4xl text-on-surface-variant/20 mb-4">landscape</span>
+                  <p className="text-sm font-bold text-on-surface-variant/40 uppercase tracking-widest">No exhibitions found in this gallery</p>
+                </div>
+              )}
+            </>
+          )}
         </main>
       </div>
     </div>

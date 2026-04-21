@@ -19,12 +19,17 @@ export function useDirectMessages() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (user?.uid) {
+      if (!isValidUUID(user.uid)) {
+        setLoading(false);
+        return;
+      }
+
       fetchConversations();
       
       // Real-time subscription for new conversations or status changes
       const channel = supabase
-        .channel('conversations_changes')
+        .channel(`conversations_${user.uid}`)
         .on('postgres_changes', { 
           event: '*', 
           schema: 'public', 
@@ -39,10 +44,23 @@ export function useDirectMessages() {
         supabase.removeChannel(channel);
       };
     }
-  }, [user]);
+  }, [user?.uid]);
+
+  const isValidUUID = (id: string) => {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+  };
 
   const fetchConversations = async () => {
-    if (!user) return;
+    if (!user?.uid) return;
+    
+    // Smart Guard
+    if (!isValidUUID(user.uid)) {
+      setConversations([]);
+      setRequests([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -59,6 +77,12 @@ export function useDirectMessages() {
       // Enhance conversations with "other user" profile data
       const processed = await Promise.all((data || []).map(async (conv) => {
         const otherId = conv.participants.find((id: string) => id !== user.uid);
+        
+        // Guard nested profile fetch
+        if (!otherId || !isValidUUID(otherId)) {
+          return { ...conv, other_user: null };
+        }
+
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
@@ -85,7 +109,14 @@ export function useDirectMessages() {
   };
 
   const createConversation = async (otherUserId: string, initialMessage?: string) => {
-    if (!user) return null;
+    if (!user?.uid) return null;
+
+    // Smart Guard
+    if (!isValidUUID(user.uid) || !isValidUUID(otherUserId)) {
+      console.warn('Conversation creation blocked: Incompatible ID format (Firebase vs UUID).');
+      return null;
+    }
+
     try {
       // Check if conversation already exists
       const { data: existing } = await supabase

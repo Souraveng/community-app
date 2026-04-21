@@ -16,8 +16,19 @@ export function useFollows(targetUserId?: string) {
     }
   }, [targetUserId, user]);
 
+  const isValidUUID = (id: string) => {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+  };
+
   const checkFollowStatus = async () => {
-    if (!user || !targetUserId) return;
+    if (!user?.uid || !targetUserId) return;
+    
+    // Smart Guard
+    if (!isValidUUID(user.uid) || !isValidUUID(targetUserId)) {
+      setIsFollowing(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('follows')
@@ -34,6 +45,15 @@ export function useFollows(targetUserId?: string) {
 
   const fetchCounts = async () => {
     if (!targetUserId) return;
+    
+    // Smart Guard
+    if (!isValidUUID(targetUserId)) {
+      setFollowerCount(0);
+      setFollowingCount(0);
+      setLoading(false);
+      return;
+    }
+
     try {
       // Fetch follower count
       const { count: followers } = await supabase
@@ -57,7 +77,14 @@ export function useFollows(targetUserId?: string) {
   };
 
   const follow = async () => {
-    if (!user || !targetUserId) return;
+    if (!user?.uid || !targetUserId) return;
+    
+    // Smart Guard
+    if (!isValidUUID(user.uid) || !isValidUUID(targetUserId)) {
+      console.warn('Follow action blocked: Incompatible ID format (Firebase vs UUID).');
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('follows')
@@ -81,7 +108,13 @@ export function useFollows(targetUserId?: string) {
   };
 
   const unfollow = async () => {
-    if (!user || !targetUserId) return;
+    if (!user?.uid || !targetUserId) return;
+    
+    // Smart Guard
+    if (!isValidUUID(user.uid) || !isValidUUID(targetUserId)) {
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('follows')

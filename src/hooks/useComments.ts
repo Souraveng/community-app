@@ -29,7 +29,17 @@ export function useComments(postId: string) {
     }
   }, [postId]);
 
+  const isValidUUID = (id: string) => {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+  };
+
   const fetchComments = async () => {
+    if (!postId || !isValidUUID(postId)) {
+      setComments([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -76,7 +86,12 @@ export function useComments(postId: string) {
   };
 
   const addComment = async (content: string, parentId: string | null = null) => {
-    if (!user || !profile) return null;
+    if (!user?.uid || !profile || !isValidUUID(postId)) return null;
+    if (!isValidUUID(user.uid)) {
+      console.warn('Comment blocked: Incompatible User ID (Firebase vs UUID).');
+      return null;
+    }
+    if (parentId && !isValidUUID(parentId)) return null;
 
     try {
       const { data, error } = await supabase.from('comments').insert({
@@ -106,13 +121,13 @@ export function useComments(postId: string) {
   };
 
   const createNotification = async (comment: any) => {
-    if (!user) return;
+    if (!user?.uid) return;
     
     try {
       let receiverId: string | null = null;
       let type: 'comment' | 'reply' = 'comment';
 
-      if (comment.parent_id) {
+      if (comment.parent_id && isValidUUID(comment.parent_id)) {
         // Find parent comment owner
         const { data: parentComment } = await supabase
           .from('comments')
@@ -124,7 +139,7 @@ export function useComments(postId: string) {
           receiverId = parentComment.user_id;
           type = 'reply';
         }
-      } else {
+      } else if (isValidUUID(postId)) {
         // Find post owner
         const { data: post } = await supabase
           .from('posts')
@@ -137,7 +152,7 @@ export function useComments(postId: string) {
         }
       }
 
-      if (receiverId) {
+      if (receiverId && isValidUUID(receiverId) && isValidUUID(user.uid)) {
         await supabase.from('notifications').insert({
           sender_id: user.uid,
           receiver_id: receiverId,
