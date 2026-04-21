@@ -14,6 +14,9 @@ import { useFollows } from '../../../hooks/useFollows';
 import { useDirectMessages } from '../../../hooks/useDirectMessages';
 import { useUserCommunities } from '../../../hooks/useUserCommunities';
 import { uploadFile } from '../../../lib/storage';
+import { usePosts } from '../../../hooks/usePosts';
+import PostCard from '../../../components/common/PostCard';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -22,9 +25,22 @@ export default function UserProfilePage() {
   const { profile, loading: profileLoading, updateProfile } = useProfile(username);
   const { isFollowing, followerCount, followingCount, follow, unfollow, loading: followLoading } = useFollows(profile?.id);
   const { createConversation } = useDirectMessages();
+  const { posts, loading: postsLoading, deletePost } = usePosts(undefined, 'latest', profile?.id);
   const router = useRouter();
 
-  const isOwnProfile = currentUser?.uid === profile?.id;
+  const isOwnProfile = currentUser?.uid === profile?.id || currentUser?.displayName === profile?.username;
+  
+  // Debug profile ownership
+  useEffect(() => {
+    if (currentUser && profile) {
+      console.log('Ownership Check:', {
+        currentUserUID: currentUser.uid,
+        profileID: profile.id,
+        isOwnProfile
+      });
+    }
+  }, [currentUser, profile, isOwnProfile]);
+
   
   const [isEditing, setIsEditing] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -137,7 +153,7 @@ export default function UserProfilePage() {
   );
 
   const stats = [
-    { label: 'Exhibits', value: '12', icon: 'gallery_thumbnail' },
+    { label: 'Exhibits', value: posts.length.toString(), icon: 'gallery_thumbnail' },
     { label: 'Following', value: followingCount.toString(), icon: 'group' },
     { label: 'Followers', value: followerCount.toString(), icon: 'diversity_3' },
     { label: 'Curation Score', value: '890', icon: 'award_star' }
@@ -321,23 +337,42 @@ export default function UserProfilePage() {
                </div>
 
                {activeTab === 'Collection' && (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {[1, 2, 3, 4].map((item) => (
-                     <div key={item} className="aspect-square rounded-[2rem] bg-surface-container-low/30 border border-outline-variant/10 p-2 group cursor-pointer overflow-hidden relative">
-                        <div className="w-full h-full rounded-[1.5rem] bg-surface-container-highest overflow-hidden relative">
-                           <Image 
-                            src={`https://images.unsplash.com/photo-${1534528741775 + item}-53994a69daeb?auto=format&fit=crop&q=80&w=800`} 
-                            alt="Gallery item" 
-                            fill 
-                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" 
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          />
-                          <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                             <span className="text-white font-headlines font-black text-xl translate-y-4 group-hover:translate-y-0 transition-transform">VIEW EXHIBIT</span>
-                          </div>
-                        </div>
+                 <div className="flex flex-col gap-8">
+                   {postsLoading ? (
+                     <div className="py-12 flex flex-col items-center gap-4 text-on-surface-variant">
+                        <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
+                        <p className="font-headlines font-bold uppercase tracking-widest">Gathering Exhibits...</p>
                      </div>
-                   ))}
+                   ) : posts.length > 0 ? (
+                     posts.map((post) => (
+                       <PostCard 
+                         key={post.id}
+                         id={post.id}
+                         user={post.username}
+                         userId={post.user_id}
+                         avatar={post.user_avatar}
+                         timestamp={formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                         community={post.community_name}
+                         title={post.title}
+                         content={post.content}
+                         image={post.image_url}
+                         videoUrl={post.video_url}
+                         upvotes={post.upvotes}
+                         comments={post.comment_count}
+                         showDelete={isOwnProfile}
+                         onDelete={deletePost}
+                       />
+                     ))
+                   ) : (
+                     <div className="py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
+                        <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">collections</span>
+                        <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Exhibits Yet</p>
+                        <p className="text-sm text-on-surface-variant/60 mt-2">Start sharing your creative vision with the world.</p>
+                        {isOwnProfile && (
+                          <Button variant="primary" className="mt-6" onClick={() => router.push('/create-post')}>Create First Exhibit</Button>
+                        )}
+                     </div>
+                   )}
                  </div>
                )}
 

@@ -22,15 +22,17 @@ export default function CommunitiesIndexPage() {
         if (error) throw error;
 
         // Grouping logic for aesthetic presentation
-        const topRated = data.slice(0, 3);
+        const topRated = data.slice(0, 6);
         const newest = [...data].sort((a, b) => 
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        ).slice(0, 3);
+        ).slice(0, 12);
 
         setCategories([
           { name: 'Top Rated', icon: 'star', galleries: topRated },
-          { name: 'Newest Arrivals', icon: 'auto_awesome', galleries: newest }
+          { name: 'Latest Launches', icon: 'auto_awesome', galleries: newest },
+          { name: 'All Galleries', icon: 'explore', galleries: data }
         ]);
+
       } catch (err) {
         console.error('Error fetching communities:', err);
       } finally {

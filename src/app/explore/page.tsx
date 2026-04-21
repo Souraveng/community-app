@@ -19,7 +19,8 @@ export default function ExplorePage() {
   );
   const { profile } = useProfile();
 
-  const categories = ['All', 'Trending', 'Architecture', 'UI/UX', 'Photography', 'Interior', 'Curated'];
+  const categories = ['All', 'Trending', 'Design', 'Photography', 'Architecture', 'Art', 'Tech', 'Lifestyle', 'Automotive'];
+
 
   const handleCategoryClick = (category: string) => {
     if (category === 'Trending') {

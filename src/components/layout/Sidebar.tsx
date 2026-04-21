@@ -60,6 +60,20 @@ const Sidebar = () => {
           ))}
         </ul>
 
+        {/* My Communities Section */}
+        <div className="mb-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 mb-3 ml-3">My Communities</p>
+          <ul className="space-y-1 font-manrope text-xs font-bold uppercase tracking-wider">
+            <li>
+              <Link href="/profile?tab=Communities" className="flex items-center gap-3 p-3 rounded-lg transition-all text-on-surface-variant hover:bg-surface-container-low hover:text-primary">
+                <span className="material-symbols-outlined text-sm">grid_view</span>
+                All Joined
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+
         <Link href="/communities/create">
           <Button variant="primary" className="w-full justify-start px-6 gap-3 py-4 rounded-2xl group shadow-lg shadow-primary/10">
             <span className="material-symbols-outlined group-hover:rotate-90 transition-transform">add_circle</span>

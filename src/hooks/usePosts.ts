@@ -16,7 +16,7 @@ export interface Post {
   created_at: string;
 }
 
-export function usePosts(communityName?: string, sort: 'latest' | 'trending' = 'latest') {
+export function usePosts(communityName?: string, sort: 'latest' | 'trending' = 'latest', userId?: string) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,17 +29,32 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
-        table: 'posts',
-        filter: communityName ? `community_name=eq.${communityName}` : undefined
+        table: 'posts'
       }, (payload: any) => {
-        setPosts(prev => [payload.new as Post, ...prev]);
+        const newPost = payload.new as Post;
+        
+        // Client-side filtering to support OR conditions (name vs c:name)
+        const matchesCommunity = communityName && (
+          newPost.community_name === communityName || 
+          newPost.community_name === `c:${communityName}`
+        );
+        
+        const matchesUser = userId && newPost.user_id === userId;
+        
+        // If no filters provided, show everything (Home Feed)
+        // If filters provided, only show if matched
+        if (!communityName && !userId) {
+          setPosts(prev => [newPost, ...prev]);
+        } else if (matchesCommunity || matchesUser) {
+          setPosts(prev => [newPost, ...prev]);
+        }
       })
       .subscribe();
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [communityName, sort]);
+  }, [communityName, sort, userId]);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -55,7 +70,12 @@ export function usePosts(communityName?: string, sort: 'latest' | 'trending' = '
       }
 
       if (communityName) {
-        query = query.eq('community_name', communityName);
+        // Match either the exact community name or the global category prefixed with c:
+        query = query.or(`community_name.eq."${communityName}",community_name.eq."c:${communityName}"`);
+      }
+
+      if (userId) {
+        query = query.eq('user_id', userId);
       }
 
       const { data, error } = await query;

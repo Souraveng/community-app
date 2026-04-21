@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
 import { supabase } from '../../lib/supabase';
@@ -15,16 +15,43 @@ export default function CreatePostPage() {
   const { user } = useAuth();
   const { profile } = useProfile();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const communityParam = searchParams.get('community');
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [community, setCommunity] = useState('Design');
+  const [postType, setPostType] = useState<'gallery' | 'global'>('gallery');
+  const [selectedCategory, setSelectedCategory] = useState('Design');
   const [imageFile, setImageFile] = useState<File | null>(null);
+
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
   const [error, setError] = useState('');
   const [communities, setCommunities] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (communityParam) {
+      if (communityParam.startsWith('c:')) {
+        setPostType('global');
+        setSelectedCategory(communityParam.replace('c:', ''));
+      } else {
+        setPostType('gallery');
+        setCommunity(communityParam);
+      }
+    }
+  }, [communityParam]);
+
+  const categories = [
+    'Design',
+    'Photography',
+    'Architecture',
+    'Art',
+    'Tech',
+    'Lifestyle',
+    'Automotive'
+  ];
 
   useEffect(() => {
     fetchCommunities();
@@ -62,18 +89,20 @@ export default function CreatePostPage() {
 
       // 3. Create Post
       setUploadProgress('Publishing to network...');
+      const finalCommunity = postType === 'gallery' ? community : `c:${selectedCategory}`;
+      
       const { error } = await supabase.from('posts').insert({
         title,
         content,
-        community_name: community,
+        community_name: finalCommunity,
         image_url: imageUrl,
         video_url: videoUrl,
         user_id: user.uid, // Required for database constraints and RLS
         username: profile.username,
-        user_avatar: profile.avatar_url,
-        upvotes: 0,
-        comment_count: 0
+        user_avatar: profile.avatar_url
       });
+
+
 
       if (error) throw error;
       router.push('/home');
@@ -100,6 +129,26 @@ export default function CreatePostPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 bg-surface-container-low/30 p-10 rounded-[2.5rem] border border-outline-variant/10 ambient-shadow">
+            <div className="md:col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 mb-4 ml-1">Exhibition Type</label>
+              <div className="flex p-1.5 bg-surface-container-high rounded-2xl w-fit gap-1">
+                <button 
+                  type="button"
+                  onClick={() => setPostType('gallery')}
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${postType === 'gallery' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:text-on-surface'}`}
+                >
+                  Gallery Post
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setPostType('global')}
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${postType === 'global' ? 'bg-secondary text-on-secondary shadow-lg shadow-secondary/20' : 'text-on-surface-variant hover:text-on-surface'}`}
+                >
+                  Global Discovery
+                </button>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="md:col-span-2">
                 <Input 
@@ -112,24 +161,37 @@ export default function CreatePostPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-bold text-on-surface-variant mb-2 ml-1">Community</label>
-                <select 
-                  className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary font-body text-on-surface"
-                  value={community}
-                  onChange={(e) => setCommunity(e.target.value)}
-                >
-                  {communities.length > 0 ? (
-                    communities.map(c => (
-                      <option key={c.name} value={c.name}>g/{c.name}</option>
-                    ))
-                  ) : (
-                    <>
-                      <option>Design</option>
-                      <option>Architecture</option>
-                      <option>Photography</option>
-                    </>
-                  )}
-                </select>
+                {postType === 'gallery' ? (
+                  <>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-2 ml-1">Community Gallery</label>
+                    <select 
+                      className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary font-body text-on-surface"
+                      value={community}
+                      onChange={(e) => setCommunity(e.target.value)}
+                    >
+                      {communities.length > 0 ? (
+                        communities.map(c => (
+                          <option key={c.name} value={c.name}>c/{c.name}</option>
+                        ))
+                      ) : (
+                        <option>Design</option>
+                      )}
+                    </select>
+                  </>
+                ) : (
+                  <>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-2 ml-1">Global Category</label>
+                    <select 
+                      className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl px-4 py-3 text-sm focus:ring-1 focus:ring-secondary font-body text-on-surface"
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </>
+                )}
               </div>
 
               {/* Media Picker */}

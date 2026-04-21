@@ -1,46 +1,57 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Navbar from '../../../components/layout/Navbar';
 import Sidebar from '../../../components/layout/Sidebar';
 import PostCard from '../../../components/common/PostCard';
+import PostForm, { PostFormHandle } from '../../../components/common/PostForm';
+import CreatePostFAB from '../../../components/common/CreatePostFAB';
+import MemberManagement from '../../../components/common/MemberManagement';
 import Button from '../../../components/common/Button';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabase';
 import { useCommunity } from '../../../hooks/useCommunity';
 import { useProfile } from '../../../hooks/useProfile';
+import { usePosts } from '../../../hooks/usePosts';
+import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 
 export default function CommunityPage() {
   const { name } = useParams();
-  const { community, isMember, joinCommunity, leaveCommunity, deleteCommunity, loading } = useCommunity(name as string);
+  const { 
+    community, 
+    membershipStatus, 
+    isFollowing,
+    requestJoin, 
+    leaveCommunity, 
+    follow,
+    unfollow,
+    resolveRequest,
+    getPendingRequests,
+    deleteCommunity, 
+    loading,
+    refresh
+  } = useCommunity(name as string);
+  
   const { profile } = useProfile();
-  const [posts, setPosts] = useState<any[]>([]);
-  const [postsLoading, setPostsLoading] = useState(true);
+  const { posts, loading: postsLoading, deletePost } = usePosts(name as string);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const postFormRef = useRef<PostFormHandle>(null);
+
+  const isOwner = profile && community && profile.id === community.creator_id;
+  const isApproved = membershipStatus === 'approved' || isOwner;
 
   useEffect(() => {
-    if (name) {
-      fetchPosts();
+    if (isOwner) {
+      getPendingRequests().then(setPendingRequests);
     }
-  }, [name]);
+  }, [isOwner, community]);
 
-  const fetchPosts = async () => {
-    setPostsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('community_name', name)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setPosts(data || []);
-    } catch (err) {
-      console.error('Error fetching community posts:', err);
-    } finally {
-      setPostsLoading(false);
-    }
+  const handleResolve = async (userId: string, approve: boolean) => {
+    await resolveRequest(userId, approve);
+    setPendingRequests(prev => prev.filter(r => r.user_id !== userId));
+    if (approve) refresh();
   };
 
   const handleDeleteCommunity = async () => {
@@ -51,10 +62,6 @@ export default function CommunityPage() {
     } catch (err) {
       alert('Failed to delete gallery. Please try again.');
     }
-  };
-
-  const handlePostDeleted = (postId: string) => {
-    setPosts(prev => prev.filter(p => p.id !== postId));
   };
 
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center font-headlines text-2xl"><Navbar />Analyzing Gallery...</div>;
@@ -87,34 +94,78 @@ export default function CommunityPage() {
               </div>
 
               <div className="flex-1 pb-2">
-                <h1 className="text-3xl md:text-5xl font-black font-headlines tracking-tighter text-on-surface">
-                  g/{community.name}
-                </h1>
-                <p className="text-sm font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
-                  {community.member_count} collectors • Active Gallery
-                </p>
+                <div className="flex items-center gap-4">
+                  <h1 className="text-3xl md:text-5xl font-black font-headlines tracking-tighter text-on-surface">
+                    c/{community.name}
+                  </h1>
+                  {isOwner && (
+                    <span className="bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-primary/20">
+                      Owner
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-4 mt-1">
+                  <p className="text-sm font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+                    {community.member_count || 0} Collectors
+                  </p>
+                  <div className="w-1 h-1 rounded-full bg-on-surface-variant/20" />
+                  <p className="text-sm font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+                    {community.follower_count || 0} Followers
+                  </p>
+                </div>
               </div>
 
-              <div className="pb-4 flex gap-4">
-                {isMember && (
-                  <Link href={`/create-post?community=${community.name}`}>
-                    <Button variant="secondary">Post Exhibit</Button>
-                  </Link>
-                )}
-                {isMember ? (
-                  <Button variant="ghost" onClick={() => leaveCommunity(community.name)}>Joined</Button>
+              <div className="pb-4 flex gap-3">
+                {isOwner ? (
+                  <Button variant="ghost" className="border-outline-variant/10" onClick={handleDeleteCommunity}>
+                    Manage Gallery
+                  </Button>
                 ) : (
-                  <Button variant="primary" onClick={() => joinCommunity(community.name)}>Join Gallery</Button>
+                  <>
+                    <Button 
+                      variant={isFollowing ? "secondary" : "outline"} 
+                      className={isFollowing ? "" : "border-outline-variant/20"}
+                      onClick={isFollowing ? unfollow : follow}
+                    >
+                      {isFollowing ? 'Following' : 'Follow'}
+                    </Button>
+
+                    {membershipStatus === 'approved' ? (
+                      <Button variant="ghost" onClick={leaveCommunity}>Collector</Button>
+                    ) : membershipStatus === 'pending' ? (
+                      <Button variant="secondary" disabled>Request Sent</Button>
+                    ) : (
+                      <Button variant="primary" onClick={requestJoin}>Join Gallery</Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           </div>
 
+          {/* Member Management for Owner */}
+          {isOwner && pendingRequests.length > 0 && (
+            <MemberManagement 
+              requests={pendingRequests} 
+              onResolve={handleResolve} 
+            />
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
             {/* Posts Feed */}
             <div className="lg:col-span-8 space-y-6">
+               {(isOwner || membershipStatus === 'approved') && (
+                 <PostForm 
+                  ref={postFormRef}
+                  mode="community" 
+                  layout="bar"
+                  communityName={community.name} 
+                  onPostCreated={() => window.location.reload()} 
+                 />
+               )}
+
                <div className="flex items-center justify-between mb-8">
-                  <h3 className="font-headlines font-black text-xl uppercase tracking-tighter">Community Exhibits</h3>
+                  <h3 className="font-headlines font-black text-xl uppercase tracking-tighter text-on-surface">Community Exhibits</h3>
                   <div className="flex gap-4">
                     <button className="text-[10px] font-black uppercase tracking-widest text-primary border-b-2 border-primary pb-1">New</button>
                     <button className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">Top</button>
@@ -131,21 +182,26 @@ export default function CommunityPage() {
                      userId={post.user_id}
                      user={post.username}
                      avatar={post.user_avatar}
-                     timestamp={new Date(post.created_at).toLocaleDateString()}
+                     timestamp={formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                      community={post.community_name}
                      title={post.title}
                      content={post.content}
                      image={post.image_url}
-                     upvotes={post.upvotes.toString()}
-                     comments={post.comment_count.toString()}
+                     videoUrl={post.video_url}
+                     upvotes={post.upvotes}
+                     comments={post.comment_count}
                      autoplay={profile?.autoplay_enabled ?? true}
-                     onDelete={handlePostDeleted}
+                     onDelete={deletePost}
                    />
                  ))
                ) : (
                  <div className="text-center py-20 bg-surface-container-low/20 rounded-[2.5rem] border border-dashed border-outline-variant/20">
-                   <p className="font-headlines font-bold text-on-surface-variant mb-4">No exhibits yet in this gallery.</p>
-                   <Button variant="secondary">Be the first to curate</Button>
+                   <p className="font-headlines font-bold text-on-surface-variant mb-4 font-body">No exhibits yet in this gallery.</p>
+                   {isApproved ? (
+                      <p className="text-xs text-on-surface-variant/60 font-body">Be the first to curate an exhibit above!</p>
+                   ) : (
+                      <Button variant="secondary" onClick={requestJoin}>Request to Curate</Button>
+                   )}
                  </div>
                )}
             </div>
@@ -153,18 +209,22 @@ export default function CommunityPage() {
             {/* About Section */}
             <div className="lg:col-span-4">
               <div className="bg-surface-container-low/30 p-8 rounded-[2.5rem] border border-outline-variant/10 sticky top-24">
-                <h3 className="font-headlines font-black text-lg mb-4 flex items-center gap-2">
+                <h3 className="font-headlines font-black text-lg mb-4 flex items-center gap-2 text-on-surface">
                   <span className="material-symbols-outlined text-primary">info</span> About Gallery
                 </h3>
                 <p className="text-sm font-body text-on-surface-variant leading-relaxed mb-6">
                   {community.description}
                 </p>
                 <div className="space-y-4 pt-6 border-t border-outline-variant/10">
-                   <div className="flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60">Members</span>
-                     <span className="text-sm font-black font-headlines text-primary">{community.member_count}</span>
+                   <div className="flex items-center justify-between font-headlines">
+                     <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60">Collectors</span>
+                     <span className="text-sm font-black text-primary">{community.member_count || 0}</span>
                    </div>
-                   <div className="flex items-center justify-between">
+                   <div className="flex items-center justify-between font-headlines">
+                     <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60">Followers</span>
+                     <span className="text-sm font-black text-secondary">{community.follower_count || 0}</span>
+                   </div>
+                   <div className="flex items-center justify-between font-headlines">
                      <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60">Founded</span>
                      <span className="text-xs font-bold text-on-surface">{new Date(community.created_at).getFullYear()}</span>
                    </div>
@@ -174,6 +234,13 @@ export default function CommunityPage() {
           </div>
         </main>
       </div>
+
+      {(isOwner || membershipStatus === 'approved') && (
+        <CreatePostFAB 
+          onClick={() => postFormRef.current?.open()} 
+          label="Exhibit Works"
+        />
+      )}
     </div>
   );
 }
