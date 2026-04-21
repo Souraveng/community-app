@@ -94,8 +94,8 @@ export default function LandingPage() {
               {/* Large Feature Card */}
               <div className="md:col-span-8 group relative overflow-hidden rounded-[2rem] bg-surface-container-lowest p-8 min-h-[400px] flex flex-col justify-end">
                 <Image 
-                  src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf86?auto=format&fit=crop&q=80&w=2000"
-                  alt="Minimalist Living"
+                  src="https://images.unsplash.com/photo-1544450614-74375d5e56bc?auto=format&fit=crop&q=80&w=2000"
+                  alt="Art Gallery Exhibit"
                   fill
                   className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
                   unoptimized
@@ -103,9 +103,9 @@ export default function LandingPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="relative z-10 text-white">
-                  <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block">Architecture</span>
-                  <h3 className="text-3xl font-bold mb-2 font-headlines">Minimalist Living</h3>
-                  <p className="text-white/80 max-w-sm font-body">Exploring the intersection of function and form in modern residential spaces.</p>
+                  <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block">Curation</span>
+                  <h3 className="text-3xl font-bold mb-2 font-headlines">The Art Gallery</h3>
+                  <p className="text-white/80 max-w-sm font-body">Immerse yourself in a curated selection of fine art and digital masterpieces.</p>
                 </div>
               </div>
 
