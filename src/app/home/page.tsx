@@ -117,7 +117,6 @@ export default function HomeFeed() {
                     content={post.content}
                     image={post.image_url}
                     videoUrl={post.video_url}
-                    upvotes={post.upvotes || 0}
                     comments={post.comment_count || 0}
                     autoplay={profile?.autoplay_enabled ?? true}
                   />

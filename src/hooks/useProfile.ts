@@ -10,7 +10,8 @@ export interface Profile {
   avatar_url: string | null;
   bio: string | null;
   age: number | null;
-  autoplay_enabled: boolean | null;
+  autoplay_enabled: boolean;
+  last_username_change: string | null;
 }
 
 export function useProfile(targetUsername?: string) {
@@ -102,11 +103,29 @@ export function useProfile(targetUsername?: string) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .upsert({ id: currentUser.uid, ...updates })
+        .update(updates)
+        .eq('id', currentUser.uid)
         .select('*')
         .single();
 
       if (error) throw error;
+      
+      // Sync denormalized display data (username and avatar) in the posts table
+      if (updates.username !== undefined || updates.avatar_url !== undefined) {
+        const postUpdates: any = {};
+        if (updates.username !== undefined) postUpdates.username = updates.username;
+        if (updates.avatar_url !== undefined) postUpdates.user_avatar = updates.avatar_url;
+        
+        if (Object.keys(postUpdates).length > 0) {
+          // Fire-and-forget sync to posts
+          // Note: If you encounter an RLS error here next, we'll need to update the posts table policy to allow updates
+          await supabase
+            .from('posts')
+            .update(postUpdates)
+            .eq('user_id', currentUser.uid);
+        }
+      }
+
       setProfile(data);
       return data;
     } catch (err) {

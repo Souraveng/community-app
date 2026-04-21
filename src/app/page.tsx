@@ -8,11 +8,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../lib/supabase';
 
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isMounted, setIsMounted] = React.useState(false);
+  const [trendingPost, setTrendingPost] = React.useState<any>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -23,6 +25,31 @@ export default function LandingPage() {
       router.push('/home');
     }
   }, [user, loading, router, isMounted]);
+
+  useEffect(() => {
+    async function fetchTrendingPost() {
+      try {
+        const { data } = await supabase
+          .from('posts')
+          .select('*')
+          .not('image_url', 'is', null)
+          .limit(20);
+        
+        if (data && data.length > 0) {
+          // Sort by trending algorithm: upvotes + (comments * 2)
+          const best = data.sort((a: any, b: any) => {
+            const scoreA = (a.upvotes || 0) + ((a.comment_count || 0) * 2);
+            const scoreB = (b.upvotes || 0) + ((b.comment_count || 0) * 2);
+            return scoreB - scoreA;
+          })[0];
+          setTrendingPost(best);
+        }
+      } catch (err) {
+        console.error('Failed to fetch trending post:', err);
+      }
+    }
+    fetchTrendingPost();
+  }, []);
 
   // If loading or user exists, we might want a brief loading state or just nothing (since we redirect)
   if (loading || user) {
@@ -90,20 +117,44 @@ export default function LandingPage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              {/* Large Feature Card */}
+              {/* Large Feature Card (Dynamic Trending Post) */}
               <div className="md:col-span-8 group relative overflow-hidden rounded-[2rem] bg-surface-container-lowest p-8 min-h-[400px] flex flex-col justify-end">
-                <Image 
-                  src="https://images.unsplash.com/photo-1544450614-74375d5e56bc?auto=format&fit=crop&q=80&w=2000"
-                  alt="Art Gallery Exhibit"
-                  fill
-                  className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
-                  sizes="(max-width: 768px) 100vw, 66vw"
+                <img 
+                  src={trendingPost?.image_url || "https://images.unsplash.com/photo-1544450614-74375d5e56bc?auto=format&fit=crop&q=80&w=2000"}
+                  alt={trendingPost?.title || "Art Gallery Exhibit"}
+                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <div className="relative z-10 text-white">
-                  <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block">Curation</span>
-                  <h3 className="text-3xl font-bold mb-2 font-headlines">The Art Gallery</h3>
-                  <p className="text-white/80 max-w-sm font-body">Immerse yourself in a curated selection of fine art and digital masterpieces.</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+                <div className="relative z-10 text-white pointer-events-none">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="bg-primary/90 text-on-primary backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-block shadow-lg">
+                      #1 Trending
+                    </span>
+                    {trendingPost?.community_name && (
+                      <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest inline-block">
+                        {trendingPost.community_name.replace('c:', 'g/')}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-3xl font-bold mb-2 font-headlines text-white drop-shadow-md">
+                    {trendingPost?.title || "The Art Gallery"}
+                  </h3>
+                  <p className="text-white/90 max-w-sm font-body line-clamp-2 drop-shadow-sm">
+                    {trendingPost?.content || "Immerse yourself in a curated selection of fine art and digital masterpieces."}
+                  </p>
+                  
+                  {trendingPost && (
+                    <div className="mt-6 flex items-center gap-3">
+                      {trendingPost.user_avatar ? (
+                        <img src={trendingPost.user_avatar} alt="Author" className="w-8 h-8 rounded-full border border-white/30 object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full border border-white/30 bg-white/20 flex items-center justify-center">
+                          <span className="material-symbols-outlined text-sm text-white">person</span>
+                        </div>
+                      )}
+                      <span className="text-sm font-bold text-white/90">u/{trendingPost.username}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

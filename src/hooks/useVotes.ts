@@ -76,18 +76,19 @@ export function useVotes(postId: string) {
       }
 
       // 2. Update the aggregate count in posts table
-      // This is a direct update. For high-traffic, an RPC call would be safer.
+      // We use the 'upvotes' column to store the net SCORE (Upvotes - Downvotes)
       const { data: postData } = await supabase
         .from('posts')
         .select('upvotes')
         .eq('id', postId)
         .single();
       
-      const currentCount = postData?.upvotes || 0;
+      const currentScore = postData?.upvotes || 0;
+      const finalScore = currentScore + delta;
       
       await supabase
         .from('posts')
-        .update({ upvotes: currentCount + delta })
+        .update({ upvotes: finalScore })
         .eq('id', postId);
 
       setUserVote(newVote);

@@ -188,7 +188,6 @@ export default function CommunityPage() {
                      content={post.content}
                      image={post.image_url}
                      videoUrl={post.video_url}
-                     upvotes={post.upvotes}
                      comments={post.comment_count}
                      autoplay={profile?.autoplay_enabled ?? true}
                      onDelete={deletePost}

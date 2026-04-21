@@ -62,6 +62,30 @@ export default function PostDetailPage() {
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center"><Navbar /><span className="material-symbols-outlined animate-spin text-4xl text-primary">circle_notifications</span></div>;
   if (!post) return <div className="min-h-screen bg-background flex items-center justify-center font-headlines text-2xl"><Navbar />Post not found.</div>;
 
+  // Authentication Guard for Post Detail
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background text-on-surface">
+        <Navbar />
+        <div className="flex pt-16 h-[calc(100vh-64px)] items-center justify-center p-6">
+          <div className="max-w-md w-full text-center space-y-8 bg-surface-container-low/20 backdrop-blur-xl p-12 rounded-[3rem] border border-outline-variant/10 ambient-shadow">
+            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary mx-auto">
+              <span className="material-symbols-outlined text-4xl">lock</span>
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-black font-headlines tracking-tighter">Collector Access Required</h1>
+              <p className="text-on-surface-variant font-body opacity-70">This exhibit is part of a curated network. Sign in to view and engage with this intelligence.</p>
+            </div>
+            <Button variant="primary" className="w-full py-4 font-black uppercase tracking-widest text-xs" onClick={() => router.push('/login')}>
+              Unlock with Identity
+            </Button>
+            <p className="text-[10px] uppercase font-black tracking-widest opacity-30">Security Protocol Alpha-6</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-on-surface select-none">
       <Navbar />

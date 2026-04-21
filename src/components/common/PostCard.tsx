@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
-import { useVotes } from '../../hooks/useVotes';
+import { useSavedPosts } from '../../hooks/useSavedPosts';
 import { formatDistanceToNow } from 'date-fns';
 import DeleteDialog from './DeleteDialog';
 import Link from 'next/link';
@@ -20,7 +20,6 @@ interface PostCardProps {
   content?: string;
   image?: string | null;
   videoUrl?: string | null;
-  upvotes: number;
   comments: number;
   autoplay?: boolean;
   showDelete?: boolean;
@@ -38,14 +37,13 @@ const PostCard: React.FC<PostCardProps> = ({
   content,
   image,
   videoUrl,
-  upvotes,
   comments,
   autoplay = true,
   showDelete = false,
   onDelete,
 }) => {
   const { user: authUser } = useAuth();
-  const { userVote, vote, loading: votesLoading } = useVotes(id);
+  const { isSaved, toggleSave } = useSavedPosts(id);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -60,12 +58,9 @@ const PostCard: React.FC<PostCardProps> = ({
     }
   }, [timestamp]);
 
-  const handleVote = async (type: 1 | -1) => {
-    if (!authUser) {
-      // Potentially trigger a login modal or alert
-      return;
-    }
-    await vote(type);
+  const handleSave = async () => {
+    if (!authUser) return;
+    await toggleSave();
   };
 
   const confirmDelete = async () => {
@@ -92,38 +87,6 @@ const PostCard: React.FC<PostCardProps> = ({
       
       <article className="group bg-surface-container-low/30 p-6 rounded-[2.5rem] hover:bg-surface-container-lowest hover:ambient-shadow transition-all duration-300">
         <div className="flex gap-6">
-          {/* Voting Column (reddit-Style) */}
-          <div className="flex flex-col items-center gap-1">
-            <button 
-              onClick={() => handleVote(1)}
-              disabled={votesLoading}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                userVote === 1 
-                  ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' 
-                  : 'hover:bg-primary/10 text-on-surface-variant hover:text-primary'
-              }`}
-            >
-              <span className="material-symbols-outlined text-2xl font-black">arrow_upward</span>
-            </button>
-            
-            <span className={`font-headlines font-black text-sm transition-colors ${
-              userVote === 1 ? 'text-primary' : userVote === -1 ? 'text-secondary' : 'text-on-surface'
-            }`}>
-              {upvotes >= 1000 ? `${(upvotes / 1000).toFixed(1)}k` : upvotes}
-            </span>
-            
-            <button 
-              onClick={() => handleVote(-1)}
-              disabled={votesLoading}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                userVote === -1 
-                  ? 'bg-secondary text-on-secondary shadow-lg shadow-secondary/20' 
-                  : 'hover:bg-secondary/10 text-on-surface-variant hover:text-secondary'
-              }`}
-            >
-              <span className="material-symbols-outlined text-2xl font-black">arrow_downward</span>
-            </button>
-          </div>
           
           {/* Content Column */}
           <div className="flex-1 min-w-0">
@@ -199,14 +162,33 @@ const PostCard: React.FC<PostCardProps> = ({
             <div className="flex items-center gap-6">
               <Link href={`/post/${id}`} className="flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-widest hover:bg-primary/5 px-4 py-2 rounded-full border border-primary/10 transition-all">
                 <span className="material-symbols-outlined text-sm">mode_comment</span>
-                {comments} Intelligence
+                {comments} Comment
               </Link>
-              <button className="flex items-center gap-2 text-on-surface-variant font-black text-[10px] uppercase tracking-widest hover:text-primary transition-all">
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(`${window.location.origin}/post/${id}`);
+                  const btn = e.currentTarget;
+                  const originalText = btn.innerHTML;
+                  btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Copied!';
+                  setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+                }}
+                className="flex items-center gap-2 text-on-surface-variant font-black text-[10px] uppercase tracking-widest hover:text-primary transition-all"
+              >
                 <span className="material-symbols-outlined text-sm">share</span>
                 Share
               </button>
-              <button className="flex items-center gap-2 text-on-surface-variant font-black text-[10px] uppercase tracking-widest hover:text-primary transition-all ml-auto">
-                <span className="material-symbols-outlined text-sm">bookmark</span>
+              <button 
+                onClick={handleSave}
+                className={`flex items-center gap-2 font-black text-[10px] uppercase tracking-widest transition-all ml-auto ${
+                  isSaved ? 'text-primary' : 'text-on-surface-variant hover:text-primary'
+                }`}
+              >
+                <span className={`material-symbols-outlined text-sm ${isSaved ? 'fill-1' : ''}`}>
+                  {isSaved ? 'bookmark_added' : 'bookmark'}
+                </span>
+                {isSaved ? 'Saved' : 'Save'}
               </button>
             </div>
           </div>

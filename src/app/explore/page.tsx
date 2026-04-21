@@ -81,7 +81,6 @@ export default function ExplorePage() {
                           title={post.title}
                           content={post.content}
                           image={post.image_url || 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=800'}
-                          upvotes={post.upvotes || 0}
                           comments={post.comment_count || 0}
                           autoplay={profile?.autoplay_enabled ?? true}
                         />

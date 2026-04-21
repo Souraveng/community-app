@@ -48,12 +48,17 @@ export default function UserProfilePage() {
   const [editData, setEditData] = useState({
     full_name: '',
     bio: '',
-    username: ''
+    username: '',
+    last_username_change: null as string | null
   });
-  const [activeTab, setActiveTab] = useState<'Collection' | 'Upvoted' | 'Communities' | 'Drafts'>('Collection');
+  const [activeTab, setActiveTab] = useState<'Collection' | 'Saved' | 'Communities' | 'Drafts'>('Collection');
   const [showConnections, setShowConnections] = useState<'followers' | 'following' | null>(null);
   const [connectionList, setConnectionList] = useState<any[]>([]);
   const [loadingConnections, setLoadingConnections] = useState(false);
+  const [savedPosts, setSavedPosts] = useState<any[]>([]);
+  const [savedLoading, setSavedLoading] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const { communities, loading: communitiesLoading } = useUserCommunities(profile?.id);
 
 
@@ -62,9 +67,11 @@ export default function UserProfilePage() {
       setEditData({
         full_name: profile.full_name || '',
         bio: profile.bio || '',
-        username: profile.username || ''
+        username: profile.username || '',
+        last_username_change: profile.last_username_change || null
       });
       setIsEditing(true);
+      setUsernameAvailable(null);
     }
   };
 
@@ -78,6 +85,27 @@ export default function UserProfilePage() {
 
   const handleSave = async () => {
     try {
+      // 1. Check Username constraint if changed
+      if (editData.username !== profile?.username) {
+        if (usernameAvailable === false) {
+           alert('Username is taken.');
+           return;
+        }
+
+        // 30-day lock check
+        if (profile?.last_username_change) {
+          const lastChange = new Date(profile.last_username_change);
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          
+          if (lastChange > thirtyDaysAgo) {
+            const daysLeft = Math.ceil((lastChange.getTime() - thirtyDaysAgo.getTime()) / (1000 * 60 * 60 * 24));
+            alert(`Identity lock active. You can change your username in ${daysLeft} days.`);
+            return;
+          }
+        }
+      }
+
       let avatarUrl = profile?.avatar_url;
 
       if (avatarFile && currentUser) {
@@ -85,7 +113,23 @@ export default function UserProfilePage() {
         avatarUrl = await uploadFile('avatars', path, avatarFile);
       }
 
-      await updateProfile({ ...editData, avatar_url: avatarUrl });
+      // Update payload
+      const payload: any = {
+        full_name: editData.full_name,
+        bio: editData.bio,
+        avatar_url: avatarUrl,
+        username: editData.username,
+      };
+
+      // Only update last_change if username actually changed
+      if (editData.username !== profile?.username) {
+        payload.last_username_change = new Date().toISOString();
+      }
+
+      const result = await updateProfile(payload);
+      
+      if (!result) throw new Error('Update failed');
+
       setIsEditing(false);
       setAvatarFile(null);
       setPreviewUrl(null);
@@ -93,8 +137,9 @@ export default function UserProfilePage() {
       if (editData.username !== username) {
         router.push(`/profile/${editData.username}`);
       }
-    } catch (err) {
-      alert('Failed to update profile.');
+    } catch (err: any) {
+      console.error('Profile Update Error:', err);
+      alert(err.message || 'Failed to update profile.');
     }
   };
 
@@ -109,6 +154,67 @@ export default function UserProfilePage() {
       console.error('Error starting conversation:', err);
     }
   };
+
+  // Real-time Username Check
+  useEffect(() => {
+    if (!isEditing || editData.username === profile?.username || editData.username.length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    const check = async () => {
+      setCheckingUsername(true);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('username', editData.username)
+          .single();
+        
+        if (error && error.code === 'PGRST116') {
+          setUsernameAvailable(true);
+        } else {
+          setUsernameAvailable(false);
+        }
+      } catch (err) {
+        console.error('Error checking username:', err);
+      } finally {
+        setCheckingUsername(false);
+      }
+    };
+
+    const timer = setTimeout(check, 500);
+    return () => clearTimeout(timer);
+  }, [editData.username, isEditing, profile?.username]);
+
+  // Fetch Saved Posts
+  useEffect(() => {
+    const fetchSaved = async () => {
+      if (activeTab !== 'Saved' || !profile) return;
+      setSavedLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('saved_posts')
+          .select('post_id, posts(*)')
+          .eq('user_id', profile.id);
+        
+        if (error) throw error;
+        
+        const mappedPosts = (data as any[]).map(item => ({
+          ...item.posts,
+          id: item.post_id // Ensure ID matches
+        }));
+        
+        setSavedPosts(mappedPosts);
+      } catch (err) {
+        console.error('Error fetching saved:', err);
+      } finally {
+        setSavedLoading(false);
+      }
+    };
+
+    fetchSaved();
+  }, [activeTab, profile]);
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -276,7 +382,17 @@ export default function UserProfilePage() {
                       onChange={(e) => setEditData({...editData, full_name: e.target.value})} 
                     />
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-on-surface-variant ml-1 uppercase tracking-widest">Bio</label>
+                      <Input 
+                        label="Username" 
+                        value={editData.username} 
+                        onChange={(e) => setEditData({...editData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})} 
+                        error={usernameAvailable === false ? 'This handle is taken.' : undefined}
+                      />
+                      {checkingUsername && <p className="text-[10px] text-primary animate-pulse ml-1">Checking availability...</p>}
+                      {usernameAvailable === true && <p className="text-[10px] text-green-500 ml-1">Identity handle available.</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-on-surface-variant ml-1 uppercase tracking-widest">Manifesto</label>
                       <textarea 
                         className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-4 text-sm font-body text-on-surface min-h-[120px] focus:ring-1 focus:ring-primary"
                         value={editData.bio}
@@ -324,7 +440,7 @@ export default function UserProfilePage() {
             {/* Right Column: Feed/Content */}
             <div className="lg:col-span-8">
                <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                  {['Collection', 'Communities', 'Upvoted', 'Drafts'].map((tab) => (
+                  {['Collection', 'Communities', 'Saved', 'Drafts'].map((tab) => (
                     <button 
                       key={tab} 
                       onClick={() => setActiveTab(tab as any)}
@@ -357,7 +473,6 @@ export default function UserProfilePage() {
                          content={post.content}
                          image={post.image_url}
                          videoUrl={post.video_url}
-                         upvotes={post.upvotes}
                          comments={post.comment_count}
                          showDelete={isOwnProfile}
                          onDelete={deletePost}
@@ -421,7 +536,42 @@ export default function UserProfilePage() {
                  </div>
                )}
 
-               {(activeTab === 'Upvoted' || activeTab === 'Drafts') && (
+               {activeTab === 'Saved' && (
+                 <div className="flex flex-col gap-8">
+                   {savedLoading ? (
+                     <div className="py-12 flex flex-col items-center gap-4 text-on-surface-variant">
+                        <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
+                        <p className="font-headlines font-bold uppercase tracking-widest">Recalling Saved Works...</p>
+                     </div>
+                   ) : savedPosts.length > 0 ? (
+                     savedPosts.map((post) => (
+                        <PostCard 
+                          key={post.id}
+                          id={post.id}
+                          user={post.username}
+                          userId={post.user_id}
+                          avatar={post.user_avatar}
+                          timestamp={post.created_at}
+                         community={post.community_name}
+                         title={post.title}
+                         content={post.content}
+                         image={post.image_url}
+                         videoUrl={post.video_url}
+                         comments={post.comment_count || 0}
+                         showDelete={false}
+                       />
+                     ))
+                   ) : (
+                     <div className="py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
+                        <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">bookmark</span>
+                        <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Saved Exhibits</p>
+                        <p className="text-sm text-on-surface-variant/60 mt-2">Start your collection by saving the intelligence you love.</p>
+                     </div>
+                   )}
+                 </div>
+               )}
+
+               {activeTab === 'Drafts' && (
                  <div className="py-24 text-center">
                    <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest opacity-40">Coming Soon to your Space</p>
                  </div>
