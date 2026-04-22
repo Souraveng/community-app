@@ -494,7 +494,8 @@ export default function UserProfilePage() {
                          content={post.content}
                          image={post.image_url}
                          videoUrl={post.video_url}
-                         comments={post.comment_count}
+                         comments={post.comment_count || 0}
+                         votes={post.upvotes || 0}
                          showDelete={isOwnProfile}
                          onDelete={deletePost}
                        />
@@ -579,6 +580,7 @@ export default function UserProfilePage() {
                          image={post.image_url}
                          videoUrl={post.video_url}
                          comments={post.comment_count || 0}
+                         votes={post.upvotes || 0}
                          showDelete={false}
                        />
                      ))

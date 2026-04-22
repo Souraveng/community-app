@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useSavedPosts } from '../../hooks/useSavedPosts';
+import { useVotes } from '../../hooks/useVotes';
+import { useFollows } from '../../hooks/useFollows';
 import { formatDistanceToNow } from 'date-fns';
 import DeleteDialog from './DeleteDialog';
 import Link from 'next/link';
@@ -21,6 +23,7 @@ interface PostCardProps {
   image?: string | null;
   videoUrl?: string | null;
   comments: number;
+  votes: number;
   autoplay?: boolean;
   showDelete?: boolean;
   onDelete?: (id: string) => void;
@@ -38,14 +41,46 @@ const PostCard: React.FC<PostCardProps> = ({
   image,
   videoUrl,
   comments,
+  votes: initialVotes,
   autoplay = true,
   showDelete = false,
   onDelete,
 }) => {
   const { user: authUser } = useAuth();
   const { isSaved, toggleSave } = useSavedPosts(id);
+  const { userVote, vote } = useVotes(id);
+  const { isFollowing, follow, unfollow } = useFollows(userId);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Local vote score for instant feedback
+  const [currentVotes, setCurrentVotes] = useState(initialVotes);
+
+  const handleVote = async (type: 1 | -1) => {
+    if (!authUser) return;
+    
+    // Optimistic Update
+    let delta = 0;
+    if (userVote === null) delta = type;
+    else if (userVote === type) delta = -type;
+    else delta = type * 2;
+    
+    setCurrentVotes(prev => prev + delta);
+    const success = await vote(type);
+    if (!success) {
+      // Rollback if failed
+      setCurrentVotes(prev => prev - delta);
+    }
+  };
+
+  const handleFollow = async () => {
+    if (!authUser) return;
+    if (isFollowing) {
+      await unfollow();
+    } else {
+      await follow();
+    }
+  };
 
   // Format relative timestamp
   const relativeTime = React.useMemo(() => {
@@ -118,6 +153,20 @@ const PostCard: React.FC<PostCardProps> = ({
                 <p className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-[0.2em] mt-0.5">{relativeTime}</p>
               </div>
 
+              {/* Follow Button */}
+              {authUser && authUser.uid !== userId && (
+                <button 
+                  onClick={handleFollow}
+                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                    isFollowing 
+                    ? 'bg-surface-container-highest text-on-surface-variant hover:bg-error/10 hover:text-error' 
+                    : 'bg-primary text-on-primary hover:scale-105 active:scale-95'
+                  }`}
+                >
+                  {isFollowing ? 'Following' : 'Follow'}
+                </button>
+              )}
+
               {showDelete && authUser?.uid === userId && (
                 <button 
                   onClick={() => setIsDialogOpen(true)}
@@ -160,7 +209,23 @@ const PostCard: React.FC<PostCardProps> = ({
             )}
 
             <div className="flex items-center gap-6">
-              <Link href={`/post/${id}`} className="flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-widest hover:bg-primary/5 px-4 py-2 rounded-full border border-primary/10 transition-all">
+              <div className="flex items-center bg-surface-container-low border border-outline-variant/10 rounded-full px-2">
+                <button 
+                  onClick={() => handleVote(1)}
+                  className={`p-2 transition-all hover:scale-110 active:scale-95 ${userVote === 1 ? 'text-primary' : 'text-on-surface-variant'}`}
+                >
+                  <span className={`material-symbols-outlined text-lg ${userVote === 1 ? 'fill-1' : ''}`}>arrow_upward</span>
+                </button>
+                <span className="text-[10px] font-black w-4 text-center">{currentVotes}</span>
+                <button 
+                  onClick={() => handleVote(-1)}
+                  className={`p-2 transition-all hover:scale-110 active:scale-95 ${userVote === -1 ? 'text-secondary' : 'text-on-surface-variant'}`}
+                >
+                  <span className={`material-symbols-outlined text-lg ${userVote === -1 ? 'fill-1' : ''}`}>arrow_downward</span>
+                </button>
+              </div>
+
+              <Link href={`/post/${id}`} className="flex items-center gap-2 text-on-surface-variant font-black text-[10px] uppercase tracking-widest hover:text-primary transition-all">
                 <span className="material-symbols-outlined text-sm">mode_comment</span>
                 {comments} Comment
               </Link>

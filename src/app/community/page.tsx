@@ -15,7 +15,7 @@ const communityPosts = [
     title: 'The evolution of minimalist interfaces in high-end automotive design',
     content: 'Looking at how brands like Rivian and Polestar are redefining the digital dashboard by removing cognitive load through intentional whitespace and limited color palettes...',
     image: 'https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&q=80&w=2000',
-    upvotes: 1400,
+    votes: 1400,
     comments: 128,
   },
   {
@@ -26,7 +26,7 @@ const communityPosts = [
     community: 'Discussion',
     title: 'Why we need to stop using 1px borders for everything',
     content: "Tonal depth is far more sophisticated than sharp lines. Let's discuss why background shifts are the future of premium UI design systems...",
-    upvotes: 852,
+    votes: 852,
     comments: 42,
   },
 ];

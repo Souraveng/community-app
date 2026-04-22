@@ -59,48 +59,65 @@ export default function NotificationsPage() {
                 <p className="mt-4 font-headlines font-bold uppercase tracking-[0.2em] text-xs">No activity detected in your sector.</p>
               </div>
             ) : (
-              notifications.map((notif) => (
-                <div 
-                  key={notif.id} 
-                  onClick={() => markAsRead(notif.id)}
-                  className={`group bg-surface-container-low/30 hover:bg-surface-container-lowest transition-all duration-300 rounded-[2rem] p-6 flex gap-6 cursor-pointer border border-outline-variant/5 hover:border-outline-variant/20 ambient-shadow ${notif.is_read ? 'opacity-60 grayscale-[0.5]' : ''}`}
-                >
-                  <div className="relative">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden relative border border-outline-variant/10">
-                      {notif.sender?.avatar_url ? (
-                        <Image src={notif.sender.avatar_url} alt={notif.sender.username} fill className="object-cover" sizes="56px" />
-                      ) : (
-                        <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-on-surface-variant">person</span>
-                        </div>
-                      )}
+              notifications.map((notif) => {
+                // Safe date parsing
+                let dateObj: Date;
+                try {
+                  dateObj = new Date(notif.created_at);
+                  if (isNaN(dateObj.getTime())) dateObj = new Date();
+                } catch (e) {
+                  dateObj = new Date();
+                }
+
+                return (
+                  <div 
+                    key={notif.id} 
+                    onClick={() => markAsRead(notif.id)}
+                    className={`group bg-surface-container-low/30 hover:bg-surface-container-lowest transition-all duration-300 rounded-[2rem] p-6 flex gap-6 cursor-pointer border border-outline-variant/5 hover:border-outline-variant/20 ambient-shadow ${notif.is_read ? 'opacity-60 grayscale-[0.5]' : ''}`}
+                  >
+                    <div className="relative">
+                      <div className="w-14 h-14 rounded-2xl overflow-hidden relative border border-outline-variant/10">
+                        {notif.sender?.avatar_url ? (
+                          <Image 
+                            src={notif.sender.avatar_url} 
+                            alt={notif.sender.username || 'User'} 
+                            fill 
+                            className="object-cover" 
+                            sizes="56px" 
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-on-surface-variant">person</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className={`absolute -bottom-1 -right-1 rounded-lg p-1.5 border-2 border-surface-container-low shadow-lg bg-primary text-on-primary`}>
+                        <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          {getIcon(notif.type)}
+                        </span>
+                      </div>
                     </div>
-                    <div className={`absolute -bottom-1 -right-1 rounded-lg p-1.5 border-2 border-surface-container-low shadow-lg bg-primary text-on-primary`}>
-                      <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>
-                        {getIcon(notif.type)}
+                    
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-2">
+                        <p className="font-body text-on-surface leading-tight">
+                          <span className="font-extrabold text-on-surface">{notif.sender?.username || 'Curator'}</span> {getActionText(notif.type)}
+                        </p>
+                        <span className="text-[10px] font-bold text-on-surface-variant opacity-40 uppercase tracking-widest whitespace-nowrap ml-4">
+                          {formatDistanceToNow(dateObj, { addSuffix: true })}
+                        </span>
+                      </div>
+                      {!notif.is_read && <div className="w-2 h-2 rounded-full bg-primary mb-2" />}
+                    </div>
+                    
+                    <div className="flex flex-col justify-center">
+                      <span className="material-symbols-outlined text-on-surface-variant opacity-20 group-hover:opacity-100 group-hover:text-primary transition-all">
+                        chevron_right
                       </span>
                     </div>
                   </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="font-body text-on-surface leading-tight">
-                        <span className="font-extrabold text-on-surface">{notif.sender?.username || 'System'}</span> {getActionText(notif.type)}
-                      </p>
-                      <span className="text-[10px] font-bold text-on-surface-variant opacity-40 uppercase tracking-widest whitespace-nowrap ml-4">
-                        {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
-                      </span>
-                    </div>
-                    {!notif.is_read && <div className="w-2 h-2 rounded-full bg-primary mb-2" />}
-                  </div>
-                  
-                  <div className="flex flex-col justify-center">
-                    <span className="material-symbols-outlined text-on-surface-variant opacity-20 group-hover:opacity-100 group-hover:text-primary transition-all">
-                      chevron_right
-                    </span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 

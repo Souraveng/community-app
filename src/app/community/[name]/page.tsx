@@ -176,22 +176,23 @@ export default function CommunityPage() {
                  <div className="text-center py-20 opacity-50 font-headlines">Curating exhibits...</div>
                ) : posts.length > 0 ? (
                  posts.map((post) => (
-                   <PostCard 
-                     key={post.id}
-                     id={post.id}
-                     userId={post.user_id}
-                     user={post.username}
-                     avatar={post.user_avatar}
-                     timestamp={post.created_at}
-                     community={post.community_name}
-                     title={post.title}
-                     content={post.content}
-                     image={post.image_url}
-                     videoUrl={post.video_url}
-                     comments={post.comment_count}
-                     autoplay={profile?.autoplay_enabled ?? true}
-                     onDelete={deletePost}
-                   />
+                    <PostCard 
+                      key={post.id}
+                      id={post.id}
+                      userId={post.user_id}
+                      user={post.username}
+                      avatar={post.user_avatar}
+                      timestamp={post.created_at}
+                      community={post.community_name}
+                      title={post.title}
+                      content={post.content}
+                      image={post.image_url}
+                      videoUrl={post.video_url}
+                      comments={post.comment_count || 0}
+                      votes={post.upvotes || 0}
+                      autoplay={profile?.autoplay_enabled ?? true}
+                      onDelete={deletePost}
+                    />
                  ))
                ) : (
                  <div className="text-center py-20 bg-surface-container-low/20 rounded-[2.5rem] border border-dashed border-outline-variant/20">

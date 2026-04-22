@@ -20,12 +20,6 @@ export function useFollows(targetUserId?: string) {
 
   const checkFollowStatus = async () => {
     if (!user?.uid || !targetUserId) return;
-    
-    // Relaxed guard to allow alphanumeric Firebase UIDs
-    if (!user.uid || !targetUserId) {
-      setIsFollowing(false);
-      return;
-    }
 
     try {
       const { data, error } = await supabase
@@ -42,9 +36,6 @@ export function useFollows(targetUserId?: string) {
   };
 
   const fetchCounts = async () => {
-    if (!targetUserId) return;
-    
-    // Relaxed guard to allow alphanumeric Firebase UIDs
     if (!targetUserId) {
       setFollowerCount(0);
       setFollowingCount(0);
@@ -75,9 +66,6 @@ export function useFollows(targetUserId?: string) {
   };
 
   const follow = async () => {
-    if (!user?.uid || !targetUserId) return;
-    
-    // Relaxed guard to allow alphanumeric Firebase UIDs
     if (!user?.uid || !targetUserId) {
       console.warn('Follow action blocked: Missing User IDs.');
       return;
@@ -102,7 +90,6 @@ export function useFollows(targetUserId?: string) {
 
     } catch (err: any) {
       console.error('Error following user:', err);
-      alert(`Follow failed: ${err.message || 'Unknown error'}. Check if your Supabase "follows" table columns are TEXT instead of UUID.`);
     }
   };
 
@@ -126,7 +113,6 @@ export function useFollows(targetUserId?: string) {
       setFollowerCount(prev => prev - 1);
     } catch (err: any) {
       console.error('Error unfollowing user:', err);
-      alert(`Unfollow failed: ${err.message || 'Unknown error'}`);
     }
   };
 

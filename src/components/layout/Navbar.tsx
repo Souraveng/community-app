@@ -8,10 +8,12 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useProfile } from '@/hooks/useProfile';
 import { formatDistanceToNow } from 'date-fns';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
+  const { profile } = useProfile();
   const authenticated = !!user;
   const pathname = usePathname();
   const isLandingPage = pathname === '/';
@@ -244,14 +246,14 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center gap-3 pl-4 border-l border-outline-variant/20 ml-2">
                   <Link href="/profile" className="flex items-center gap-2 group">
                     <div className="w-8 h-8 rounded-full overflow-hidden relative border border-outline-variant/10 group-hover:border-primary transition-all">
-                      {user.photoURL ? (
-                        <Image src={user.photoURL} alt={user.displayName || 'User'} fill className="object-cover" sizes="32px" />
+                      {profile?.avatar_url || user.photoURL ? (
+                        <Image src={profile?.avatar_url || user.photoURL!} alt={profile?.username || user.displayName || 'User'} fill className="object-cover" sizes="32px" />
                       ) : (
                         <span className="material-symbols-outlined text-zinc-400">account_circle</span>
                       )}
                     </div>
-                    <span className="hidden lg:block text-xs font-bold text-on-surface truncate max-w-[100px]">
-                      {user.displayName?.split(' ')[0] || 'Curator'}
+                    <span className="hidden lg:block text-xs font-black uppercase tracking-widest text-on-surface truncate max-w-[100px]">
+                      {profile?.username || user.displayName?.split(' ')[0] || 'Curator'}
                     </span>
                   </Link>
                   <button 
