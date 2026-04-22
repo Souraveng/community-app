@@ -33,46 +33,81 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
-  const remoteStreamRef = useRef<MediaStream | null>(null);
+  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+
+  // Auto-attach streams when refs or streams change
+  useEffect(() => {
+    if (localVideoRef.current && localStreamRef.current) {
+      localVideoRef.current.srcObject = localStreamRef.current;
+    }
+  }, [callState, localVideoRef.current]);
+
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      console.log('📺 Attaching remote stream to video element');
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream, remoteVideoRef.current]);
 
   // Set up signaling channel
   useEffect(() => {
     if (!conversationId || !user) return;
 
-    const channel = supabase.channel(`call_${conversationId}`);
+    // Use a more unique channel name for signaling
+    const channel = supabase.channel(`call_signaling_${conversationId}`);
     channelRef.current = channel;
 
     channel
       .on('broadcast', { event: 'call-offer' }, async ({ payload }: any) => {
         if (payload.from === user.uid) return;
+        console.log('📞 Received call offer');
         setIncomingCall({ from: payload.from, type: payload.callType });
         setCallType(payload.callType);
 
-        // Store the offer for when user accepts
+        // Prepare the peer connection
         pcRef.current = createPeerConnection();
-        await pcRef.current.setRemoteDescription(new RTCSessionDescription(payload.offer));
+        try {
+          await pcRef.current.setRemoteDescription(new RTCSessionDescription(payload.offer));
+        } catch (err) {
+          console.error('Failed to set remote description (offer):', err);
+        }
       })
       .on('broadcast', { event: 'call-answer' }, async ({ payload }: any) => {
         if (payload.from === user.uid || !pcRef.current) return;
-        await pcRef.current.setRemoteDescription(new RTCSessionDescription(payload.answer));
-        setCallState('connected');
+        console.log('✅ Received call answer');
+        try {
+          await pcRef.current.setRemoteDescription(new RTCSessionDescription(payload.answer));
+          setCallState('connected');
+        } catch (err) {
+          console.error('Failed to set remote description (answer):', err);
+        }
       })
       .on('broadcast', { event: 'ice-candidate' }, async ({ payload }: any) => {
         if (payload.from === user.uid || !pcRef.current) return;
+        console.log('❄️ Received ICE candidate');
         try {
-          await pcRef.current.addIceCandidate(new RTCIceCandidate(payload.candidate));
+          if (pcRef.current.remoteDescription) {
+            await pcRef.current.addIceCandidate(new RTCIceCandidate(payload.candidate));
+          } else {
+            // Queue candidate or handle accordingly
+            console.warn('Received ICE candidate before remote description');
+          }
         } catch (err) {
           console.error('Error adding ICE candidate:', err);
         }
       })
       .on('broadcast', { event: 'call-end' }, ({ payload }: any) => {
         if (payload.from === user.uid) return;
+        console.log('🛑 Call ended by other party');
         endCall();
       })
-      .subscribe();
+      .subscribe((status: string) => {
+        if (status === 'SUBSCRIBED') console.log('📡 Signaling channel active');
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -80,10 +115,12 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
   }, [conversationId, user]);
 
   const createPeerConnection = useCallback(() => {
+    console.log('🏗️ Creating RTCPeerConnection');
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
 
     pc.onicecandidate = (event) => {
       if (event.candidate && channelRef.current) {
+        console.log('❄️ Sending local ICE candidate');
         channelRef.current.send({
           type: 'broadcast',
           event: 'ice-candidate',
@@ -93,38 +130,52 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
     };
 
     pc.ontrack = (event) => {
-      remoteStreamRef.current = event.streams[0];
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = event.streams[0];
+      console.log('🎬 Received remote track');
+      if (event.streams && event.streams[0]) {
+        setRemoteStream(event.streams[0]);
       }
     };
 
     pc.onconnectionstatechange = () => {
+      console.log('🔌 PeerConnection State:', pc.connectionState);
+      if (pc.connectionState === 'connected') {
+        setCallState('connected');
+      }
       if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
         endCall();
       }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log('🧊 ICE Connection State:', pc.iceConnectionState);
     };
 
     return pc;
   }, [user]);
 
   const getMediaStream = async (type: CallType) => {
-    return navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: type === 'video',
-    });
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: type === 'video',
+      });
+    } catch (err) {
+      console.error('Access denied to camera/microphone:', err);
+      throw err;
+    }
   };
 
   const startCall = async (type: CallType) => {
-    if (!user || !channelRef.current) return;
+    if (!user || !channelRef.current || isInitializing) return;
+    setIsInitializing(true);
     setCallType(type);
     setCallState('calling');
 
     try {
+      console.log(`🚀 Starting ${type} call`);
       const stream = await getMediaStream(type);
       localStreamRef.current = stream;
-      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-
+      
       const pc = createPeerConnection();
       pcRef.current = pc;
 
@@ -140,19 +191,21 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
       });
     } catch (err) {
       console.error('Error starting call:', err);
-      setCallState('idle');
+      endCall();
+    } finally {
+      setIsInitializing(false);
     }
   };
 
   const acceptCall = async () => {
-    if (!user || !pcRef.current || !channelRef.current) return;
-    setCallState('connected');
+    if (!user || !pcRef.current || !channelRef.current || isInitializing) return;
+    setIsInitializing(true);
     setIncomingCall(null);
 
     try {
+      console.log(`📥 Accepting ${callType} call`);
       const stream = await getMediaStream(callType);
       localStreamRef.current = stream;
-      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
 
       stream.getTracks().forEach((track) => pcRef.current!.addTrack(track, stream));
 
@@ -164,14 +217,18 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
         event: 'call-answer',
         payload: { answer, from: user.uid },
       });
+      
+      setCallState('connected');
     } catch (err) {
       console.error('Error accepting call:', err);
       endCall();
+    } finally {
+      setIsInitializing(false);
     }
   };
 
   const declineCall = () => {
-    setIncomingCall(null);
+    console.log('👎 Rejection callback sent');
     if (channelRef.current && user) {
       channelRef.current.send({
         type: 'broadcast',
@@ -183,11 +240,12 @@ export function useWebRTC(conversationId?: string, otherUserId?: string) {
   };
 
   const endCall = () => {
+    console.log('🏁 Terminating call session');
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
     pcRef.current?.close();
     pcRef.current = null;
     localStreamRef.current = null;
-    remoteStreamRef.current = null;
+    setRemoteStream(null);
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
     setCallState('idle');
