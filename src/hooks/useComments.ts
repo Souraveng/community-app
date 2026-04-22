@@ -17,22 +17,22 @@ export interface Comment {
   replies?: Comment[];
 }
 
-export function useComments(postId: string) {
+export function useComments(postId?: string, listingId?: string) {
   const { user } = useAuth();
   const { profile } = useProfile();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (postId) {
+    if (postId || listingId) {
       fetchComments();
     }
-  }, [postId]);
+  }, [postId, listingId]);
 
   // Removed restrictive UUID validation to support Firebase UIDs
 
   const fetchComments = async () => {
-    if (!postId) {
+    if (!postId && !listingId) {
       setComments([]);
       setLoading(false);
       return;
@@ -49,7 +49,7 @@ export function useComments(postId: string) {
             avatar_url
           )
         `)
-        .eq('post_id', postId)
+        .filter(postId ? 'post_id' : 'listing_id', 'eq', postId || listingId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -88,7 +88,8 @@ export function useComments(postId: string) {
 
     try {
       const { data, error } = await supabase.from('comments').insert({
-        post_id: postId,
+        post_id: postId || null,
+        listing_id: listingId || null,
         user_id: user.uid,
         parent_id: parentId,
         content: content.trim()
@@ -143,6 +144,17 @@ export function useComments(postId: string) {
         if (post && post.user_id !== user.uid) {
           receiverId = post.user_id;
         }
+      } else if (listingId) {
+        // Find listing owner
+        const { data: listing } = await supabase
+          .from('marketplace_listings')
+          .select('user_id')
+          .eq('id', listingId)
+          .single();
+        
+        if (listing && listing.user_id !== user.uid) {
+          receiverId = listing.user_id;
+        }
       }
 
       if (receiverId) {
@@ -150,7 +162,7 @@ export function useComments(postId: string) {
           sender_id: user.uid,
           receiver_id: receiverId,
           type: type === 'reply' ? 'comment' : 'comment', // Mapping to existing notification type
-          target_id: postId,
+          target_id: postId || listingId,
           is_read: false
         });
       }

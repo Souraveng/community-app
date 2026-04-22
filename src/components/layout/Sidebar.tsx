@@ -23,6 +23,7 @@ const Sidebar = () => {
   const menuItems = [
     { name: 'Home', icon: 'home', path: '/home' },
     { name: 'Explore', icon: 'explore', path: '/explore' },
+    { name: 'Marketplace', icon: 'storefront', path: '/marketplace' },
     { name: 'Communities', icon: 'groups', path: '/communities' },
     { name: 'Creators', icon: 'person', path: '/creators' },
     { name: 'Messages', icon: 'forum', path: '/chat' },

@@ -12,6 +12,8 @@ export interface Post {
   username: string;
   user_avatar: string | null;
   upvotes: number;
+  upvote_count: number;
+  downvote_count: number;
   comment_count: number;
   created_at: string;
 }

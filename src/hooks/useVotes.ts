@@ -7,33 +7,46 @@ export type VoteType = 1 | -1 | null;
 export function useVotes(postId: string) {
   const { user } = useAuth();
   const [userVote, setUserVote] = useState<VoteType>(null);
+  const [counts, setCounts] = useState({ upvoteCount: 0, downvoteCount: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.uid && postId) {
-      fetchUserVote();
-    } else {
-      setLoading(false);
+    if (postId) {
+      fetchData();
     }
   }, [user?.uid, postId]);
 
-  const fetchUserVote = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('post_votes')
-        .select('vote_type')
-        .eq('post_id', postId)
-        .eq('user_id', user?.uid)
-        .single();
+      // 1. Fetch user's personal vote
+      if (user?.uid) {
+        const { data: voteData, error: voteError } = await supabase
+          .from('post_votes')
+          .select('vote_type')
+          .eq('post_id', postId)
+          .eq('user_id', user.uid)
+          .single();
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
+        if (voteError && voteError.code !== 'PGRST116') throw voteError;
+        setUserVote(voteData ? (voteData.vote_type as VoteType) : null);
       }
 
-      setUserVote(data ? (data.vote_type as VoteType) : null);
+      // 2. Fetch aggregate counts from the post itself
+      const { data: postData, error: postError } = await supabase
+        .from('posts')
+        .select('upvote_count, downvote_count')
+        .eq('id', postId)
+        .single();
+
+      if (postError) throw postError;
+      setCounts({
+        upvoteCount: postData?.upvote_count || 0,
+        downvoteCount: postData?.downvote_count || 0
+      });
+
     } catch (err) {
-      console.error('Error fetching user vote:', err);
+      console.error('Error fetching votes data:', err);
     } finally {
       setLoading(false);
     }
@@ -42,62 +55,42 @@ export function useVotes(postId: string) {
   const vote = async (type: 1 | -1) => {
     if (!user?.uid) return false;
 
-    // Calculate the increment/decrement for the post's counter
-    let delta = 0;
-    const newVote = userVote === type ? null : type;
-
-    if (userVote === null) {
-      // First time voting
-      delta = type;
-    } else if (userVote === type) {
-      // Removing existing vote
-      delta = -type;
-    } else {
-      // Switching votes (from up to down or vice versa)
-      delta = type * 2;
-    }
+    // Toggle: if clicking same type, we send 0 (remove) to RPC
+    const targetVote = userVote === type ? 0 : type;
 
     try {
-      // 1. Update post_votes table
-      if (newVote === null) {
-        await supabase
-          .from('post_votes')
-          .delete()
-          .eq('post_id', postId)
-          .eq('user_id', user.uid);
-      } else {
-        await supabase
-          .from('post_votes')
-          .upsert({
-            post_id: postId,
-            user_id: user.uid,
-            vote_type: newVote
-          });
-      }
+      // Call Atomic RPC
+      const { error } = await supabase.rpc('handle_post_vote', {
+        p_post_id: postId,
+        p_user_id: user.uid,
+        p_vote_type: targetVote
+      });
 
-      // 2. Update the aggregate count in posts table
-      // We use the 'upvotes' column to store the net SCORE (Upvotes - Downvotes)
-      const { data: postData } = await supabase
+      if (error) throw error;
+
+      // Update local state
+      setUserVote(targetVote === 0 ? null : (targetVote as VoteType));
+      
+      // Refetch counts to be precise
+      const { data: updatedPost } = await supabase
         .from('posts')
-        .select('upvotes')
+        .select('upvote_count, downvote_count')
         .eq('id', postId)
         .single();
       
-      const currentScore = postData?.upvotes || 0;
-      const finalScore = currentScore + delta;
-      
-      await supabase
-        .from('posts')
-        .update({ upvotes: finalScore })
-        .eq('id', postId);
+      if (updatedPost) {
+        setCounts({
+          upvoteCount: updatedPost.upvote_count,
+          downvoteCount: updatedPost.downvote_count
+        });
+      }
 
-      setUserVote(newVote);
       return true;
     } catch (err) {
-      console.error('Error submitting vote:', err);
+      console.error('Error submitting vote via RPC:', err);
       return false;
     }
   };
 
-  return { userVote, vote, loading };
+  return { userVote, upvoteCount: counts.upvoteCount, downvoteCount: counts.downvoteCount, vote, loading, refresh: fetchData };
 }

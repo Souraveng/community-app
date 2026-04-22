@@ -16,6 +16,8 @@ import { useUserCommunities } from '../../../hooks/useUserCommunities';
 import { uploadFile } from '../../../lib/storage';
 import { usePosts } from '../../../hooks/usePosts';
 import PostCard from '../../../components/common/PostCard';
+import { useMarketplace } from '../../../hooks/useMarketplace';
+import MarketListingCard from '../../../components/marketplace/MarketListingCard';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function UserProfilePage() {
@@ -51,7 +53,7 @@ export default function UserProfilePage() {
     username: '',
     last_username_change: null as string | null
   });
-  const [activeTab, setActiveTab] = useState<'Collection' | 'Saved' | 'Communities' | 'Drafts'>('Collection');
+  const [activeTab, setActiveTab] = useState<'Collection' | 'Saved' | 'Communities' | 'Drafts' | 'Marketplace'>('Collection');
   const [showConnections, setShowConnections] = useState<'followers' | 'following' | null>(null);
   const [connectionList, setConnectionList] = useState<any[]>([]);
   const [loadingConnections, setLoadingConnections] = useState(false);
@@ -461,17 +463,19 @@ export default function UserProfilePage() {
             {/* Right Column: Feed/Content */}
             <div className="lg:col-span-8">
                 <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                  {(['Collection', 'Communities', isOwnProfile && 'Saved', isOwnProfile && 'Drafts'].filter(Boolean) as string[]).map((tab) => (
+                  {(['Collection', 'Marketplace', 'Communities', isOwnProfile && 'Saved', isOwnProfile && 'Drafts'].filter(Boolean) as string[]).map((tab) => (
                     <button 
                       key={tab} 
                       onClick={() => setActiveTab(tab as any)}
                       className={`pb-4 text-[10px] md:text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === tab ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
                     >
                       {tab}
-                      {activeTab === tab && <span className="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-full" />}
+                      {activeTab === tab && (
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full animate-in fade-in slide-in-from-bottom-1" />
+                      )}
                     </button>
                   ))}
-               </div>
+                </div>
 
                {activeTab === 'Collection' && (
                  <div className="flex flex-col gap-8">
@@ -594,11 +598,15 @@ export default function UserProfilePage() {
                  </div>
                )}
 
-               {activeTab === 'Drafts' && (
-                 <div className="py-24 text-center">
-                   <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest opacity-40">Coming Soon to your Space</p>
-                 </div>
-               )}
+                {activeTab === 'Drafts' && (
+                  <div className="py-24 text-center">
+                    <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest opacity-40">Coming Soon to your Space</p>
+                  </div>
+                )}
+
+                {activeTab === 'Marketplace' && (
+                  <MarketplaceTab userId={profile?.id} />
+                )}
             </div>
 
           </div>
@@ -659,6 +667,35 @@ export default function UserProfilePage() {
           )}
         </main>
       </div>
+    </div>
+  );
+}
+
+function MarketplaceTab({ userId }: { userId?: string }) {
+  const { listings, loading } = useMarketplace();
+  const userListings = listings.filter(l => l.user_id === userId);
+
+  return (
+    <div className="space-y-8">
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="aspect-square rounded-[2.5rem] bg-surface-container-low animate-pulse" />
+          ))}
+        </div>
+      ) : userListings.length === 0 ? (
+        <div className="py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
+          <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">storefront</span>
+          <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Active Listings</p>
+          <p className="text-sm text-on-surface-variant/60 mt-2">Browse the marketplace to start your auction journey.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {userListings.map(listing => (
+            <MarketListingCard key={listing.id} listing={listing} isOwner={true} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

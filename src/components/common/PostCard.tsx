@@ -10,6 +10,7 @@ import { useFollows } from '../../hooks/useFollows';
 import { formatDistanceToNow } from 'date-fns';
 import DeleteDialog from './DeleteDialog';
 import Link from 'next/link';
+import ImageModal from './ImageModal';
 
 interface PostCardProps {
   id: string;
@@ -48,30 +49,11 @@ const PostCard: React.FC<PostCardProps> = ({
 }) => {
   const { user: authUser } = useAuth();
   const { isSaved, toggleSave } = useSavedPosts(id);
-  const { userVote, vote } = useVotes(id);
+  const { userVote, vote, upvoteCount, downvoteCount } = useVotes(id);
   const { isFollowing, follow, unfollow } = useFollows(userId);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  // Local vote score for instant feedback
-  const [currentVotes, setCurrentVotes] = useState(initialVotes);
-
-  const handleVote = async (type: 1 | -1) => {
-    if (!authUser) return;
-    
-    // Optimistic Update
-    let delta = 0;
-    if (userVote === null) delta = type;
-    else if (userVote === type) delta = -type;
-    else delta = type * 2;
-    
-    setCurrentVotes(prev => prev + delta);
-    const success = await vote(type);
-    if (!success) {
-      // Rollback if failed
-      setCurrentVotes(prev => prev - delta);
-    }
-  };
+  const [showImageModal, setShowImageModal] = useState(false);
 
   const handleFollow = async () => {
     if (!authUser) return;
@@ -188,41 +170,56 @@ const PostCard: React.FC<PostCardProps> = ({
 
             {/* Media Section */}
             {(videoUrl || image) && (
-              <Link href={`/post/${id}`}>
-                <div className="rounded-[2rem] overflow-hidden aspect-video mb-6 cursor-pointer relative group/img bg-surface-container-highest border border-outline-variant/10 shadow-sm">
-                    {videoUrl ? (
-                      <video src={videoUrl} autoPlay={autoplay} muted loop playsInline className="w-full h-full object-cover" />
-                    ) : (
-                      image && (
-                        <Image 
-                          src={image} 
-                          alt={title} 
-                          fill 
-                          className="object-cover transition-transform duration-700 group-hover/img:scale-105" 
-                          sizes="(max-width: 768px) 100vw, 800px"
-                        />
-                      )
-                    )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity" />
-                </div>
-              </Link>
+              <div className="relative group/img aspect-video mb-6 rounded-[2rem] overflow-hidden border border-outline-variant/10 shadow-sm bg-surface-container-highest">
+                {videoUrl ? (
+                  <Link href={`/post/${id}`} className="block w-full h-full">
+                    <video src={videoUrl} autoPlay={autoplay} muted loop playsInline className="w-full h-full object-cover" />
+                  </Link>
+                ) : (
+                  image && (
+                    <div 
+                      className="w-full h-full cursor-zoom-in relative"
+                      onClick={() => setShowImageModal(true)}
+                    >
+                      <Image 
+                        src={image} 
+                        alt={title} 
+                        fill 
+                        className="object-cover transition-transform duration-700 group-hover/img:scale-105" 
+                        sizes="(max-width: 768px) 100vw, 800px"
+                      />
+                      <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="material-symbols-outlined text-white text-4xl scale-50 group-hover/img:scale-100 transition-transform duration-500">zoom_in</span>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
             )}
 
             <div className="flex items-center gap-6">
               <div className="flex items-center bg-surface-container-low border border-outline-variant/10 rounded-full px-2">
                 <button 
-                  onClick={() => handleVote(1)}
+                  onClick={() => vote(1)}
                   className={`p-2 transition-all hover:scale-110 active:scale-95 ${userVote === 1 ? 'text-primary' : 'text-on-surface-variant'}`}
                 >
                   <span className={`material-symbols-outlined text-lg ${userVote === 1 ? 'fill-1' : ''}`}>arrow_upward</span>
                 </button>
-                <span className="text-[10px] font-black w-4 text-center">{currentVotes}</span>
+                
+                {/* Always show upvote count */}
+                <span className="text-[10px] font-black w-4 text-center">{upvoteCount}</span>
+
                 <button 
-                  onClick={() => handleVote(-1)}
+                  onClick={() => vote(-1)}
                   className={`p-2 transition-all hover:scale-110 active:scale-95 ${userVote === -1 ? 'text-secondary' : 'text-on-surface-variant'}`}
                 >
                   <span className={`material-symbols-outlined text-lg ${userVote === -1 ? 'fill-1' : ''}`}>arrow_downward</span>
                 </button>
+
+                {/* Only show downvote count to the owner */}
+                {authUser?.uid === userId && downvoteCount > 0 && (
+                  <span className="text-[10px] font-black w-4 text-center text-secondary opacity-60 mr-2">-{downvoteCount}</span>
+                )}
               </div>
 
               <Link href={`/post/${id}`} className="flex items-center gap-2 text-on-surface-variant font-black text-[10px] uppercase tracking-widest hover:text-primary transition-all">
@@ -259,6 +256,14 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
       </article>
+
+      {showImageModal && image && (
+        <ImageModal 
+          imageUrl={image} 
+          title={title} 
+          onClose={() => setShowImageModal(false)}
+        />
+      )}
     </>
   );
 };
