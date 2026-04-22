@@ -14,9 +14,10 @@ interface MarketListingCardProps {
   listing: any;
   isOwner?: boolean;
   onAcceptBid?: (bid: any) => void;
+  onDelete?: (listingId: string) => void;
 }
 
-const MarketListingCard: React.FC<MarketListingCardProps> = ({ listing, isOwner, onAcceptBid }) => {
+const MarketListingCard: React.FC<MarketListingCardProps> = ({ listing, isOwner, onAcceptBid, onDelete }) => {
   const { user } = useAuth();
   const { bids, placeBid, acceptBid, loading: bidsLoading } = useBids(listing.id);
   const [bidAmount, setBidAmount] = useState<number>(listing.current_highest_bid + 1);
@@ -40,6 +41,13 @@ const MarketListingCard: React.FC<MarketListingCardProps> = ({ listing, isOwner,
 
   const handlePlaceBid = async () => {
     if (!user) return;
+    
+    // MAX BID LIMIT: 10,000,000
+    if (bidAmount > 10000000) {
+      setError('Curation Limit: 10,000,000 max.');
+      return;
+    }
+
     setError(null);
     try {
       await placeBid(bidAmount);
@@ -47,6 +55,11 @@ const MarketListingCard: React.FC<MarketListingCardProps> = ({ listing, isOwner,
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this listing? This action is permanent.')) return;
+    if (onDelete) onDelete(listing.id);
   };
 
   const handleAccept = async (bid: any) => {
@@ -84,9 +97,20 @@ const MarketListingCard: React.FC<MarketListingCardProps> = ({ listing, isOwner,
       <div className="p-8">
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1 mr-4">
-            <Link href={`/marketplace/${listing.id}`}>
-              <h3 className="text-2xl font-black font-headlines tracking-tighter text-on-surface hover:text-primary transition-colors mb-1 truncate">{listing.title}</h3>
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href={`/marketplace/${listing.id}`} className="flex-1">
+                <h3 className="text-2xl font-black font-headlines tracking-tighter text-on-surface hover:text-primary transition-colors mb-1 truncate">{listing.title}</h3>
+              </Link>
+              {isOwner && onDelete && (
+                <button 
+                  onClick={handleDelete}
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                  title="Delete Listing"
+                >
+                  <span className="material-symbols-outlined text-sm">delete</span>
+                </button>
+              )}
+            </div>
             <p className="text-[10px] font-bold text-primary font-headlines uppercase tracking-widest flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">person</span> u/{listing.seller_name}
             </p>

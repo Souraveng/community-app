@@ -22,28 +22,63 @@ export function useBids(listingId?: string) {
     if (listingId) {
       fetchBids();
 
+      // Self-healing Realtime Logic
       const channelId = `bids_${listingId}_${Math.random().toString(36).substring(7)}`;
-      const channel = supabase
-        .channel(channelId)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'bids',
-          filter: `listing_id=eq.${listingId}`
-        }, () => {
-          fetchBids();
-        })
-        .subscribe();
+      const channel = supabase.channel(channelId);
+      
+      let retryCount = 0;
+      const maxRetries = 2;
+      let pollingTimer: NodeJS.Timeout | null = null;
+
+      const startPolling = () => {
+        if (pollingTimer) return;
+        console.log('🔄 Bids Realtime unreliable. Starting background polling...');
+        pollingTimer = setInterval(fetchBids, 5000);
+      };
+
+      const subscribe = () => {
+        channel
+          .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'bids',
+            // BROAD LISTENING: Filter in JS to bypass Postgres syntax errors
+            // filter: `listing_id=eq.${listingId}`
+          }, (payload: any) => {
+            const bid = payload.new;
+            if (bid.listing_id === listingId) {
+              fetchBids();
+            }
+          })
+          .subscribe((status: string) => {
+            if (status === 'CHANNEL_ERROR') {
+              console.warn('Bids Realtime Error. Retry:', retryCount);
+              if (retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(subscribe, 2000 * retryCount);
+              } else {
+                startPolling();
+              }
+            } else if (status === 'SUBSCRIBED') {
+              console.log('✅ Bids Realtime connected');
+              retryCount = 0;
+            }
+          });
+      };
+
+      subscribe();
 
       return () => {
         supabase.removeChannel(channel);
+        if (pollingTimer) clearInterval(pollingTimer);
       };
     }
   }, [listingId]);
 
   const fetchBids = async () => {
     if (!listingId) return;
-    setLoading(true);
+    // Don't set loading on repeats to avoid flickering
+    // setLoading(true); 
     try {
       const { data, error } = await supabase
         .from('bids')
@@ -55,7 +90,7 @@ export function useBids(listingId?: string) {
         .order('amount', { ascending: false });
 
       if (error) throw error;
-
+      
       const processed = (data || []).map((b: any) => ({
         ...b,
         bidder_name: b.profiles?.username,
@@ -72,6 +107,11 @@ export function useBids(listingId?: string) {
 
   const placeBid = async (amount: number) => {
     if (!user || !listingId) return null;
+
+    // MAX BID LIMIT: 10,000,000
+    if (amount > 10000000) {
+      throw new Error('Bid exceeds the curation limit of 10,000,000.');
+    }
 
     try {
       // 1. Check if bid is higher than current highest

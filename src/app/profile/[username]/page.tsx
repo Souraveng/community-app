@@ -605,7 +605,7 @@ export default function UserProfilePage() {
                 )}
 
                 {activeTab === 'Marketplace' && (
-                  <MarketplaceTab userId={profile?.id} />
+                  <MarketplaceTab userId={profile?.id} isOwnProfile={isOwnProfile} />
                 )}
             </div>
 
@@ -671,8 +671,8 @@ export default function UserProfilePage() {
   );
 }
 
-function MarketplaceTab({ userId }: { userId?: string }) {
-  const { listings, loading } = useMarketplace();
+function MarketplaceTab({ userId, isOwnProfile }: { userId?: string, isOwnProfile: boolean }) {
+  const { listings, loading, deleteListing } = useMarketplace();
   const userListings = listings.filter(l => l.user_id === userId);
 
   return (
@@ -692,7 +692,12 @@ function MarketplaceTab({ userId }: { userId?: string }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {userListings.map(listing => (
-            <MarketListingCard key={listing.id} listing={listing} isOwner={true} />
+            <MarketListingCard 
+              key={listing.id} 
+              listing={listing} 
+              isOwner={isOwnProfile} 
+              onDelete={isOwnProfile ? deleteListing : undefined}
+            />
           ))}
         </div>
       )}

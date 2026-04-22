@@ -93,6 +93,38 @@ export function useMarketplace() {
     }
   };
 
+  const deleteListing = async (listingId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketplace_listings')
+        .delete()
+        .eq('id', listingId);
+      
+      if (error) throw error;
+      fetchListings();
+      return true;
+    } catch (err) {
+      console.error('Error deleting listing:', err);
+      return false;
+    }
+  };
+
+  const markAsSold = async (listingId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketplace_listings')
+        .update({ status: 'sold' })
+        .eq('id', listingId);
+      
+      if (error) throw error;
+      fetchListings();
+      return true;
+    } catch (err) {
+      console.error('Error marking as sold:', err);
+      return false;
+    }
+  };
+
   const closeListing = async (listingId: string) => {
     try {
       const { error } = await supabase
@@ -101,44 +133,29 @@ export function useMarketplace() {
         .eq('id', listingId);
       
       if (error) throw error;
+      fetchListings();
     } catch (err) {
       console.error('Error closing listing:', err);
     }
   };
 
-  return { listings, loading, createListing, closeListing, refresh: fetchListings };
+  return { 
+    listings, 
+    loading, 
+    createListing, 
+    closeListing, 
+    deleteListing, 
+    markAsSold, 
+    refresh: fetchListings 
+  };
 }
 
 export function useListing(listingId?: string) {
   const [listing, setListing] = useState<MarketplaceListing | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (listingId) {
-      fetchListing();
-
-      const channelId = `listing_${listingId}_${Math.random().toString(36).substring(7)}`;
-      const channel = supabase
-        .channel(channelId)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'marketplace_listings',
-          filter: `id=eq.${listingId}`
-        }, () => {
-          fetchListing();
-        })
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [listingId]);
-
   const fetchListing = async () => {
     if (!listingId) return;
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('marketplace_listings')
@@ -165,5 +182,74 @@ export function useListing(listingId?: string) {
     }
   };
 
-  return { listing, loading, refresh: fetchListing };
+  const markAsSold = async (listingId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketplace_listings')
+        .update({ status: 'sold' })
+        .eq('id', listingId);
+      
+      if (error) throw error;
+      fetchListing();
+      return true;
+    } catch (err) {
+      console.error('Error marking as sold:', err);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (listingId) {
+      fetchListing();
+
+      // Self-healing Realtime Logic
+      const channelId = `listing_${listingId}_${Math.random().toString(36).substring(7)}`;
+      const channel = supabase.channel(channelId);
+      
+      let retryCount = 0;
+      const maxRetries = 2;
+      let pollingTimer: NodeJS.Timeout | null = null;
+
+      const startPolling = () => {
+        if (pollingTimer) return;
+        pollingTimer = setInterval(fetchListing, 5000);
+      };
+
+      const subscribe = () => {
+        channel
+          .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'marketplace_listings',
+            // BROAD LISTENING: Filter in JS to bypass Postgres syntax errors
+            // filter: `id=eq.${listingId}`
+          }, (payload: any) => {
+            if (payload.new?.id === listingId || payload.old?.id === listingId) {
+              fetchListing();
+            }
+          })
+          .subscribe((status: string) => {
+            if (status === 'CHANNEL_ERROR') {
+              if (retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(subscribe, 2000);
+              } else {
+                startPolling();
+              }
+            } else if (status === 'SUBSCRIBED') {
+              retryCount = 0;
+            }
+          });
+      };
+
+      subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+        if (pollingTimer) clearInterval(pollingTimer);
+      };
+    }
+  }, [listingId]);
+
+  return { listing, loading, markAsSold, refresh: fetchListing };
 }

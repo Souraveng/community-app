@@ -19,8 +19,8 @@ export default function MarketplaceDetailPage() {
   const router = useRouter();
   const { user } = useAuth();
   
-  const { listing, loading: listingLoading } = useListing(id as string);
-  const { bids, placeBid, loading: bidsLoading } = useBids(id as string);
+  const { listing, loading: listingLoading, markAsSold: apiMarkAsSold } = useListing(id as string);
+  const { bids, placeBid, acceptBid, loading: bidsLoading } = useBids(id as string);
   const { comments, loading: commentsLoading, addComment } = useComments(undefined, id as string);
   
   const [bidAmount, setBidAmount] = useState<string>('');
@@ -28,6 +28,10 @@ export default function MarketplaceDetailPage() {
   const [submittingBid, setSubmittingBid] = useState(false);
   const [postingComment, setPostingComment] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [acceptingBidId, setAcceptingBidId] = useState<string | null>(null);
+  const [isSelling, setIsSelling] = useState(false);
+
+  const isOwner = user?.uid === listing?.user_id;
 
   const handlePlaceBid = async () => {
     if (!user) {
@@ -36,6 +40,13 @@ export default function MarketplaceDetailPage() {
     }
     
     const amount = parseFloat(bidAmount);
+    
+    // VALIDATION: 10,000,000 Max Bid
+    if (amount > 10000000) {
+      setError('Curation Limit Exceeded: Bids cannot exceed 10,000,000.');
+      return;
+    }
+
     if (isNaN(amount) || amount <= (listing?.current_highest_bid || 0)) {
       setError(`Bid must be higher than ${listing?.currency === 'INR' ? '₹' : '$'}${listing?.current_highest_bid}`);
       return;
@@ -51,6 +62,26 @@ export default function MarketplaceDetailPage() {
     } finally {
       setSubmittingBid(false);
     }
+  };
+
+  const handleAcceptBid = async (bid: any) => {
+    if (!confirm(`Are you sure you want to accept u/${bid.bidder_name}'s bid of ${listing?.currency === 'INR' ? '₹' : '$'}${bid.amount}? This will end the auction.`)) {
+      return;
+    }
+    
+    setAcceptingBidId(bid.id);
+    const success = await acceptBid(bid);
+    if (success) {
+      // Could add confetti here
+    }
+    setAcceptingBidId(null);
+  };
+
+  const handleMarkAsSold = async () => {
+    if (!confirm('Mark this item as sold manually? This will prevent further bidding.')) return;
+    setIsSelling(true);
+    await apiMarkAsSold(id as string);
+    setIsSelling(false);
   };
 
   const handlePostComment = async () => {
@@ -103,8 +134,21 @@ export default function MarketplaceDetailPage() {
             <div className="lg:col-span-5 space-y-8">
               <div className="p-10 bg-surface-container-lowest rounded-[3rem] border border-outline-variant/10 shadow-2xl relative overflow-hidden">
                 {/* Status Badge */}
-                <div className="absolute top-8 right-8 px-4 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20">
-                  {listing.status}
+                <div className="absolute top-8 right-8 flex items-center gap-2">
+                  {isOwner && listing.status === 'open' && (
+                    <button 
+                      onClick={handleMarkAsSold}
+                      disabled={isSelling}
+                      className="px-3 py-1 rounded-full bg-secondary/10 text-secondary text-[9px] font-black uppercase tracking-widest border border-secondary/20 hover:bg-secondary/20 transition-all"
+                    >
+                      {isSelling ? 'Processing...' : 'Mark as Sold'}
+                    </button>
+                  )}
+                  <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                    listing.status === 'sold' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'
+                  }`}>
+                    {listing.status}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-4 mb-8">
@@ -186,17 +230,41 @@ export default function MarketplaceDetailPage() {
                   {bids.length === 0 ? (
                     <p className="text-center py-10 text-[10px] font-black uppercase tracking-widest text-on-surface-variant/20">No bids placed encrypted</p>
                   ) : bids.map((bid) => (
-                    <div key={bid.id} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-outline-variant/5">
+                    <div key={bid.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
+                      bid.status === 'accepted' ? 'bg-green-500/10 border-green-500/30' : 'bg-white/5 border-outline-variant/5'
+                    }`}>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg overflow-hidden relative bg-surface-container-high">
                           {bid.bidder_avatar && <Image src={bid.bidder_avatar} alt={bid.bidder_name || ''} fill className="object-cover" />}
                         </div>
                         <div>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-on-surface">u/{bid.bidder_name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-on-surface">u/{bid.bidder_name}</p>
+                            {bid.status === 'accepted' && (
+                              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-500 text-[8px] font-black uppercase tracking-widest text-black">
+                                <span className="material-symbols-outlined text-[10px]">trophy</span> Winner
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[9px] font-bold text-on-surface-variant/40">{formatDistanceToNow(new Date(bid.created_at), { addSuffix: true })}</p>
                         </div>
                       </div>
-                      <p className="font-headlines font-black text-secondary">{currencySymbol}{bid.amount}</p>
+                      
+                      <div className="flex items-center gap-4">
+                        <p className={`font-headlines font-black ${bid.status === 'accepted' ? 'text-green-500 text-xl' : 'text-secondary'}`}>
+                          {currencySymbol}{bid.amount}
+                        </p>
+                        
+                        {isOwner && listing.status === 'open' && (
+                          <button 
+                            onClick={() => handleAcceptBid(bid)}
+                            disabled={!!acceptingBidId}
+                            className="bg-primary text-black px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                          >
+                            {acceptingBidId === bid.id ? 'Connecting...' : 'Accept'}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
