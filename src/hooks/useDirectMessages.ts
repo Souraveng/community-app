@@ -23,21 +23,55 @@ export function useDirectMessages() {
       // Fetch conversations directly without strict UUID formatting guard
       fetchConversations();
       
-      // Real-time subscription for new conversations or status changes
-      const channel = supabase
-        .channel(`conversations_${user.uid}`)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'conversations',
-          filter: `participants=cs.{${user.uid}}`
-        }, () => {
-          fetchConversations();
-        })
-        .subscribe();
+      // Self-healing Realtime Logic
+      const channelName = `conversations_realtime_${user.uid}_${Date.now()}`;
+      const channel = supabase.channel(channelName);
+      
+      let retryCount = 0;
+      const maxRetries = 2;
+      let pollingTimer: NodeJS.Timeout | null = null;
+
+      const startPolling = () => {
+        if (pollingTimer) return;
+        console.log('🔄 Realtime unreliable. Starting background polling for conversations...');
+        pollingTimer = setInterval(fetchConversations, 10000); // 10s for the sidebar list
+      };
+
+      const subscribe = () => {
+        channel
+          .on('postgres_changes', { 
+            event: '*', // Listen to status updates and last_message_at updates
+            schema: 'public', 
+            table: 'conversations',
+            // BROAD LISTENING: Filter in JS to bypass Postgres array syntax issues
+            // filter: `participants=cs.{${user.uid}}`
+          }, (payload: any) => {
+            const conv = payload.new;
+            if (conv.participants?.includes(user.uid)) {
+              fetchConversations();
+            }
+          })
+          .subscribe((status: string) => {
+            if (status === 'CHANNEL_ERROR') {
+              console.warn('Conversations Realtime Error. Retry:', retryCount);
+              if (retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(subscribe, 2000 * retryCount);
+              } else {
+                startPolling();
+              }
+            } else if (status === 'SUBSCRIBED') {
+              console.log('✅ Realtime conversations connected');
+              retryCount = 0;
+            }
+          });
+      };
+
+      subscribe();
 
       return () => {
         supabase.removeChannel(channel);
+        if (pollingTimer) clearInterval(pollingTimer);
       };
     }
   }, [user?.uid]);

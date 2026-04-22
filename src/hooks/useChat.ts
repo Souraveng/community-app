@@ -37,24 +37,86 @@ export function useChat(conversationId?: string) {
       fetchMessages();
       checkMessagingConstraints();
 
-      // Subscribe to new messages
-      const channel = supabase
-        .channel(`chat_${conversationId}`)
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`
-        }, async (payload: any) => {
-          const msg = payload.new as Message;
-          const decrypted = await decryptSingle(msg);
-          setMessages(prev => [...prev, decrypted]);
-          checkMessagingConstraints();
-        })
-        .subscribe();
+      // Self-healing Realtime Logic
+      const channelName = `chat_realtime_${conversationId}_${Date.now()}`;
+      const channel = supabase.channel(channelName);
+      
+      let retryCount = 0;
+      const maxRetries = 2;
+      let pollingTimer: NodeJS.Timeout | null = null;
+
+      const startPolling = () => {
+        if (pollingTimer) return;
+        console.log('🔄 Realtime unreliable. Starting background polling for chat...');
+        pollingTimer = setInterval(fetchMessages, 5000);
+      };
+
+      const subscribe = () => {
+        channel
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            // BROAD LISTENING: Remove filter to bypass Postgres syntax/type issues
+            // filter: `conversation_id=eq.${conversationId}` 
+          }, async (payload: any) => {
+            const msg = payload.new as Message;
+            
+            // CLIENT-SIDE FILTERING (Safer)
+            if (msg.conversation_id !== conversationId) return;
+
+            // Prevent duplicates (especially if polling is also active)
+            setMessages(prev => {
+              if (prev.some(m => m.id === msg.id)) return prev;
+              
+              // Process decryption for the new message
+              (async () => {
+                let currentOtherId = otherUserId;
+                if (!currentOtherId) {
+                  const { data: conv } = await supabase
+                    .from('conversations')
+                    .select('participants')
+                    .eq('id', conversationId)
+                    .single();
+                  currentOtherId = conv?.participants.find((id: string) => id !== user.uid);
+                }
+
+                const decrypted = currentOtherId 
+                  ? await decryptSingle(msg, currentOtherId)
+                  : { ...msg, decryptedContent: msg.content };
+
+                setMessages(innerPrev => {
+                  if (innerPrev.some(m => m.id === msg.id && m.decryptedContent)) return innerPrev;
+                  return [...innerPrev.filter(m => m.id !== msg.id), decrypted];
+                });
+              })();
+
+              return [...prev, { ...msg, decryptedContent: '' }]; // Add placeholder while decrypting
+            });
+            
+            checkMessagingConstraints();
+          })
+          .subscribe((status: string) => {
+            if (status === 'CHANNEL_ERROR') {
+              console.warn('Chat Realtime Error. Retry:', retryCount);
+              if (retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(subscribe, 2000 * retryCount);
+              } else {
+                startPolling();
+              }
+            } else if (status === 'SUBSCRIBED') {
+              console.log('✅ Realtime chat connected');
+              retryCount = 0;
+            }
+          });
+      };
+
+      subscribe();
 
       return () => {
         supabase.removeChannel(channel);
+        if (pollingTimer) clearInterval(pollingTimer);
       };
     }
   }, [conversationId, user?.uid]);
@@ -75,12 +137,13 @@ export function useChat(conversationId?: string) {
     }
   };
 
-  const decryptSingle = async (msg: Message): Promise<Message> => {
-    if (!user?.uid || !otherUserId || !msg.iv || msg.type !== 'text') {
+  const decryptSingle = async (msg: Message, otherIdOverride?: string): Promise<Message> => {
+    const finalOtherId = otherIdOverride || otherUserId;
+    if (!user?.uid || !finalOtherId || !msg.iv || msg.type !== 'text') {
       return { ...msg, decryptedContent: msg.content };
     }
     try {
-      const decrypted = await decryptMessage(msg.content, msg.iv, user.uid, otherUserId);
+      const decrypted = await decryptMessage(msg.content, msg.iv, user.uid, finalOtherId);
       return { ...msg, decryptedContent: decrypted };
     } catch {
       return { ...msg, decryptedContent: msg.content };
@@ -167,21 +230,39 @@ export function useChat(conversationId?: string) {
       return false;
     }
 
+    // Create a temporary ID for the optimistic message
+    const tempId = `temp_${Date.now()}`;
+    const optimisticMessage: Message = {
+      id: tempId,
+      conversation_id: conversationId,
+      sender_id: user.uid,
+      content: content.trim(),
+      decryptedContent: content.trim(), // We already know the plaintext
+      is_read: false,
+      created_at: new Date().toISOString(),
+      type: 'text'
+    };
+
+    // Optimistically add to state
+    setMessages(prev => [...prev.filter(m => !m.id.startsWith('temp_')), optimisticMessage]);
+
     try {
       // Get other user ID for encryption
-      const { data: conv } = await supabase
-        .from('conversations')
-        .select('participants')
-        .eq('id', conversationId)
-        .single();
-
-      const otherId = conv?.participants.find((id: string) => id !== user.uid);
+      let currentOtherId = otherUserId;
+      if (!currentOtherId) {
+        const { data: conv } = await supabase
+          .from('conversations')
+          .select('participants')
+          .eq('id', conversationId)
+          .single();
+        currentOtherId = conv?.participants.find((id: string) => id !== user.uid);
+      }
 
       let encryptedContent = content.trim();
       let iv: string | undefined;
 
-      if (otherId) {
-        const encrypted = await encryptMessage(content.trim(), user.uid, otherId);
+      if (currentOtherId) {
+        const encrypted = await encryptMessage(content.trim(), user.uid, currentOtherId);
         encryptedContent = encrypted.ciphertext;
         iv = encrypted.iv;
       }
@@ -206,6 +287,8 @@ export function useChat(conversationId?: string) {
       return true;
     } catch (err) {
       console.error('Error sending message:', err);
+      // Remove the optimistic message on failure
+      setMessages(prev => prev.filter(m => m.id !== tempId));
       return false;
     }
   };

@@ -29,22 +29,55 @@ export function useNotifications() {
 
     fetchNotifications();
 
-    // Subscribe to new notifications
-    const channel = supabase.channel(`notifications_${user.uid}`);
+    // Subscribe to new notifications with a unique channel name or explicit cleanup
+    const channelName = `notifications_realtime_${user.uid}_${Date.now()}`;
+    const channel = supabase.channel(channelName);
     
-    channel
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'notifications',
-        filter: `receiver_id=eq.${user.uid}`
-      }, () => {
-        fetchNotifications();
-      })
-      .subscribe();
+    let retryCount = 0;
+    const maxRetries = 2;
+    let pollingTimer: NodeJS.Timeout | null = null;
+
+    const startPolling = () => {
+      if (pollingTimer) return;
+      console.log('🔄 Realtime unreliable. Starting background polling for notifications...');
+      pollingTimer = setInterval(fetchNotifications, 5000);
+    };
+
+    const subscribe = () => {
+      channel
+        .on('postgres_changes', { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'notifications',
+          // BROAD LISTENING: Filter in JS to bypass Postgres syntax errors
+          // filter: `receiver_id=eq.${user.uid}`
+        }, (payload: any) => {
+          const notif = payload.new;
+          if (notif.receiver_id === user.uid) {
+            fetchNotifications();
+          }
+        })
+        .subscribe((status: string) => {
+          if (status === 'CHANNEL_ERROR') {
+            console.warn('Notifications Realtime Error. Retry:', retryCount);
+            if (retryCount < maxRetries) {
+              retryCount++;
+              setTimeout(subscribe, 2000 * retryCount);
+            } else {
+              startPolling();
+            }
+          } else if (status === 'SUBSCRIBED') {
+            console.log('✅ Realtime notifications connected');
+            retryCount = 0;
+          }
+        });
+    };
+
+    subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      if (pollingTimer) clearInterval(pollingTimer);
     };
   }, [user?.uid]);
 
