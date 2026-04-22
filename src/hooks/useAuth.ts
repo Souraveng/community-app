@@ -8,6 +8,7 @@ import {
   User 
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -57,5 +58,38 @@ export function useAuth() {
     }
   };
 
-  return { user, loading, loginWithGoogle, logout, signUpWithEmail, signInWithEmail };
+  const deleteAccount = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    try {
+      // 1. Delete from Supabase (Profile, Posts, etc. assuming cascade or manual check)
+      // We start with the profile. If this fails due to RLS, the user remains.
+      const { error: supabaseError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', currentUser.uid);
+
+      if (supabaseError) {
+        console.error('Supabase deletion error:', supabaseError);
+        // Continue anyway or throw? Let's proceed to ensure auth is cleared if possible.
+      }
+
+      // 2. Delete from Firebase Auth
+      await currentUser.delete();
+      
+      // 3. Clear local state and redirect
+      setUser(null);
+      window.location.href = '/';
+      return true;
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      if (error.code === 'auth/requires-recent-login') {
+        alert('Security Re-authentication required. Please sign out and sign in again to delete your account.');
+      }
+      throw error;
+    }
+  };
+
+  return { user, loading, loginWithGoogle, logout, signUpWithEmail, signInWithEmail, deleteAccount };
 }

@@ -18,6 +18,7 @@ import { usePosts } from '../../../hooks/usePosts';
 import PostCard from '../../../components/common/PostCard';
 import { useMarketplace } from '../../../hooks/useMarketplace';
 import MarketListingCard from '../../../components/marketplace/MarketListingCard';
+import ImageModal from '../../../components/common/ImageModal';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function UserProfilePage() {
@@ -46,12 +47,16 @@ export default function UserProfilePage() {
   
   const [isEditing, setIsEditing] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [bannerPreviewUrl, setBannerPreviewUrl] = useState<string | null>(null);
+  const [fullImage, setFullImage] = useState<{ url: string; title: string } | null>(null);
   const [editData, setEditData] = useState({
     full_name: '',
     bio: '',
     username: '',
-    last_username_change: null as string | null
+    last_username_change: null as string | null,
+    banner_url: null as string | null
   });
   const [activeTab, setActiveTab] = useState<'Collection' | 'Saved' | 'Communities' | 'Drafts' | 'Marketplace'>('Collection');
   const [showConnections, setShowConnections] = useState<'followers' | 'following' | null>(null);
@@ -84,7 +89,8 @@ export default function UserProfilePage() {
         full_name: profile.full_name || '',
         bio: profile.bio || '',
         username: profile.username || '',
-        last_username_change: profile.last_username_change || null
+        last_username_change: profile.last_username_change || null,
+        banner_url: profile.banner_url || null
       });
       setIsEditing(true);
       setUsernameAvailable(null);
@@ -96,6 +102,14 @@ export default function UserProfilePage() {
     if (file) {
       setAvatarFile(file);
       setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBannerFile(file);
+      setBannerPreviewUrl(URL.createObjectURL(file));
     }
   };
 
@@ -123,10 +137,16 @@ export default function UserProfilePage() {
       }
 
       let avatarUrl = profile?.avatar_url;
+      let bannerUrl = profile?.banner_url;
 
       if (avatarFile && currentUser) {
         const path = `avatars/${currentUser.uid}/${Date.now()}_${avatarFile.name}`;
         avatarUrl = await uploadFile('avatars', path, avatarFile);
+      }
+
+      if (bannerFile && currentUser) {
+        const path = `banners/${currentUser.uid}/${Date.now()}_${bannerFile.name}`;
+        bannerUrl = await uploadFile('banners', path, bannerFile);
       }
 
       // Update payload
@@ -134,6 +154,7 @@ export default function UserProfilePage() {
         full_name: editData.full_name,
         bio: editData.bio,
         avatar_url: avatarUrl,
+        banner_url: bannerUrl,
         username: editData.username,
       };
 
@@ -148,7 +169,9 @@ export default function UserProfilePage() {
 
       setIsEditing(false);
       setAvatarFile(null);
+      setBannerFile(null);
       setPreviewUrl(null);
+      setBannerPreviewUrl(null);
       
       if (editData.username !== username) {
         router.push(`/profile/${editData.username}`);
@@ -291,13 +314,45 @@ export default function UserProfilePage() {
         <main className="flex-1 ml-0 lg:ml-64 p-4 md:p-12 max-w-6xl mx-auto w-full">
           {/* Header Profile Section */}
           <div className="relative mb-16">
-            <div className="h-41 md:h-64 w-full rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-tr from-surface-container-highest via-primary/5 to-secondary/5 border border-outline-variant/10 ambient-shadow overflow-hidden">
-               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5" />
+            <div className={`h-41 md:h-64 w-full rounded-[2.5rem] md:rounded-[3.5rem] relative overflow-hidden border border-outline-variant/10 ambient-shadow group/banner ${!profile.banner_url && !bannerPreviewUrl ? 'bg-gradient-to-tr from-surface-container-highest via-primary/5 to-secondary/5' : ''}`}>
+               {(bannerPreviewUrl || profile.banner_url) && (
+                 <Image 
+                   src={bannerPreviewUrl || profile.banner_url || ''} 
+                   alt="Profile Banner" 
+                   fill 
+                   className="object-cover cursor-zoom-in"
+                   onClick={() => setFullImage({ url: bannerPreviewUrl || profile.banner_url || '', title: 'Profile Banner' })}
+                 />
+               )}
+               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none" />
+               
+               {isOwnProfile && isEditing && (
+                 <>
+                   <label htmlFor="banner-upload" className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/banner:opacity-100 transition-opacity cursor-pointer z-10">
+                      <div className="flex flex-col items-center gap-2">
+                         <span className="material-symbols-outlined text-white text-3xl">add_a_photo</span>
+                         <span className="text-white text-[10px] font-black uppercase tracking-widest">Update Banner</span>
+                      </div>
+                   </label>
+                   <label htmlFor="banner-upload" className="absolute top-6 right-6 z-20 cursor-pointer">
+                      <div className="w-12 h-12 rounded-2xl bg-surface-container-highest/80 backdrop-blur-md flex items-center justify-center text-on-surface shadow-xl border border-outline-variant/20 hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined">edit</span>
+                      </div>
+                      <input 
+                        id="banner-upload"
+                        type="file" 
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleBannerChange}
+                      />
+                   </label>
+                 </>
+               )}
             </div>
             
             <div className="absolute -bottom-12 left-8 md:left-12 flex items-end gap-5 md:gap-8">
               <div className="w-24 h-24 md:w-36 md:h-36 rounded-3xl md:rounded-[2rem] bg-surface-container-lowest p-2 ambient-shadow border border-outline-variant/10 group relative">
-                <div className="w-full h-full rounded-2xl md:rounded-[1.5rem] overflow-hidden relative">
+                <div className="w-full h-full rounded-2xl md:rounded-[1.5rem] overflow-hidden relative cursor-zoom-in" onClick={() => !isEditing && (previewUrl || profile.avatar_url) && setFullImage({ url: previewUrl || profile.avatar_url || '', title: profile.full_name || profile.username })}>
                   {previewUrl || profile.avatar_url ? (
                     <Image 
                       src={previewUrl || profile.avatar_url || ''} 
@@ -462,150 +517,163 @@ export default function UserProfilePage() {
 
             {/* Right Column: Feed/Content */}
             <div className="lg:col-span-8">
-                <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                  {(['Collection', 'Marketplace', 'Communities', isOwnProfile && 'Saved', isOwnProfile && 'Drafts'].filter(Boolean) as string[]).map((tab) => (
-                    <button 
-                      key={tab} 
-                      onClick={() => setActiveTab(tab as any)}
-                      className={`pb-4 text-[10px] md:text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === tab ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
-                    >
-                      {tab}
-                      {activeTab === tab && (
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full animate-in fade-in slide-in-from-bottom-1" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-               {activeTab === 'Collection' && (
-                 <div className="flex flex-col gap-8">
-                   {postsLoading ? (
-                     <div className="py-12 flex flex-col items-center gap-4 text-on-surface-variant">
-                        <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
-                        <p className="font-headlines font-bold uppercase tracking-widest">Gathering Exhibits...</p>
-                     </div>
-                   ) : posts.length > 0 ? (
-                     posts.map((post) => (
-                        <PostCard 
-                          key={post.id}
-                          id={post.id}
-                          user={post.username}
-                          userId={post.user_id}
-                          avatar={post.user_avatar}
-                          timestamp={post.created_at}
-                         community={post.community_name}
-                         title={post.title}
-                         content={post.content}
-                         image={post.image_url}
-                         videoUrl={post.video_url}
-                         comments={post.comment_count || 0}
-                         votes={post.upvotes || 0}
-                         showDelete={isOwnProfile}
-                         onDelete={deletePost}
-                       />
-                     ))
-                   ) : (
-                     <div className="py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
-                        <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">collections</span>
-                        <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Exhibits Yet</p>
-                        <p className="text-sm text-on-surface-variant/60 mt-2">Start sharing your creative vision with the world.</p>
-                        {isOwnProfile && (
-                          <Button variant="primary" className="mt-6" onClick={() => router.push('/create-post')}>Create First Exhibit</Button>
-                        )}
-                     </div>
-                   )}
-                 </div>
-               )}
-
-               {activeTab === 'Communities' && (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {communitiesLoading ? (
-                     <div className="col-span-2 py-12 flex flex-col items-center gap-4 text-on-surface-variant">
-                       <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
-                       <p className="font-headlines font-bold uppercase tracking-widest">Scanning Networks...</p>
-                     </div>
-                   ) : communities.length > 0 ? (
-                     communities.map((comm) => (
-                       <div 
-                         key={comm.name} 
-                         className="flex flex-col gap-4 p-6 rounded-[2.5rem] bg-surface-container-low/30 border border-outline-variant/10 hover:ambient-shadow transition-all group cursor-pointer"
-                         onClick={() => router.push(`/community/${comm.name}`)}
-                       >
-                         <div className="flex items-center gap-4">
-                           <div className="w-16 h-16 rounded-[1.2rem] overflow-hidden relative border border-outline-variant/10">
-                             {comm.avatar_url ? (
-                               <Image src={comm.avatar_url} alt={comm.name} fill className="object-cover" />
-                             ) : (
-                               <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary">
-                                 <span className="material-symbols-outlined text-3xl">groups</span>
-                               </div>
-                             )}
-                           </div>
-                           <div className="flex-1">
-                             <h4 className="font-headlines font-black text-lg tracking-tight group-hover:text-primary transition-colors">{comm.name}</h4>
-                             <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{comm.member_count} Members</p>
-                           </div>
-                         </div>
-                         <p className="text-sm text-on-surface-variant line-clamp-2 leading-relaxed opacity-70">
-                           {comm.description || 'Welcome to this gallery of creativity and curation.'}
-                         </p>
-                       </div>
-                     ))
-                   ) : (
-                     <div className="col-span-2 py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
-                       <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">explore</span>
-                       <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Communities Found</p>
-                       <p className="text-sm text-on-surface-variant/60 mt-2">Start your journey by joining or building a gallery.</p>
-                       <Button variant="ghost" className="mt-6" onClick={() => router.push('/home')}>Explore All</Button>
-                     </div>
-                   )}
-                 </div>
-               )}
-
-               {activeTab === 'Saved' && (
-                 <div className="flex flex-col gap-8">
-                   {savedLoading ? (
-                     <div className="py-12 flex flex-col items-center gap-4 text-on-surface-variant">
-                        <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
-                        <p className="font-headlines font-bold uppercase tracking-widest">Recalling Saved Works...</p>
-                     </div>
-                   ) : savedPosts.length > 0 ? (
-                     savedPosts.map((post) => (
-                        <PostCard 
-                          key={post.id}
-                          id={post.id}
-                          user={post.username}
-                          userId={post.user_id}
-                          avatar={post.user_avatar}
-                          timestamp={post.created_at}
-                         community={post.community_name}
-                         title={post.title}
-                         content={post.content}
-                         image={post.image_url}
-                         videoUrl={post.video_url}
-                         comments={post.comment_count || 0}
-                         votes={post.upvotes || 0}
-                         showDelete={false}
-                       />
-                     ))
-                   ) : (
-                     <div className="py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
-                        <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">bookmark</span>
-                        <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Saved Exhibits</p>
-                        <p className="text-sm text-on-surface-variant/60 mt-2">Start your collection by saving the intelligence you love.</p>
-                     </div>
-                   )}
-                 </div>
-               )}
-
-                {activeTab === 'Drafts' && (
-                  <div className="py-24 text-center">
-                    <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest opacity-40">Coming Soon to your Space</p>
+                {profile.is_private && !isOwnProfile && !isFollowing ? (
+                  <div className="py-32 text-center bg-surface-container-low/20 rounded-[3rem] border border-outline-variant/20 flex flex-col items-center">
+                    <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mb-6">
+                      <span className="material-symbols-outlined text-4xl">lock</span>
+                    </div>
+                    <h3 className="text-2xl font-black font-headlines tracking-tighter mb-2">Curated Gallery is Private</h3>
+                    <p className="text-on-surface-variant font-body mb-8 max-w-md mx-auto">Follow u/{profile.username} to access their collection and creative vision.</p>
+                    <Button variant="primary" onClick={follow} disabled={followLoading}>Request Access</Button>
                   </div>
-                )}
+                ) : (
+                  <>
+                    <div className="flex items-center gap-6 md:gap-10 border-b border-outline-variant/10 mb-8 md:mb-10 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                      {(['Collection', 'Marketplace', 'Communities', isOwnProfile && 'Saved', isOwnProfile && 'Drafts'].filter(Boolean) as string[]).map((tab) => (
+                        <button 
+                          key={tab} 
+                          onClick={() => setActiveTab(tab as any)}
+                          className={`pb-4 text-[10px] md:text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === tab ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
+                        >
+                          {tab}
+                          {activeTab === tab && (
+                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full animate-in fade-in slide-in-from-bottom-1" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
 
-                {activeTab === 'Marketplace' && (
-                  <MarketplaceTab userId={profile?.id} isOwnProfile={isOwnProfile} />
+                   {activeTab === 'Collection' && (
+                     <div className="flex flex-col gap-8">
+                       {postsLoading ? (
+                         <div className="py-12 flex flex-col items-center gap-4 text-on-surface-variant">
+                            <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
+                            <p className="font-headlines font-bold uppercase tracking-widest">Gathering Exhibits...</p>
+                         </div>
+                       ) : posts.length > 0 ? (
+                         posts.map((post) => (
+                            <PostCard 
+                              key={post.id}
+                              id={post.id}
+                              user={post.username}
+                              userId={post.user_id}
+                              avatar={post.user_avatar}
+                              timestamp={post.created_at}
+                             community={post.community_name}
+                             title={post.title}
+                             content={post.content}
+                             image={post.image_url}
+                             videoUrl={post.video_url}
+                             comments={post.comment_count || 0}
+                             votes={post.upvotes || 0}
+                             showDelete={isOwnProfile}
+                             onDelete={deletePost}
+                           />
+                         ))
+                       ) : (
+                         <div className="py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
+                            <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">collections</span>
+                            <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Exhibits Yet</p>
+                            <p className="text-sm text-on-surface-variant/60 mt-2">Start sharing your creative vision with the world.</p>
+                            {isOwnProfile && (
+                              <Button variant="primary" className="mt-6" onClick={() => router.push('/create-post')}>Create First Exhibit</Button>
+                            )}
+                         </div>
+                       )}
+                     </div>
+                   )}
+
+                   {activeTab === 'Communities' && (
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       {communitiesLoading ? (
+                         <div className="col-span-2 py-12 flex flex-col items-center gap-4 text-on-surface-variant">
+                           <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
+                           <p className="font-headlines font-bold uppercase tracking-widest">Scanning Networks...</p>
+                         </div>
+                       ) : communities.length > 0 ? (
+                         communities.map((comm) => (
+                           <div 
+                             key={comm.name} 
+                             className="flex flex-col gap-4 p-6 rounded-[2.5rem] bg-surface-container-low/30 border border-outline-variant/10 hover:ambient-shadow transition-all group cursor-pointer"
+                             onClick={() => router.push(`/community/${comm.name}`)}
+                           >
+                             <div className="flex items-center gap-4">
+                               <div className="w-16 h-16 rounded-[1.2rem] overflow-hidden relative border border-outline-variant/10">
+                                 {comm.avatar_url ? (
+                                   <Image src={comm.avatar_url} alt={comm.name} fill className="object-cover" />
+                                 ) : (
+                                   <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary">
+                                     <span className="material-symbols-outlined text-3xl">groups</span>
+                                   </div>
+                                 )}
+                               </div>
+                               <div className="flex-1">
+                                 <h4 className="font-headlines font-black text-lg tracking-tight group-hover:text-primary transition-colors">{comm.name}</h4>
+                                 <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{comm.member_count} Members</p>
+                               </div>
+                             </div>
+                             <p className="text-sm text-on-surface-variant line-clamp-2 leading-relaxed opacity-70">
+                               {comm.description || 'Welcome to this gallery of creativity and curation.'}
+                             </p>
+                           </div>
+                         ))
+                       ) : (
+                         <div className="col-span-2 py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
+                           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">explore</span>
+                           <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Communities Found</p>
+                           <p className="text-sm text-on-surface-variant/60 mt-2">Start your journey by joining or building a gallery.</p>
+                           <Button variant="ghost" className="mt-6" onClick={() => router.push('/home')}>Explore All</Button>
+                         </div>
+                       )}
+                     </div>
+                   )}
+
+                   {activeTab === 'Saved' && (
+                     <div className="flex flex-col gap-8">
+                       {savedLoading ? (
+                         <div className="py-12 flex flex-col items-center gap-4 text-on-surface-variant">
+                            <span className="material-symbols-outlined animate-spin text-4xl">sync</span>
+                            <p className="font-headlines font-bold uppercase tracking-widest">Recalling Saved Works...</p>
+                         </div>
+                       ) : savedPosts.length > 0 ? (
+                         savedPosts.map((post) => (
+                            <PostCard 
+                              key={post.id}
+                              id={post.id}
+                              user={post.username}
+                              userId={post.user_id}
+                              avatar={post.user_avatar}
+                              timestamp={post.created_at}
+                             community={post.community_name}
+                             title={post.title}
+                             content={post.content}
+                             image={post.image_url}
+                             videoUrl={post.video_url}
+                             comments={post.comment_count || 0}
+                             votes={post.upvotes || 0}
+                             showDelete={false}
+                           />
+                         ))
+                       ) : (
+                         <div className="py-20 text-center bg-surface-container-low/20 rounded-[3rem] border border-dashed border-outline-variant/20">
+                            <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 opacity-30">bookmark</span>
+                            <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest">No Saved Exhibits</p>
+                            <p className="text-sm text-on-surface-variant/60 mt-2">Start your collection by saving the intelligence you love.</p>
+                         </div>
+                       )}
+                     </div>
+                   )}
+
+                    {activeTab === 'Drafts' && (
+                      <div className="py-24 text-center">
+                        <p className="text-on-surface-variant font-headlines font-bold uppercase tracking-widest opacity-40">Coming Soon to your Space</p>
+                      </div>
+                    )}
+
+                    {activeTab === 'Marketplace' && (
+                      <MarketplaceTab userId={profile?.id} isOwnProfile={isOwnProfile} />
+                    )}
+                  </>
                 )}
             </div>
 
@@ -667,6 +735,13 @@ export default function UserProfilePage() {
           )}
         </main>
       </div>
+      {fullImage && (
+        <ImageModal 
+          imageUrl={fullImage.url} 
+          title={fullImage.title} 
+          onClose={() => setFullImage(null)} 
+        />
+      )}
     </div>
   );
 }

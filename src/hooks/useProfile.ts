@@ -8,9 +8,11 @@ export interface Profile {
   username: string;
   full_name: string | null;
   avatar_url: string | null;
+  banner_url: string | null;
   bio: string | null;
   age: number | null;
   autoplay_enabled: boolean;
+  is_private: boolean;
   last_username_change: string | null;
 }
 
@@ -72,9 +74,11 @@ export function useProfile(targetUsername?: string) {
             username: user.email?.split('@')[0] || `user_${Math.floor(Math.random() * 1000)}`,
             full_name: user.displayName,
             avatar_url: user.photoURL,
+            banner_url: null,
             bio: '',
             age: null,
             autoplay_enabled: true,
+            is_private: false,
           };
 
           const { data: insertedData, error: insertError } = await supabase
